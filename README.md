@@ -58,10 +58,13 @@ Unifi WiFi Site
 
 UBNT AirMax
 
+# Macros
 
 # Limitations
 
-There is a 64k limit to ssh.run items in zabbix, which we run into running mca-dump on large switches for ex.  The commands in the template have some potentially brittle sed scripting to work around that limitation.  This might manifest itself in items becoming supported items with a 'unable to read JSON path - unexpected end of string'
+1/ Some devices periodically refuse to answer.  This typically resolves in a few minutes but I haven't been able to get to the root cause.
+
+2/ There is a 64k limit to ssh.run items in zabbix, which we run into running mca-dump on large switches for ex.  The commands in the template have some potentially brittle sed scripting to work around that limitation.  This might manifest itself in items becoming supported items with a 'unable to read JSON path - unexpected end of string'
 
 To raise that limit in Zabbix you have to recompile and I didn't want to have that dependency.  If anyone can think of another more stable and convenient workaround, please let me know!  Gzip comes to mind and is present on BusyBox which is the OS that those Unifi devices run, but I haven't found a way to decompress it on the zabbix side and still use the JSON path preprocessing option
 
