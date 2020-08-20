@@ -12,19 +12,19 @@ To get started import unifyTemplates.xml into Zabbix.
 
 You should now have the following templates available, and it should be pretty self explanatory what type of device you need to link them to in Zabbix.
 
-## Unifi AP
+### Unifi AP
 
-## Unifi Switch
+### Unifi Switch
 
-## Unifi Router
+### Unifi Router
 
-## Unifi USG
+### Unifi USG
 
-## Unifi UDMP
+### Unifi UDMP
 
-## UBNT AirMax
+### UBNT AirMax
 
-## Unifi WiFi Site
+### Unifi WiFi Site
 
 This one is a bit special and meant to aggregate WiFi traffic across your wifi networks.  Just assign it to one of the APs that can see all the networks in question and assign the {$UNIFI_AP_GROUP} macro for that host to the name of a group that contains all the APs for that site.
 
@@ -45,7 +45,7 @@ You will need to specifically enable SSH access to the unifi devices.  There is 
 
 Permissions can get in the way so check that your zabbix server can actually get the SSH access with:
 
-sudo -u zabbix ssh -i my-key-pair yourUserName@oneOfYouUnifiDevicesIP
+> sudo -u zabbix ssh -i my-key-pair yourUserName@oneOfYouUnifiDevicesIP
   
 If you are set up correctly that should log you in without asking for a password
 
@@ -53,7 +53,7 @@ If you are set up correctly that should log you in without asking for a password
 
 In your Zabbix conf file (/etc/zabbix/zabbix_server.conf typically) add:
 
-SSHKeyLocation=/the/path/to/your/keys
+> SSHKeyLocation=/the/path/to/your/keys
 
 and in zabbix Macros (in Zabbix's Web UI Administration > General > Macros) set:
 
