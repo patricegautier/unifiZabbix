@@ -37,7 +37,7 @@ These templates use public key SSH to access APs, Switches, Routers, AirMax stat
 
 1/ You should generate a new key pair for this.  Zabbix is finicky and this is the specific way I needed to run the generation get a workable keypair (no passphrase, pem format):
 
-ssh-keygen -P "" -t rsa  -m pem -f zb_id_rsa
+> ssh-keygen -P "" -t rsa  -m pem -f zb_id_rsa
 
 put that keypair somewhere on your zabbix server.
 
