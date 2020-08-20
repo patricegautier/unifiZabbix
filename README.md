@@ -11,13 +11,13 @@ These templates use public key SSH to access APs, Switches, Routers, AirMax stat
 
 ssh-keygen -P "" -t rsa  -m pem -f zb_id_rsa
 
-put that keypair where your zabbix server can get to it.
+put that keypair somewhere on your zabbix server.
 
 You will need to specifically enable SSH access to the unifi devices.  There is one setting in the controller UI for devices at large in Settings > Site and one for the UDMP in the UDMP advanced settings which is separate.  The controller has handy UI to install your public key on all the devices, you will need to do it by hand on UDMPs and AirMax devices.  ssh-copy-id helps there, esp. on the UDMP since those will embarrasingly wipe all your keys at every firmware update.
 
 Permissions can get in the way so check that your zabbix server can actually get the SSH access with:
 
-sudo -u zabbix ssh -i my-key-pair <yourUserName>@<oneOfYouUnifiDevicesIP>
+sudo -u zabbix ssh -i my-key-pair yourUserName@oneOfYouUnifiDevicesIP
   
 If you are set up correctly that should log you in without asking for a password
 
