@@ -79,6 +79,12 @@ In Administration > General > Macros, you need to set a vlues for the following 
 
 Those two are used to create moving averages that make graphs far easier to read
 
+# Graphs
+
+If everything is working you should be able to see data flowing in the Monitoring > Latest Data section of Zabbix.  Time to set up some graphs..  Unfortunately Zabbix doesn't to have a good way to share graphs as it does for templates, so here is a quick rundown of what I have setup..:
+
+
+
 # Limitations
 
 1/ Some devices periodically refuse to answer.  This typically resolves in a few minutes but I haven't been able to get to the root cause.
