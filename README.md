@@ -4,6 +4,33 @@ This projet contains a collection of Templates to monitor Unifi and other UBNT d
 
 I am currently running those on the current version of the base software as of August 2020: Zabbix 5.0.2, Unifi 4.3.20 and AirMax 8.7.1, UDMP 1.8.0, controller 6.0.13
 
+
+
+# Templates
+
+To get started import unifyTemplates.xml into Zabbix.  
+
+You should now have the following templates available, and it should be pretty self explanatory what type of device you need to link them to in Zabbix.
+
+## Unifi AP
+
+## Unifi Switch
+
+## Unifi Router
+
+## Unifi USG
+
+## Unifi UDMP
+
+## UBNT AirMax
+
+## Unifi WiFi Site
+
+This one is a bit special and meant to aggregate WiFi traffic across your wifi networks.  Just assign it to one of the APs that can see all the networks in question and assign the {$UNIFI_AP_GROUP} macro for that host to the name of a group that contains all the APs for that site.
+
+
+The templates surrounded by dashes (- Unifi base -, - Unifi host - and - Unifi router -) are just there to factor things out and not meant to be assigned directly to hosts in Zabbix
+
 # SSH
 
 These templates use public key SSH to access APs, Switches, Routers, AirMax stations and retrieve data directly, using the mca-dump or mca-status utility. You need to setup SSH access on your Zabbix server:
@@ -34,31 +61,6 @@ and in zabbix Macros (in Zabbix's Web UI Administration > General > Macros) set:
 {$UNIFI_PUB_KEY} to zb_id_rsa.pub
 {$UNIFI_PRIV_KEY} to zb_id_rsa
 
-
-# Templates
-
-To get started import unifyTemplates.xml into Zabbix.  
-
-You should now have the following templates available, and it should be pretty self explanatory what you need to link them to:
-
-## Unifi AP
-
-## Unifi Switch
-
-## Unifi Router
-
-## Unifi USG
-
-## Unifi UDMP
-
-## UBNT AirMax
-
-## Unifi WiFi Site
-
-This one is a bit special and meant to aggregate WiFi traffic across your wifi networks.  Just assign it to one of the APs that can see all the networks in question and assign the {$UNIFI_AP_GROUP} macro for that host to the name of a group that contains all the APs for that site.
-
-
-The templates surrounded by dashes (- Unifi base -, - Unifi host - and - Unifi router -) are just there to factor things out and not meant to be assigned directly to hosts in Zabbix
 
 # Macros
 
