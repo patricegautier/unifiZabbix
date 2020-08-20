@@ -108,6 +108,9 @@ Observe the tight correlation between upload bandwidt and latency.. Cable techno
 ## Channel Interference
 ![Channel Interference](/images/channelInterference.png)
 
+## WiFi Transmission by Network
+![Retries](/images/wifiXmit.png)
+
 ## WiFi Retries
 ![Retries](/images/retries.png)
 
