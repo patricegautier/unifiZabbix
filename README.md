@@ -41,19 +41,19 @@ To get started import unifyTemplates.xml into Zabbix.
 
 You should now have the following templates available, and it should be pretty self explanatory what you need to link them to:
 
-Unifi AP
+##Unifi AP
 
-Unifi Switch
+##Unifi Switch
 
-Unifi Router
+##Unifi Router
 
-Unifi USG
+##Unifi USG
 
-Unifi UDMP
+##Unifi UDMP
 
-UBNT AirMax
+##UBNT AirMax
 
-Unifi WiFi Site
+##Unifi WiFi Site
 This one is a bit special and meant to aggregate WiFi traffic across your wifi networks.  Just assign it to one of the APs that can see all the networks in question and assign the {$UNIFI_AP_GROUP} macro for that host to the name of a group that contains all the APs for that site.
 
 
@@ -63,20 +63,29 @@ The templates surrounded by dashes (- Unifi base -, - Unifi host - and - Unifi r
 
 In Administration > General > Macros, you need to set a vlues for the following macros:
 
-{$UNIFI_USER} The username that will let the zabbix server (or proxy) in to your unifi devices via SSH
+##{$UNIFI_USER}
+The username that will let the zabbix server (or proxy) in to your unifi devices via SSH
 
-{$UNIFI_PUB_KEY} The public key file to be able to SSH into your unifi devices. As an example, that macro is set to 'zb_id_rsa.pub' on my system. The actual public key should be added to the SSH keys in the Unifi controller SSH area.  The public key file should also be on your Zabbix server and proxies and the path to that in the Zabbix conf file, typicially /etc/Zabbix/zabbix_server.conf.  The entry should look like. SSHKeyLocation=/home/pi/.ssh/zabbix.
+##{$UNIFI_PUB_KEY}
+The public key file to be able to SSH into your unifi devices. As an example, that macro is set to 'zb_id_rsa.pub' on my system. The actual public key should be added to the SSH keys in the Unifi controller SSH area.  The public key file should also be on your Zabbix server and proxies and the path to that in the Zabbix conf file, typicially /etc/Zabbix/zabbix_server.conf.  The entry should look like. SSHKeyLocation=/home/pi/.ssh/zabbix.
 
-{$UNIFI_PRIV_KEY} The private key filename to be able to SSH into your Unifi devices.  As an example, that macro is set to 'zb_id_rsa' on my system. The actual private key file needs to be on your Zabbix server and proxies, and the path to that in the Zabbix conf file, typicially /etc/Zabbix/zabbix_server.conf.  As an example. I have this set to:  SSHKeyLocation=/home/pi/.ssh/zabbix
+##{$UNIFI_PRIV_KEY}
+The private key filename to be able to SSH into your Unifi devices.  As an example, that macro is set to 'zb_id_rsa' on my system. The actual private key file needs to be on your Zabbix server and proxies, and the path to that in the Zabbix conf file, typicially /etc/Zabbix/zabbix_server.conf.  As an example. I have this set to:  SSHKeyLocation=/home/pi/.ssh/zabbix
 
-{$UNIFI_CHECK_FREQUENCY} I have this set to '1m'
+##{$UNIFI_CHECK_FREQUENCY}
+I have this set to '1m'
 
-{$UNIFI_ALERT_TEMP} The temperature in Celsius above which to alert.  I have to this to '90'.
+##{$UNIFI_ALERT_TEMP}
+The temperature in Celsius above which to alert.  I have to this to '90'.
 
-{$UNIFI_ALERT_PERIOD} The period after which to alert for most checks. I have this set to '10m'.
+##{$UNIFI_ALERT_PERIOD}
+The period after which to alert for most checks. I have this set to '10m'.
 
-{$UNIFI_SMOOTHING_COUNT} I have this set to '#5'
-{$UNIFI_SMOOTHING_PERIOD}  I have this set to '10m'
+##{$UNIFI_SMOOTHING_COUNT}
+I have this set to '#5'
+
+##{$UNIFI_SMOOTHING_PERIOD}
+I have this set to '10m'
 
 Those two are used to create moving averages that make graphs far easier to read
 
