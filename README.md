@@ -97,6 +97,24 @@ If everything is working you should be able to see data flowing in the Monitorin
 ## Wan Download
 ![Wan Download](/images/wanDownload.png)
 
+## Wan Upload
+![Wan Upload](/images/wanUpload.png)
+
+Observe the tight correlation between upload bandwidt and latency.. Cable technology at its finest!
+
+## Channel Usage
+![Channel Interference](/images/channelUsage.png)
+
+## Channel Interference
+![Channel Interference](/images/channelInterference.png)
+
+## WiFi Retries
+![Retries](/images/retries.png)
+
+## Airmax S/N and Airtime
+![Airmad](/images/airmaxSN.png)
+
+
 
 
 # Limitations
