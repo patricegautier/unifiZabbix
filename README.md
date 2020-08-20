@@ -53,7 +53,8 @@ You should now have the following templates available, and it should be pretty s
 
 ## UBNT AirMax
 
-Unifi WiFi Site
+## Unifi WiFi Site
+
 This one is a bit special and meant to aggregate WiFi traffic across your wifi networks.  Just assign it to one of the APs that can see all the networks in question and assign the {$UNIFI_AP_GROUP} macro for that host to the name of a group that contains all the APs for that site.
 
 
