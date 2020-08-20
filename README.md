@@ -1,5 +1,6 @@
 # unifiZabbix
-Templates to monitor unifi and other UBNT devices in Zabbix
+
+This projet contains a collection of Templates to monitor Unifi and other UBNT devices with Zabbix: APs, Switches, Routers (USG and UDMP), AirMax devices, and NVRs
 
 I am currently running those on the current version of the base software as of August 2020: Zabbix 5.0.2, Unifi 4.3.20 and AirMax 8.7.1, UDMP 1.8.0, controller 6.0.13
 
