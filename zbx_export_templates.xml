@@ -1,0 +1,1184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>5.0</version>
+    <date>2020-08-20T05:42:56Z</date>
+    <groups>
+        <group>
+            <name>Patrice</name>
+        </group>
+        <group>
+            <name>Unifi</name>
+        </group>
+    </groups>
+    <templates>
+        <template>
+            <template>- Unifi Base -</template>
+            <name>- Unifi Base -</name>
+            <description>Abstract base template for all unifi devices supporting mca-dump.</description>
+            <groups>
+                <group>
+                    <name>Patrice</name>
+                </group>
+            </groups>
+            <applications>
+                <application>
+                    <name>Host</name>
+                </application>
+            </applications>
+            <items>
+                <item>
+                    <name>mca-dump</name>
+                    <type>SSH</type>
+                    <key>ssh.run[mca-dump]</key>
+                    <delay>{$UNIFI_CHECK_FREQUENCY}</delay>
+                    <history>0</history>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <params>mca-dump | sed 's/^[ \t]*//'</params>
+                    <authtype>PUBLIC_KEY</authtype>
+                    <username>{$UNIFI_USER}</username>
+                    <publickey>{$UNIFI_PUB_KEY}</publickey>
+                    <privatekey>{$UNIFI_PRIV_KEY}</privatekey>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                </item>
+            </items>
+        </template>
+        <template>
+            <template>- Unifi Host -</template>
+            <name>- Unifi Host -</name>
+            <description>Abstract base template to support all Unifi devices and basic host level info.</description>
+            <templates>
+                <template>
+                    <name>- Unifi Base -</name>
+                </template>
+            </templates>
+            <groups>
+                <group>
+                    <name>Patrice</name>
+                </group>
+                <group>
+                    <name>Unifi</name>
+                </group>
+            </groups>
+            <items>
+                <item>
+                    <name>CPU Smooth</name>
+                    <type>CALCULATED</type>
+                    <key>cpu_smooth</key>
+                    <value_type>FLOAT</value_type>
+                    <units>%</units>
+                    <params>avg(cpu,{$UNIFI_SMOOTHING_COUNT})</params>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Load Average Smooth</name>
+                    <type>CALCULATED</type>
+                    <key>loadavg_smooth</key>
+                    <value_type>FLOAT</value_type>
+                    <params>avg(loadavg_1,{$UNIFI_SMOOTHING_COUNT})</params>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Memory Utilization</name>
+                    <type>CALCULATED</type>
+                    <key>memory</key>
+                    <value_type>FLOAT</value_type>
+                    <units>%</units>
+                    <params>100* last(&quot;mem_used&quot;) / last(&quot;mem_total&quot;)</params>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                </item>
+            </items>
+        </template>
+        <template>
+            <template>- Unifi Router -</template>
+            <name>- Unifi Router -</name>
+            <description>Abstract template to support USGs and UDMPs</description>
+            <templates>
+                <template>
+                    <name>- Unifi Host -</name>
+                </template>
+            </templates>
+            <groups>
+                <group>
+                    <name>Patrice</name>
+                </group>
+                <group>
+                    <name>Unifi</name>
+                </group>
+            </groups>
+            <applications>
+                <application>
+                    <name>wan</name>
+                </application>
+            </applications>
+            <items>
+                <item>
+                    <name>Download Bandwidth Smooth</name>
+                    <type>CALCULATED</type>
+                    <key>download_bandwidth_smooth</key>
+                    <value_type>FLOAT</value_type>
+                    <units>bps</units>
+                    <params>avg(download_bandwidth,{$UNIFI_SMOOTHING_PERIOD})</params>
+                    <applications>
+                        <application>
+                            <name>wan</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Upload Bandwidth Smooth</name>
+                    <type>CALCULATED</type>
+                    <key>upload_bandwidth_smooth</key>
+                    <value_type>FLOAT</value_type>
+                    <units>bps</units>
+                    <params>avg(upload_bandwidth,{$UNIFI_SMOOTHING_PERIOD})</params>
+                    <applications>
+                        <application>
+                            <name>wan</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Wan Latency Smooth</name>
+                    <type>CALCULATED</type>
+                    <key>wan_latency_smooth</key>
+                    <value_type>FLOAT</value_type>
+                    <units>ms</units>
+                    <params>avg( wan_latency, {$UNIFI_SMOOTHING_PERIOD})</params>
+                    <applications>
+                        <application>
+                            <name>wan</name>
+                        </application>
+                    </applications>
+                </item>
+            </items>
+        </template>
+        <template>
+            <template>UBNT Airmax</template>
+            <name>UBNT Airmax</name>
+            <groups>
+                <group>
+                    <name>Patrice</name>
+                </group>
+            </groups>
+            <applications>
+                <application>
+                    <name>Host</name>
+                </application>
+                <application>
+                    <name>Radio</name>
+                </application>
+            </applications>
+            <items>
+                <item>
+                    <name>airTime</name>
+                    <type>DEPENDENT</type>
+                    <key>airTime</key>
+                    <delay>0</delay>
+                    <value_type>FLOAT</value_type>
+                    <units>%</units>
+                    <applications>
+                        <application>
+                            <name>Radio</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>REGEX</type>
+                            <params>airTime=(.*)
+\1</params>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>ssh.run[mca-status]</key>
+                    </master_item>
+                    <triggers>
+                        <trigger>
+                            <expression>{nodata({$UNIFI_ALERT_PERIOD})}=1</expression>
+                            <name>{HOST.NAME} Device did not report statistics</name>
+                            <priority>WARNING</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>AirTime Smooth</name>
+                    <type>CALCULATED</type>
+                    <key>airTimeSmooth</key>
+                    <value_type>FLOAT</value_type>
+                    <units>%</units>
+                    <params>avg(airTime,{$UNIFI_SMOOTHING_PERIOD})</params>
+                    <applications>
+                        <application>
+                            <name>Radio</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>CPU</name>
+                    <type>DEPENDENT</type>
+                    <key>cpuUsage</key>
+                    <delay>0</delay>
+                    <status>DISABLED</status>
+                    <value_type>FLOAT</value_type>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>REGEX</type>
+                            <params>cpuUsage=(.*)
+\1</params>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>ssh.run[mca-status]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>loadavg</name>
+                    <type>DEPENDENT</type>
+                    <key>loadavg</key>
+                    <delay>0</delay>
+                    <status>DISABLED</status>
+                    <value_type>FLOAT</value_type>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>REGEX</type>
+                            <params>loadavg=(.*)
+\1</params>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>ssh.run[mca-status]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>noise</name>
+                    <type>DEPENDENT</type>
+                    <key>noise</key>
+                    <delay>0</delay>
+                    <value_type>FLOAT</value_type>
+                    <units>db</units>
+                    <applications>
+                        <application>
+                            <name>Radio</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>REGEX</type>
+                            <params>noise=(.*)
+\1</params>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>ssh.run[mca-status]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Noise Smooth</name>
+                    <type>CALCULATED</type>
+                    <key>noiseSmooth</key>
+                    <value_type>FLOAT</value_type>
+                    <units>dB</units>
+                    <params>avg(noise,{$UNIFI_SMOOTHING_PERIOD})</params>
+                    <applications>
+                        <application>
+                            <name>Radio</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>signal</name>
+                    <type>DEPENDENT</type>
+                    <key>signal</key>
+                    <delay>0</delay>
+                    <value_type>FLOAT</value_type>
+                    <units>db</units>
+                    <applications>
+                        <application>
+                            <name>Radio</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>REGEX</type>
+                            <params>signal=(.*)
+\1</params>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>ssh.run[mca-status]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Signal Smooth</name>
+                    <type>CALCULATED</type>
+                    <key>signalSmooth</key>
+                    <value_type>FLOAT</value_type>
+                    <units>dB</units>
+                    <params>avg(signal,{$UNIFI_SMOOTHING_PERIOD})</params>
+                    <applications>
+                        <application>
+                            <name>Radio</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>mca-status</name>
+                    <type>SSH</type>
+                    <key>ssh.run[mca-status]</key>
+                    <delay>{$UNIFI_CHECK_FREQUENCY}</delay>
+                    <history>0</history>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <params>/bin/mca-status</params>
+                    <authtype>PUBLIC_KEY</authtype>
+                    <username>{$UNIFI_USER}</username>
+                    <publickey>{$UNIFI_PUB_KEY}</publickey>
+                    <privatekey>{$UNIFI_PRIV_KEY}</privatekey>
+                </item>
+                <item>
+                    <name>wlanDownlinkCapacity</name>
+                    <type>DEPENDENT</type>
+                    <key>wlanDownlinkCapacity</key>
+                    <delay>0</delay>
+                    <units>bps</units>
+                    <applications>
+                        <application>
+                            <name>Radio</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>REGEX</type>
+                            <params>wlanDownlinkCapacity=(.*)
+\1</params>
+                        </step>
+                        <step>
+                            <type>MULTIPLIER</type>
+                            <params>1000</params>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>ssh.run[mca-status]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>WAN Downlink Capacity Smooth</name>
+                    <type>CALCULATED</type>
+                    <key>wlanDownlinkCapacitySmooth</key>
+                    <value_type>FLOAT</value_type>
+                    <units>bps</units>
+                    <params>avg(wlanDownlinkCapacity,{$UNIFI_SMOOTHING_PERIOD})</params>
+                    <applications>
+                        <application>
+                            <name>Radio</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>wlanRxBandwidth</name>
+                    <type>DEPENDENT</type>
+                    <key>wlanRxBandwidth</key>
+                    <delay>0</delay>
+                    <units>bps</units>
+                    <applications>
+                        <application>
+                            <name>Radio</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>REGEX</type>
+                            <params>wlanRxBytes=(.*)
+\1</params>
+                        </step>
+                        <step>
+                            <type>CHANGE_PER_SECOND</type>
+                            <params/>
+                        </step>
+                        <step>
+                            <type>MULTIPLIER</type>
+                            <params>8</params>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>ssh.run[mca-status]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>WAN Reception Bandwidth Smooth</name>
+                    <type>CALCULATED</type>
+                    <key>wlanRxBandwidthSmooth</key>
+                    <value_type>FLOAT</value_type>
+                    <units>bps</units>
+                    <params>avg(wlanRxBandwidth,{$UNIFI_SMOOTHING_PERIOD})</params>
+                    <applications>
+                        <application>
+                            <name>Radio</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>wlanRxErrors</name>
+                    <type>DEPENDENT</type>
+                    <key>wlanRxErrors</key>
+                    <delay>0</delay>
+                    <applications>
+                        <application>
+                            <name>Radio</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>REGEX</type>
+                            <params>wlanRxErrors=(.*)
+\1</params>
+                        </step>
+                        <step>
+                            <type>CHANGE_PER_SECOND</type>
+                            <params/>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>ssh.run[mca-status]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>wlanTxBandwidth</name>
+                    <type>DEPENDENT</type>
+                    <key>wlanTxBandwidth</key>
+                    <delay>0</delay>
+                    <units>bps</units>
+                    <applications>
+                        <application>
+                            <name>Radio</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>REGEX</type>
+                            <params>wlanTxBytes=(.*)
+\1</params>
+                        </step>
+                        <step>
+                            <type>CHANGE_PER_SECOND</type>
+                            <params/>
+                        </step>
+                        <step>
+                            <type>MULTIPLIER</type>
+                            <params>8</params>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>ssh.run[mca-status]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>WAN Transmission Bandwidth Smooth</name>
+                    <type>CALCULATED</type>
+                    <key>wlanTxBandwidthSmooth</key>
+                    <value_type>FLOAT</value_type>
+                    <units>bps</units>
+                    <params>avg(wlanTxBandwidth,{$UNIFI_SMOOTHING_PERIOD})</params>
+                    <applications>
+                        <application>
+                            <name>Radio</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>wlanTxErrors</name>
+                    <type>DEPENDENT</type>
+                    <key>wlanTxErrors</key>
+                    <delay>0</delay>
+                    <applications>
+                        <application>
+                            <name>Radio</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>REGEX</type>
+                            <params>wlanTxErrors=(.*)
+\1</params>
+                        </step>
+                        <step>
+                            <type>CHANGE_PER_SECOND</type>
+                            <params/>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>ssh.run[mca-status]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>wlanUplinkCapacity</name>
+                    <type>DEPENDENT</type>
+                    <key>wlanUplinkCapacity</key>
+                    <delay>0</delay>
+                    <units>bps</units>
+                    <applications>
+                        <application>
+                            <name>Radio</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>REGEX</type>
+                            <params>wlanUplinkCapacity=(.*)
+\1</params>
+                        </step>
+                        <step>
+                            <type>MULTIPLIER</type>
+                            <params>1000</params>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>ssh.run[mca-status]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>WAN Uplink Capacity Smooth</name>
+                    <type>CALCULATED</type>
+                    <key>wlanUplinkCapacitySmooth</key>
+                    <value_type>FLOAT</value_type>
+                    <units>bps</units>
+                    <params>avg(wlanUplinkCapacity,{$UNIFI_SMOOTHING_PERIOD})</params>
+                    <applications>
+                        <application>
+                            <name>Radio</name>
+                        </application>
+                    </applications>
+                </item>
+            </items>
+        </template>
+        <template>
+            <template>Unifi AP</template>
+            <name>Unifi AP</name>
+            <description>uses mca-dump via ssh to get AP info.&#13;
+&#13;
+Assign this template to all APs in your site</description>
+            <templates>
+                <template>
+                    <name>- Unifi Host -</name>
+                </template>
+            </templates>
+            <groups>
+                <group>
+                    <name>Patrice</name>
+                </group>
+                <group>
+                    <name>Unifi</name>
+                </group>
+            </groups>
+            <applications>
+                <application>
+                    <name>Radio</name>
+                </application>
+            </applications>
+            <items>
+                <item>
+                    <name>2G Channel Interference</name>
+                    <type>CALCULATED</type>
+                    <key>2g_interference</key>
+                    <units>%</units>
+                    <params>(last(2g_interference_raw)&gt;0)*last(2g_interference_raw)</params>
+                    <applications>
+                        <application>
+                            <name>Radio</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>2G Channel Interference raw</name>
+                    <type>CALCULATED</type>
+                    <key>2g_interference_raw</key>
+                    <units>%</units>
+                    <params>last(cu_total_2g)- last(cu_self_tx_2g) - last(cu_self_rx_2g)</params>
+                    <applications>
+                        <application>
+                            <name>Radio</name>
+                        </application>
+                    </applications>
+                    <triggers>
+                        <trigger>
+                            <expression>{avg({$UNIFI_ALERT_PERIOD})}&gt;30</expression>
+                            <name>{HOST.NAME} 2G Interference &gt; 30%</name>
+                            <priority>AVERAGE</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>2G Channel Interference Smooth</name>
+                    <type>CALCULATED</type>
+                    <key>2g_interference_smooth</key>
+                    <value_type>FLOAT</value_type>
+                    <units>%</units>
+                    <params>avg(2g_interference,{$UNIFI_SMOOTHING_PERIOD})</params>
+                    <applications>
+                        <application>
+                            <name>Radio</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>5G Channel Interference</name>
+                    <type>CALCULATED</type>
+                    <key>5g_interference</key>
+                    <units>%</units>
+                    <params>(last(5g_interference_raw)&gt;0)*last(5g_interference_raw)</params>
+                    <applications>
+                        <application>
+                            <name>Radio</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>5G Channel Interference Raw</name>
+                    <type>CALCULATED</type>
+                    <key>5g_interference_raw</key>
+                    <value_type>FLOAT</value_type>
+                    <units>%</units>
+                    <params>last(cu_total_5g) - last(cu_self_rx_5g) - last(cu_self_tx_5g)</params>
+                    <applications>
+                        <application>
+                            <name>Radio</name>
+                        </application>
+                    </applications>
+                    <triggers>
+                        <trigger>
+                            <expression>{avg({$UNIFI_ALERT_PERIOD})}&gt;20</expression>
+                            <name>{HOST.NAME} 5G Interference &gt; 20%</name>
+                            <priority>AVERAGE</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>5G Channel Interference Smooth</name>
+                    <type>CALCULATED</type>
+                    <key>5g_interference_smooth</key>
+                    <value_type>FLOAT</value_type>
+                    <units>%</units>
+                    <params>avg(5g_interference,{$UNIFI_SMOOTHING_PERIOD})</params>
+                    <applications>
+                        <application>
+                            <name>Radio</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>2G Channel Utilization Smooth</name>
+                    <type>CALCULATED</type>
+                    <key>cu_avg_5mn_2g</key>
+                    <value_type>FLOAT</value_type>
+                    <units>%</units>
+                    <params>avg(cu_total_2g,{$UNIFI_SMOOTHING_PERIOD})</params>
+                    <applications>
+                        <application>
+                            <name>Radio</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>5G Channel Utilization Smooth</name>
+                    <type>CALCULATED</type>
+                    <key>cu_avg_5mn_5g</key>
+                    <value_type>FLOAT</value_type>
+                    <units>%</units>
+                    <params>avg(cu_total_5g,{$UNIFI_SMOOTHING_PERIOD})</params>
+                    <applications>
+                        <application>
+                            <name>Radio</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Satisfaction Smooth</name>
+                    <type>CALCULATED</type>
+                    <key>sat_smooth</key>
+                    <value_type>FLOAT</value_type>
+                    <units>%</units>
+                    <params>avg(sat,{$UNIFI_SMOOTHING_PERIOD})</params>
+                </item>
+                <item>
+                    <name>Wireless Reception Bandwidth Smooth</name>
+                    <type>CALCULATED</type>
+                    <key>wireless_reception_bandwidth_smooth</key>
+                    <value_type>FLOAT</value_type>
+                    <units>bps</units>
+                    <params>avg(wireless_reception_bandwidth,{$UNIFI_SMOOTHING_PERIOD})</params>
+                    <applications>
+                        <application>
+                            <name>Radio</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Wireless Transmission Bandwidth Smooth</name>
+                    <type>CALCULATED</type>
+                    <key>wireless_transmission_bandwidth_smooth</key>
+                    <value_type>FLOAT</value_type>
+                    <units>bps</units>
+                    <params>avg(wireless_transmission_bandwidth,{$UNIFI_SMOOTHING_PERIOD})</params>
+                    <applications>
+                        <application>
+                            <name>Radio</name>
+                        </application>
+                    </applications>
+                </item>
+            </items>
+        </template>
+        <template>
+            <template>Unifi Protect Cloud Key</template>
+            <name>Unifi Protect Cloud Key</name>
+            <description>Assign this template to your Cloud Keys running Protect</description>
+            <groups>
+                <group>
+                    <name>Patrice</name>
+                </group>
+            </groups>
+            <applications>
+                <application>
+                    <name>Network</name>
+                </application>
+            </applications>
+            <items>
+                <item>
+                    <name>Incoming Bandwidth</name>
+                    <type>DEPENDENT</type>
+                    <key>IpExtInOctets</key>
+                    <delay>0</delay>
+                    <units>bps</units>
+                    <applications>
+                        <application>
+                            <name>Network</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <params>$.kernel.IpExtInOctets</params>
+                        </step>
+                        <step>
+                            <type>CHANGE_PER_SECOND</type>
+                            <params/>
+                        </step>
+                        <step>
+                            <type>MULTIPLIER</type>
+                            <params>8</params>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>ssh.run[nstat]</key>
+                    </master_item>
+                    <triggers>
+                        <trigger>
+                            <expression>{nodata({$UNIFI_ALERT_PERIOD})}=1</expression>
+                            <name>{HOST.NAME} didn’t report statistics</name>
+                            <priority>AVERAGE</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                        <trigger>
+                            <expression>{avg(1200s)} &lt; {avg(12000s)}*.7</expression>
+                            <name>{HOST.NAME} Incoming Bandwidth Too Low</name>
+                            <priority>AVERAGE</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>nstat</name>
+                    <type>SSH</type>
+                    <key>ssh.run[nstat]</key>
+                    <delay>{$UNIFI_CHECK_FREQUENCY}</delay>
+                    <history>0</history>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <params>nstat -j -a</params>
+                    <authtype>PUBLIC_KEY</authtype>
+                    <username>{$UNIFI_USER}</username>
+                    <publickey>{$UNIFI_PUB_KEY}</publickey>
+                    <privatekey>{$UNIFI_PRIV_KEY}</privatekey>
+                    <applications>
+                        <application>
+                            <name>Network</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Web Entry Point</name>
+                    <type>HTTP_AGENT</type>
+                    <key>web_app</key>
+                    <history>0</history>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <url>https://{HOST.NAME}:7443</url>
+                    <retrieve_mode>HEADERS</retrieve_mode>
+                </item>
+            </items>
+        </template>
+        <template>
+            <template>Unifi Protect NVR4</template>
+            <name>Unifi Protect NVR4</name>
+            <description>Assign this template to your UNVR4s running Protect</description>
+            <templates>
+                <template>
+                    <name>Unifi Protect Cloud Key</name>
+                </template>
+            </templates>
+            <groups>
+                <group>
+                    <name>Patrice</name>
+                </group>
+            </groups>
+            <applications>
+                <application>
+                    <name>Host</name>
+                </application>
+            </applications>
+            <items>
+                <item>
+                    <name>CPU Idle</name>
+                    <type>DEPENDENT</type>
+                    <key>cpu_idle</key>
+                    <delay>0</delay>
+                    <value_type>FLOAT</value_type>
+                    <units>%</units>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <params>$.sysstat.hosts[0].statistics[0].cpuload[0].idle</params>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>ssh.run[mpstat]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>CPU smooth</name>
+                    <type>CALCULATED</type>
+                    <key>cpu_smooth</key>
+                    <value_type>FLOAT</value_type>
+                    <units>%</units>
+                    <params>avg(&quot;cpu_utilization&quot;, {$UNIFI_SMOOTHING_PERIOD})</params>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>CPU Utlization</name>
+                    <type>CALCULATED</type>
+                    <key>cpu_utilization</key>
+                    <value_type>FLOAT</value_type>
+                    <units>%</units>
+                    <params>100 - last(&quot;cpu_idle&quot;)</params>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>nodename</name>
+                    <type>DEPENDENT</type>
+                    <key>nodename</key>
+                    <delay>0</delay>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <params>$.sysstat.hosts[0].nodename</params>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>ssh.run[mpstat]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>mpstat</name>
+                    <type>SSH</type>
+                    <key>ssh.run[mpstat]</key>
+                    <delay>{$UNIFI_CHECK_FREQUENCY}</delay>
+                    <history>0</history>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <params>mpstat -o JSON | sed 's/&quot;cpu-load&quot;/&quot;cpuload&quot;/'</params>
+                    <authtype>PUBLIC_KEY</authtype>
+                    <username>root</username>
+                    <publickey>{$UNIFI_PUB_KEY}</publickey>
+                    <privatekey>{$UNIFI_PRIV_KEY}</privatekey>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Temp 1</name>
+                    <type>SSH</type>
+                    <key>ssh.run[temp1]</key>
+                    <delay>{$UNIFI_CHECK_FREQUENCY}</delay>
+                    <value_type>FLOAT</value_type>
+                    <units>ºC</units>
+                    <params>cat /sys/bus/i2c/drivers/adt7475/4-002e/hwmon/hwmon0/device/temp1_input</params>
+                    <authtype>PUBLIC_KEY</authtype>
+                    <username>root</username>
+                    <publickey>{$UNIFI_PUB_KEY}</publickey>
+                    <privatekey>{$UNIFI_PRIV_KEY}</privatekey>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>MULTIPLIER</type>
+                            <params>0.001</params>
+                        </step>
+                    </preprocessing>
+                </item>
+                <item>
+                    <name>Temp 2</name>
+                    <type>SSH</type>
+                    <key>ssh.run[temp2]</key>
+                    <delay>{$UNIFI_CHECK_FREQUENCY}</delay>
+                    <value_type>FLOAT</value_type>
+                    <units>ºC</units>
+                    <params>cat /sys/bus/i2c/drivers/adt7475/4-002e/hwmon/hwmon0/device/temp2_input</params>
+                    <authtype>PUBLIC_KEY</authtype>
+                    <username>root</username>
+                    <publickey>{$UNIFI_PUB_KEY}</publickey>
+                    <privatekey>{$UNIFI_PRIV_KEY}</privatekey>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>MULTIPLIER</type>
+                            <params>0.001</params>
+                        </step>
+                    </preprocessing>
+                </item>
+                <item>
+                    <name>Temp 3</name>
+                    <type>SSH</type>
+                    <key>ssh.run[temp3]</key>
+                    <delay>{$UNIFI_CHECK_FREQUENCY}</delay>
+                    <value_type>FLOAT</value_type>
+                    <units>ºC</units>
+                    <params>cat /sys/bus/i2c/drivers/adt7475/4-002e/hwmon/hwmon0/device/temp3_input</params>
+                    <authtype>PUBLIC_KEY</authtype>
+                    <username>root</username>
+                    <publickey>{$UNIFI_PUB_KEY}</publickey>
+                    <privatekey>{$UNIFI_PRIV_KEY}</privatekey>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>MULTIPLIER</type>
+                            <params>0.001</params>
+                        </step>
+                    </preprocessing>
+                </item>
+            </items>
+        </template>
+        <template>
+            <template>Unifi Switch</template>
+            <name>Unifi Switch</name>
+            <description>Link this template to all Unifi switches</description>
+            <templates>
+                <template>
+                    <name>- Unifi Host -</name>
+                </template>
+            </templates>
+            <groups>
+                <group>
+                    <name>Patrice</name>
+                </group>
+                <group>
+                    <name>Unifi</name>
+                </group>
+            </groups>
+            <items>
+                <item>
+                    <name>Percentage Max Power</name>
+                    <type>CALCULATED</type>
+                    <key>percentage_max_power</key>
+                    <value_type>FLOAT</value_type>
+                    <units>%</units>
+                    <params>100*last(&quot;power_consumed_smooth&quot;)/last(&quot;max_total_power&quot;)</params>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Power Consumed Smooth</name>
+                    <type>CALCULATED</type>
+                    <key>power_consumed_smooth</key>
+                    <value_type>FLOAT</value_type>
+                    <units>W</units>
+                    <params>avg(power_consumed,{$UNIFI_SMOOTHING_PERIOD})</params>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                </item>
+            </items>
+        </template>
+        <template>
+            <template>Unifi UDMP</template>
+            <name>Unifi UDMP</name>
+            <description>Link this template to UDMPs</description>
+            <templates>
+                <template>
+                    <name>- Unifi Router -</name>
+                </template>
+            </templates>
+            <groups>
+                <group>
+                    <name>Patrice</name>
+                </group>
+            </groups>
+            <macros>
+                <macro>
+                    <macro>{$UNIFI_USER}</macro>
+                    <value>root</value>
+                    <description>AP Zabbix SSH Username - UDMP only supports root</description>
+                </macro>
+            </macros>
+        </template>
+        <template>
+            <template>Unifi USG</template>
+            <name>Unifi USG</name>
+            <description>Link this template to USGs</description>
+            <templates>
+                <template>
+                    <name>- Unifi Router -</name>
+                </template>
+            </templates>
+            <groups>
+                <group>
+                    <name>Patrice</name>
+                </group>
+            </groups>
+        </template>
+        <template>
+            <template>Unifi WiFi Site</template>
+            <name>Unifi WiFi Site</name>
+            <description>This template is meant to collect WiFi data across all of a site's APs.  Assign to one of the APs and set the {$UNIFI_AP_GROUP} macro to the name of a group that contains all of the APs you want to aggregate against.</description>
+            <templates>
+                <template>
+                    <name>- Unifi Base -</name>
+                </template>
+            </templates>
+            <groups>
+                <group>
+                    <name>Patrice</name>
+                </group>
+            </groups>
+            <applications>
+                <application>
+                    <name>Radio</name>
+                </application>
+            </applications>
+            <items>
+                <item>
+                    <name>Total Reception Wireless Bandwidth</name>
+                    <type>AGGREGATE</type>
+                    <key>grpsum[&quot;{$AP_GROUP}&quot;, &quot;wireless_reception_bandwidth&quot;,avg, {$UNIFI_SMOOTHING_PERIOD}]</key>
+                    <units>bps</units>
+                    <applications>
+                        <application>
+                            <name>Radio</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Total Transmission Wireless Bandwidth</name>
+                    <type>AGGREGATE</type>
+                    <key>grpsum[&quot;{$AP_GROUP}&quot;, &quot;wireless_transmission_bandwidth&quot;,avg, {$UNIFI_SMOOTHING_PERIOD}]</key>
+                    <units>bps</units>
+                    <applications>
+                        <application>
+                            <name>Radio</name>
+                        </application>
+                    </applications>
+                </item>
+            </items>
+            <macros>
+                <macro>
+                    <macro>{$AP_GROUP}</macro>
+                    <value>Override me!</value>
+                    <description>The name of the group containing the site MAPs</description>
+                </macro>
+            </macros>
+        </template>
+    </templates>
+    <triggers>
+        <trigger>
+            <expression>{Unifi Protect NVR4:ssh.run[temp1].last(#1)}&gt;{$UNIFI_ALERT_TEMP} or {Unifi Protect NVR4:ssh.run[temp2].last(#1)}&gt;{$UNIFI_ALERT_TEMP} or {Unifi Protect NVR4:ssh.run[temp3].last(#1)}&gt;{$UNIFI_ALERT_TEMP}</expression>
+            <name>{HOST.NAME} is hot</name>
+        </trigger>
+        <trigger>
+            <expression>{Unifi UDMP:temperature.cpu.last(#1)}&gt;{$UNIFI_ALERT_TEMP} or {Unifi UDMP:temperature.phy.last(#1)}&gt;{$UNIFI_ALERT_TEMP}</expression>
+            <name>{HOST.NAME} Temperature is &gt;{$UNIFI_ALERT_TEMP}C</name>
+            <priority>AVERAGE</priority>
+            <manual_close>YES</manual_close>
+        </trigger>
+        <trigger>
+            <expression>{Unifi USG:temperature.cpu.last(#1)}&gt;{$UNIFI_ALERT_TEMP} or {Unifi USG:temperature.phy.last(#1)}&gt;{$UNIFI_ALERT_TEMP}</expression>
+            <name>{HOST.NAME} Temperature is &gt; {$UNIFI_ALERT_TEMP}C</name>
+            <priority>AVERAGE</priority>
+            <manual_close>YES</manual_close>
+        </trigger>
+    </triggers>
+</zabbix_export>
