@@ -53,7 +53,18 @@ If you are set up correctly that should get you in without asking for a password
 
 > SSHKeyLocation=/the/path/to/your/keys
 
+# Using SSH passwords instead of key pairs
 
+If you would rather use passwords, it's fairly simple to switch.  You only need to modify one spot.  Go to Configuration > Templates and select the '- Unifi Base -' template. Click on the Items tab, you should see one SSH agent entry called 'mca-dump'. Select that and you will see this:
+
+![Key Pair](/images/keypair.png)
+
+Change that section to:
+
+![Password](/images/password.png)
+
+
+Save and set up the {$UNIFI_PW} macro in General > Macros to your chosen password and it should automaticaly apply to all the Unifi devices that you have assigned one of Unifi templates of this package.
 
 # Macros
 
