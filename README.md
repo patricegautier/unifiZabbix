@@ -66,6 +66,8 @@ Change that section to:
 
 Save and set up the {$UNIFI_PW} macro in General > Macros to your chosen password and it should automaticaly apply to all the Unifi devices that you have assigned one of Unifi templates of this package.
 
+If you use the UBNT Airmax template, you will have to do the same with the mca-status item.
+
 # Macros
 
 In Zabbix, in Administration > General > Macros, you will need to set a value for __*all*__ the following macros:
