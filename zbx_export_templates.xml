@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-08-20T05:42:56Z</date>
+    <date>2020-08-30T00:15:02Z</date>
     <groups>
         <group>
             <name>Patrice</name>
@@ -807,9 +807,9 @@ Assign this template to all APs in your site</description>
                             <manual_close>YES</manual_close>
                         </trigger>
                         <trigger>
-                            <expression>{avg(1200s)} &lt; {avg(12000s)}*.7</expression>
+                            <expression>{avg(3600s)} &lt; {avg(3600s, 1d)}*.7</expression>
                             <name>{HOST.NAME} Incoming Bandwidth Too Low</name>
-                            <priority>AVERAGE</priority>
+                            <priority>WARNING</priority>
                             <manual_close>YES</manual_close>
                         </trigger>
                     </triggers>
