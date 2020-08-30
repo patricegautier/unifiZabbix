@@ -8,7 +8,7 @@ I am currently running those on the current version of the base software as of A
 
 # Templates
 
-To get started import unifyTemplates.xml into Zabbix.  
+To get started import unifiTemplates.xml into Zabbix.  
 
 You should now have the following templates available, and it should be pretty self explanatory what type of device you need to link them to in Zabbix.
 
