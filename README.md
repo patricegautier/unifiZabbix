@@ -4,7 +4,7 @@ This projet contains a collection of Templates to monitor Unifi and other UBNT d
 
 I am currently running those on the current version of the base software as of August 2020: Zabbix 5.0.2, Unifi 4.3.20 and AirMax 8.7.1, UDMP 1.8.0, controller 6.0.13
 
-
+# BREAKING:  it turns out the zabbix export feature does not export the entirety of the templates and they will not work after being imported on the other side.   Please hold on using this package for now.
 
 # Templates
 
