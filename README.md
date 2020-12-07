@@ -137,5 +137,5 @@ Observe the tight correlation between upload bandwidt and latency.. Cable techno
 
 To raise that limit in Zabbix you have to recompile and I didn't want to have that dependency.  If anyone can think of another more stable and convenient workaround, please let me know!  Gzip comes to mind and is present on BusyBox which is the OS that those Unifi devices run, but I haven't found a way to decompress it on the zabbix side and still use the JSON path preprocessing option
 
-
+3/ if some of your items randomly fail with 'Cannot read data from SSH server' (in the UI or in  /var/log/zabbix/zabbix_server.log), the likely culprit is an outdated version of libssh, which sometimes returns an error code even on success.  You have to download sources from libssh.org and recompile I'm afraid..  This is confirmed fixed with libssh 0.9.5 on Raspbian Buster
  
