@@ -2,13 +2,37 @@
 
 This projet contains a collection of Templates to monitor Unifi and other UBNT devices with Zabbix: APs, Switches, Routers (USG and UDMP), AirMax devices, and NVRs
 
-I am currently running those on the current version of the base software as of August 2020: Zabbix 5.0.2, Unifi 4.3.20 and AirMax 8.7.1, UDMP 1.8.0, controller 6.0.13
+I am currently running those on the current versions of the base software as of Dec 2020: Zabbix 5.2, a mix of Unifi 4.x and 5.x APs and switches, AirMax 8.7.1, UDMP 1.8.3, controller 6.0.41
 
-# BREAKING:  it turns out the zabbix export feature does not export the entirety of the templates and they will not work after being imported on the other side.   Please hold on using this package for now.
 
-# Templates
+# Setup
 
-To get started import unifyTemplates.xml into Zabbix.  
+
+## Install jq
+
+You need to install jq on your system: https://stedolan.github.io/jq/
+
+On Raspbian, this can be done with:
+
+>apt-get install jq
+
+## Install mca-dump-short script
+
+You need to install mca-dump-short.sh in Zabbix's external script directory
+
+Please confirm where that directory is from the variable ExternalScripts in your zabbix server conf at /etc/zabbix/zabbix_server.conf.  On my system this is set to:
+
+>ExternalScripts=/usr/lib/zabbix/externalscripts
+
+After cp-ing the script to that directory, make sure you have the permissions necessary for zabbix to execute this script:
+
+chown zabbix:zabbix /usr/lib/zabbix/externalscripts /usr/lib/zabbix/externalscripts/mca-dump-short.sh
+chmod a+x /usr/lib/zabbix/externalscripts /usr/lib/zabbix/externalscripts/mca-dump-short.sh
+
+
+## Templates Import
+
+Import unifyTemplates.xml into Zabbix, from Configuration > Templates > Import
 
 You should now have the following templates available, and it should be pretty self explanatory what type of device you need to link them to in Zabbix.
 
@@ -26,22 +50,26 @@ You should now have the following templates available, and it should be pretty s
 
 ### Unifi WiFi Site
 
-This one is a bit special and meant to aggregate WiFi traffic across your wifi networks.  Just assign it to one of the APs that can see all the networks in question and assign the {$UNIFI_AP_GROUP} macro for that host to the name of a group that contains all the APs for that site.
+### Unifi Protect Cloud Key
+
+### Unifi Protect NVR4
 
 
-The templates surrounded by dashes (- Unifi base -, - Unifi host - and - Unifi router -) are there to factor things out and not meant to be assigned directly to hosts in Zabbix. They have to be on your system, but you can ignore them
+You will need to assign those templates to hosts that you have created to match the different types of devices.
 
-# SSH
+Unifi Wifi Site is a bit special and meant to aggregate WiFi traffic across your wifi networks.  Just assign it to one of the APs that can see all the networks in question and assign the {$UNIFI_AP_GROUP} macro for that host to the name of a group that contains all the APs for that site.
 
-These templates use public key SSH to access APs, Switches, Routers, AirMax stations and retrieve data directly, using the mca-dump or mca-status command line utility. You need to setup SSH access on your Zabbix server:
+## SSH via public/private keypair
 
-1/ You should generate a new key pair for this.  Zabbix is finicky and this is the specific way I needed to run the generation get a workable keypair (no passphrase, pem format):
+These templates use public key SSH to access APs, Switches, Routers, AirMax stations and retrieve data directly, using the mca-dump or mca-status command line utility.  Your zabbix server (or your proxies if you use those) will need public key SSH access to all the unifi devices they are monitoring:
+
+1/ You should generate a new key pair for this.  Zabbix is finicky and this is the specific way I needed to run the generation get a workable keypair (no passphrase, pem format). From your Zabbix server, run:
 
 > ssh-keygen -P "" -t rsa  -m pem -f zb_id_rsa
 
 put that keypair somewhere on your zabbix server (I put it in ~/.ssh/zabbix/)
 
-You will need to specifically enable SSH access to the unifi devices.  There is one setting in the controller UI for devices at large in Settings > Site and one for the UDMP in the UDMP advanced settings which is separate.  The controller has handy UI to install your public key on all the devices, you will need to do it by hand on UDMPs and AirMax devices.  *ssh-copy-id* helps there, esp. on the UDMP since those will embarrasingly wipe all your keys at every firmware update and reboot (seriously UBNT).
+You will need to specifically enable SSH access on the unifi devices.  There is one setting in the Unifi controller UI for devices at large in Settings > Site and one for the UDMP in the UDMP advanced settings which is separate.  The controller has handy UI to install your public key on all the devices, you will need to do it by hand on UDMPs and AirMax devices.  *ssh-copy-id* helps there, esp. on the UDMP since those will embarrasingly wipe all your keys at every firmware update and reboot (seriously UBNT).
 
 Permissions can get in the way so check that your zabbix server can actually get the SSH access with:
 
@@ -49,54 +77,52 @@ Permissions can get in the way so check that your zabbix server can actually get
   
 If you are set up correctly that should get you in without asking for a password
 
+You can also check that the script used to retrieve data is working correctly for a given device with:
+
+> sudo -u zabbix /usr/lib/zabbix/externalscripts/mca-dump-short.sh -d <theDeviceIP> -u <yourUnifiUserName> -i <fullPathToYourPrivateKey> -t <UDMP|AP|SWITCH|CK>
+
+You should get a JSON document in return.
+
+
 2/ You then need to point Zabbix to those keys.  In your Zabbix conf file (/etc/zabbix/zabbix_server.conf typically) add:
 
 > SSHKeyLocation=/the/path/to/your/keys
 
-# Using SSH passwords instead of key pairs
 
-If you would rather use passwords, it's fairly simple to switch.  You only need to modify one spot.  Go to Configuration > Templates and select the '- Unifi Base -' template. Click on the Items tab, you should see one SSH agent entry called 'mca-dump'. Select that and you will see this:
-
-![Key Pair](/images/keypair.png)
-
-Change that section to:
-
-![Password](/images/password.png)
-
-
-Save and set up the {$UNIFI_PW} macro in General > Macros to your chosen password and it should automaticaly apply to all the Unifi devices that you have assigned one of Unifi templates of this package.
-
-If you use the UBNT Airmax template, you will have to do the same with the mca-status item.
-
-# Macros
+## Macros
 
 In Zabbix, in Administration > General > Macros, you will need to set a value for __*all*__ the following macros:
 
-## {$UNIFI_USER}
+### {$UNIFI_USER}
 The username that will let the zabbix server (or proxy) log in to your unifi devices via SSH
 
-## {$UNIFI_PUB_KEY}
-The public key file to be able to SSH into your unifi devices. As an example, that macro is set to 'zb_id_rsa.pub' on my system. The actual public key should be added to the SSH keys in the Unifi controller SSH area.  The public key file should also be on your Zabbix server and proxies and the path to that in the Zabbix conf file, typicially /etc/Zabbix/zabbix_server.conf.  The entry should look like: SSHKeyLocation=/home/pi/.ssh/zabbix.
+### {$UNIFI_PRIV_KEY_PATH}
+The full path private key filename to be able to SSH into your Unifi devices.  Please set this to the same value as SSHKeyLocation from your zabbix conf file.
 
-## {$UNIFI_PRIV_KEY}
-The private key filename to be able to SSH into your Unifi devices.  As an example, that macro is set to 'zb_id_rsa' on my system. The actual private key file needs to be on your Zabbix server and proxies, and the path to that in the Zabbix conf file, typicially /etc/Zabbix/zabbix_server.conf.  As an example. I have this set to:  SSHKeyLocation=/home/pi/.ssh/zabbix
-
-## {$UNIFI_CHECK_FREQUENCY}
+### {$UNIFI_CHECK_FREQUENCY}
 I have this set to '1m'
 
-## {$UNIFI_ALERT_TEMP}
+### {$UNIFI_ALERT_TEMP}
 The temperature in Celsius above which to alert.  I have set this to '90'.
 
-## {$UNIFI_ALERT_PERIOD}
+### {$UNIFI_ALERT_PERIOD}
 The period after which to alert for most checks. I have this set to '10m'.
 
-## {$UNIFI_SMOOTHING_COUNT}
+### {$UNIFI_SMOOTHING_COUNT}
 I have this set to '#5'
 
-## {$UNIFI_SMOOTHING_PERIOD}
+### {$UNIFI_SMOOTHING_PERIOD}
 I have this set to '10m'
 
 Those last two are used to create moving averages that make graphs far easier to read.
+
+
+
+
+# SUCCESS!
+
+If you got this far, congratulations the install is complete!  Now for the funner part:
+
 
 # Graphs
 
@@ -129,13 +155,32 @@ Observe the tight correlation between upload bandwidt and latency.. Cable techno
 
 
 
-# Limitations
+# Troubleshooting - Notes
 
-1/ You may seem some devices periodically time out.  This resolves usually at the next check but I haven't been able to get to the root cause.
 
-2/ There is a 64k limit to ssh.run items in zabbix, which we run into running mca-dump on large switches for ex.  The commands in the template have some potentially brittle sed scripting to work around that limitation.  This might manifest itself in some of the Zabbix items becoming unsupported with a *'unable to read JSON path - unexpected end of string'* error.
 
-To raise that limit in Zabbix you have to recompile and I didn't want to have that dependency.  If anyone can think of another more stable and convenient workaround, please let me know!  Gzip comes to mind and is present on BusyBox which is the OS that those Unifi devices run, but I haven't found a way to decompress it on the zabbix side and still use the JSON path preprocessing option
-
-3/ if some of your items randomly fail with 'Cannot read data from SSH server' (in the UI or in  /var/log/zabbix/zabbix_server.log), the likely culprit is an outdated version of libssh, which sometimes returns an error code even on success.  You have to download sources from libssh.org and recompile I'm afraid..  This is confirmed fixed with libssh 0.9.5 on Raspbian Buster
+• if some of your items randomly fail with 'Cannot read data from SSH server' (in the UI or in  /var/log/zabbix/zabbix_server.log), the likely culprit is an outdated version of libssh, which sometimes returns an error code even on success.  You have to compile the last version from sources from libssh.org and recompile I'm afraid..  This was a problem on Raspbian buster for libssh 0.8.x and is confirmed fixed with libssh 0.9.5 at least.  
  
+• SSH to Unifi devices is invoked with the SSH option "-o StrictHostKeyChecking=accept-new" which means it will automatically accept their SSH host key on first connection to that IP or Host Name.  The default SSH setting is to ask for the user's confirmation on first connection but I deemed the extra convenience of not having to do this to be worth it in the context of a Home/Small Business Unifi setup
+
+• The reason for the existence of the mca-dump-short external script instead of using SSH items directly if you are wondering is that there is a 64k limit to ssh.run items in zabbix, which we run into running mca-dump on large switches for ex. To raise that limit in Zabbix you have to recompile from sources and I didn't want to have that dependency.  The only reliable way I found around this is to run an external script to retrieve the mca-dump data from device, and then post-process it with jq to make the data < 64k on the way into Zabbix
+
+
+# Future Additions
+
+## Auto-discovery of devices based on controller connection
+
+i.e automatically created all the proper hosts connected to the proper templates via a single connection to the Unifi controller
+
+## Better SSH debugging
+
+Most of the pain in setting this up is debugging the SSH connections..  Add pre-processing to check for valid json on mca-dump-short to all templates
+
+	sudo -u zabbix /usr/lib/zabbix/externalscripts/mca-dump-short.sh -d 192.168.217.1 -u root -i ~/.ssh/zabbix/zb_id_rsa -t UDMP
+	maybe have a special disable item to get the full transcript
+
+## Moar data!
+
+There is a mountain of information to be retrieved from devices.  I added what made most sense to me, but let me know if you would like to see added.
+
+

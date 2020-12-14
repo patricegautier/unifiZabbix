@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-    <version>5.0</version>
-    <date>2020-08-30T00:15:02Z</date>
+    <version>5.2</version>
+    <date>2020-12-14T00:57:34Z</date>
     <groups>
         <group>
             <name>Patrice</name>
@@ -9,172 +9,26 @@
         <group>
             <name>Unifi</name>
         </group>
+        <group>
+            <name>unifiZabbix</name>
+        </group>
+        <group>
+            <name>Unifi Zabbix Export</name>
+        </group>
     </groups>
     <templates>
-        <template>
-            <template>- Unifi Base -</template>
-            <name>- Unifi Base -</name>
-            <description>Abstract base template for all unifi devices supporting mca-dump.</description>
-            <groups>
-                <group>
-                    <name>Patrice</name>
-                </group>
-            </groups>
-            <applications>
-                <application>
-                    <name>Host</name>
-                </application>
-            </applications>
-            <items>
-                <item>
-                    <name>mca-dump</name>
-                    <type>SSH</type>
-                    <key>ssh.run[mca-dump]</key>
-                    <delay>{$UNIFI_CHECK_FREQUENCY}</delay>
-                    <history>0</history>
-                    <trends>0</trends>
-                    <value_type>TEXT</value_type>
-                    <params>mca-dump | sed 's/^[ \t]*//'</params>
-                    <authtype>PUBLIC_KEY</authtype>
-                    <username>{$UNIFI_USER}</username>
-                    <publickey>{$UNIFI_PUB_KEY}</publickey>
-                    <privatekey>{$UNIFI_PRIV_KEY}</privatekey>
-                    <applications>
-                        <application>
-                            <name>Host</name>
-                        </application>
-                    </applications>
-                </item>
-            </items>
-        </template>
-        <template>
-            <template>- Unifi Host -</template>
-            <name>- Unifi Host -</name>
-            <description>Abstract base template to support all Unifi devices and basic host level info.</description>
-            <templates>
-                <template>
-                    <name>- Unifi Base -</name>
-                </template>
-            </templates>
-            <groups>
-                <group>
-                    <name>Patrice</name>
-                </group>
-                <group>
-                    <name>Unifi</name>
-                </group>
-            </groups>
-            <items>
-                <item>
-                    <name>CPU Smooth</name>
-                    <type>CALCULATED</type>
-                    <key>cpu_smooth</key>
-                    <value_type>FLOAT</value_type>
-                    <units>%</units>
-                    <params>avg(cpu,{$UNIFI_SMOOTHING_COUNT})</params>
-                    <applications>
-                        <application>
-                            <name>Host</name>
-                        </application>
-                    </applications>
-                </item>
-                <item>
-                    <name>Load Average Smooth</name>
-                    <type>CALCULATED</type>
-                    <key>loadavg_smooth</key>
-                    <value_type>FLOAT</value_type>
-                    <params>avg(loadavg_1,{$UNIFI_SMOOTHING_COUNT})</params>
-                    <applications>
-                        <application>
-                            <name>Host</name>
-                        </application>
-                    </applications>
-                </item>
-                <item>
-                    <name>Memory Utilization</name>
-                    <type>CALCULATED</type>
-                    <key>memory</key>
-                    <value_type>FLOAT</value_type>
-                    <units>%</units>
-                    <params>100* last(&quot;mem_used&quot;) / last(&quot;mem_total&quot;)</params>
-                    <applications>
-                        <application>
-                            <name>Host</name>
-                        </application>
-                    </applications>
-                </item>
-            </items>
-        </template>
-        <template>
-            <template>- Unifi Router -</template>
-            <name>- Unifi Router -</name>
-            <description>Abstract template to support USGs and UDMPs</description>
-            <templates>
-                <template>
-                    <name>- Unifi Host -</name>
-                </template>
-            </templates>
-            <groups>
-                <group>
-                    <name>Patrice</name>
-                </group>
-                <group>
-                    <name>Unifi</name>
-                </group>
-            </groups>
-            <applications>
-                <application>
-                    <name>wan</name>
-                </application>
-            </applications>
-            <items>
-                <item>
-                    <name>Download Bandwidth Smooth</name>
-                    <type>CALCULATED</type>
-                    <key>download_bandwidth_smooth</key>
-                    <value_type>FLOAT</value_type>
-                    <units>bps</units>
-                    <params>avg(download_bandwidth,{$UNIFI_SMOOTHING_PERIOD})</params>
-                    <applications>
-                        <application>
-                            <name>wan</name>
-                        </application>
-                    </applications>
-                </item>
-                <item>
-                    <name>Upload Bandwidth Smooth</name>
-                    <type>CALCULATED</type>
-                    <key>upload_bandwidth_smooth</key>
-                    <value_type>FLOAT</value_type>
-                    <units>bps</units>
-                    <params>avg(upload_bandwidth,{$UNIFI_SMOOTHING_PERIOD})</params>
-                    <applications>
-                        <application>
-                            <name>wan</name>
-                        </application>
-                    </applications>
-                </item>
-                <item>
-                    <name>Wan Latency Smooth</name>
-                    <type>CALCULATED</type>
-                    <key>wan_latency_smooth</key>
-                    <value_type>FLOAT</value_type>
-                    <units>ms</units>
-                    <params>avg( wan_latency, {$UNIFI_SMOOTHING_PERIOD})</params>
-                    <applications>
-                        <application>
-                            <name>wan</name>
-                        </application>
-                    </applications>
-                </item>
-            </items>
-        </template>
         <template>
             <template>UBNT Airmax</template>
             <name>UBNT Airmax</name>
             <groups>
                 <group>
                     <name>Patrice</name>
+                </group>
+                <group>
+                    <name>unifiZabbix</name>
+                </group>
+                <group>
+                    <name>Unifi Zabbix Export</name>
                 </group>
             </groups>
             <applications>
@@ -201,8 +55,10 @@
                     <preprocessing>
                         <step>
                             <type>REGEX</type>
-                            <params>airTime=(.*)
-\1</params>
+                            <parameters>
+                                <parameter>airTime=(.*)</parameter>
+                                <parameter>\1</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -245,8 +101,10 @@
                     <preprocessing>
                         <step>
                             <type>REGEX</type>
-                            <params>cpuUsage=(.*)
-\1</params>
+                            <parameters>
+                                <parameter>cpuUsage=(.*)</parameter>
+                                <parameter>\1</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -268,8 +126,10 @@
                     <preprocessing>
                         <step>
                             <type>REGEX</type>
-                            <params>loadavg=(.*)
-\1</params>
+                            <parameters>
+                                <parameter>loadavg=(.*)</parameter>
+                                <parameter>\1</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -291,8 +151,10 @@
                     <preprocessing>
                         <step>
                             <type>REGEX</type>
-                            <params>noise=(.*)
-\1</params>
+                            <parameters>
+                                <parameter>noise=(.*)</parameter>
+                                <parameter>\1</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -327,8 +189,10 @@
                     <preprocessing>
                         <step>
                             <type>REGEX</type>
-                            <params>signal=(.*)
-\1</params>
+                            <parameters>
+                                <parameter>signal=(.*)</parameter>
+                                <parameter>\1</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -376,12 +240,16 @@
                     <preprocessing>
                         <step>
                             <type>REGEX</type>
-                            <params>wlanDownlinkCapacity=(.*)
-\1</params>
+                            <parameters>
+                                <parameter>wlanDownlinkCapacity=(.*)</parameter>
+                                <parameter>\1</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>MULTIPLIER</type>
-                            <params>1000</params>
+                            <parameters>
+                                <parameter>1000</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -415,16 +283,22 @@
                     <preprocessing>
                         <step>
                             <type>REGEX</type>
-                            <params>wlanRxBytes=(.*)
-\1</params>
+                            <parameters>
+                                <parameter>wlanRxBytes=(.*)</parameter>
+                                <parameter>\1</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters>
+                                <parameter/>
+                            </parameters>
                         </step>
                         <step>
                             <type>MULTIPLIER</type>
-                            <params>8</params>
+                            <parameters>
+                                <parameter>8</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -457,12 +331,16 @@
                     <preprocessing>
                         <step>
                             <type>REGEX</type>
-                            <params>wlanRxErrors=(.*)
-\1</params>
+                            <parameters>
+                                <parameter>wlanRxErrors=(.*)</parameter>
+                                <parameter>\1</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters>
+                                <parameter/>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -483,16 +361,22 @@
                     <preprocessing>
                         <step>
                             <type>REGEX</type>
-                            <params>wlanTxBytes=(.*)
-\1</params>
+                            <parameters>
+                                <parameter>wlanTxBytes=(.*)</parameter>
+                                <parameter>\1</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters>
+                                <parameter/>
+                            </parameters>
                         </step>
                         <step>
                             <type>MULTIPLIER</type>
-                            <params>8</params>
+                            <parameters>
+                                <parameter>8</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -525,12 +409,16 @@
                     <preprocessing>
                         <step>
                             <type>REGEX</type>
-                            <params>wlanTxErrors=(.*)
-\1</params>
+                            <parameters>
+                                <parameter>wlanTxErrors=(.*)</parameter>
+                                <parameter>\1</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters>
+                                <parameter/>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -551,12 +439,16 @@
                     <preprocessing>
                         <step>
                             <type>REGEX</type>
-                            <params>wlanUplinkCapacity=(.*)
-\1</params>
+                            <parameters>
+                                <parameter>wlanUplinkCapacity=(.*)</parameter>
+                                <parameter>\1</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>MULTIPLIER</type>
-                            <params>1000</params>
+                            <parameters>
+                                <parameter>1000</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -581,14 +473,9 @@
         <template>
             <template>Unifi AP</template>
             <name>Unifi AP</name>
-            <description>uses mca-dump via ssh to get AP info.&#13;
-&#13;
+            <description>uses mca-dump via ssh to get AP info.
+
 Assign this template to all APs in your site</description>
-            <templates>
-                <template>
-                    <name>- Unifi Host -</name>
-                </template>
-            </templates>
             <groups>
                 <group>
                     <name>Patrice</name>
@@ -596,8 +483,17 @@ Assign this template to all APs in your site</description>
                 <group>
                     <name>Unifi</name>
                 </group>
+                <group>
+                    <name>unifiZabbix</name>
+                </group>
+                <group>
+                    <name>Unifi Zabbix Export</name>
+                </group>
             </groups>
             <applications>
+                <application>
+                    <name>Host</name>
+                </application>
                 <application>
                     <name>Radio</name>
                 </application>
@@ -620,7 +516,7 @@ Assign this template to all APs in your site</description>
                     <type>CALCULATED</type>
                     <key>2g_interference_raw</key>
                     <units>%</units>
-                    <params>last(cu_total_2g)- last(cu_self_tx_2g) - last(cu_self_rx_2g)</params>
+                    <params>((last(cu_total_2g)- last(cu_self_tx_2g) - last(cu_self_rx_2g))&gt;0)*(last(cu_total_2g)- last(cu_self_tx_2g) - last(cu_self_rx_2g))</params>
                     <applications>
                         <application>
                             <name>Radio</name>
@@ -628,8 +524,8 @@ Assign this template to all APs in your site</description>
                     </applications>
                     <triggers>
                         <trigger>
-                            <expression>{avg({$UNIFI_ALERT_PERIOD})}&gt;30</expression>
-                            <name>{HOST.NAME} 2G Interference &gt; 30%</name>
+                            <expression>{avg({$UNIFI_ALERT_PERIOD})}&gt;40</expression>
+                            <name>{HOST.NAME} 2G Interference &gt; 40%</name>
                             <priority>AVERAGE</priority>
                             <manual_close>YES</manual_close>
                         </trigger>
@@ -695,6 +591,43 @@ Assign this template to all APs in your site</description>
                     </applications>
                 </item>
                 <item>
+                    <name>CPU Utilization</name>
+                    <type>DEPENDENT</type>
+                    <key>cpu</key>
+                    <delay>0</delay>
+                    <value_type>FLOAT</value_type>
+                    <units>%</units>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.['system-stats'].cpu</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;AP&quot;]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>CPU Smooth</name>
+                    <type>CALCULATED</type>
+                    <key>cpu_smooth</key>
+                    <value_type>FLOAT</value_type>
+                    <units>%</units>
+                    <params>avg(cpu,{$UNIFI_SMOOTHING_COUNT})</params>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
                     <name>2G Channel Utilization Smooth</name>
                     <type>CALCULATED</type>
                     <key>cu_avg_5mn_2g</key>
@@ -721,12 +654,543 @@ Assign this template to all APs in your site</description>
                     </applications>
                 </item>
                 <item>
+                    <name>2G Channel Usage Reception</name>
+                    <type>DEPENDENT</type>
+                    <key>cu_self_rx_2g</key>
+                    <delay>0</delay>
+                    <units>%</units>
+                    <applications>
+                        <application>
+                            <name>Radio</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.radio_table.[?(@.is_11ac != 'true')].athstats.cu_self_rx.first()</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;AP&quot;]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>5G Channel Usage Reception</name>
+                    <type>DEPENDENT</type>
+                    <key>cu_self_rx_5g</key>
+                    <delay>0</delay>
+                    <units>%</units>
+                    <applications>
+                        <application>
+                            <name>Radio</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.radio_table.[?(@.is_11ac == 'true')].athstats.cu_self_rx.first()</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;AP&quot;]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>2G Channel Usage Transmission</name>
+                    <type>DEPENDENT</type>
+                    <key>cu_self_tx_2g</key>
+                    <delay>0</delay>
+                    <units>%</units>
+                    <applications>
+                        <application>
+                            <name>Radio</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.radio_table.[?(@.is_11ac != 'true')].athstats.cu_self_tx.first()</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;AP&quot;]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>5G Channel Usage Transmission</name>
+                    <type>DEPENDENT</type>
+                    <key>cu_self_tx_5g</key>
+                    <delay>0</delay>
+                    <units>%</units>
+                    <applications>
+                        <application>
+                            <name>Radio</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.radio_table.[?(@.is_11ac == 'true')].athstats.cu_self_tx.first()</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;AP&quot;]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>2G Channel Usage Total</name>
+                    <type>DEPENDENT</type>
+                    <key>cu_total_2g</key>
+                    <delay>0</delay>
+                    <units>%</units>
+                    <applications>
+                        <application>
+                            <name>Radio</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.radio_table.[?(@.is_11ac != 'true')].athstats.cu_total.first()</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;AP&quot;]</key>
+                    </master_item>
+                    <triggers>
+                        <trigger>
+                            <expression>{avg({$UNIFI_ALERT_PERIOD})}&gt;50</expression>
+                            <name>{HOST.NAME} 2G Channel Usage &gt; 50%</name>
+                            <priority>INFO</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                        <trigger>
+                            <expression>{avg({$UNIFI_ALERT_PERIOD})}&gt;80</expression>
+                            <name>{HOST.NAME} 2G Channel Usage &gt; 80%</name>
+                            <priority>AVERAGE</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>5G Channel Usage Total</name>
+                    <type>DEPENDENT</type>
+                    <key>cu_total_5g</key>
+                    <delay>0</delay>
+                    <units>%</units>
+                    <applications>
+                        <application>
+                            <name>Radio</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.radio_table.[?(@.is_11ac == 'true')].athstats.cu_total.first()</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;AP&quot;]</key>
+                    </master_item>
+                    <triggers>
+                        <trigger>
+                            <expression>{avg({$UNIFI_ALERT_PERIOD})}&gt;50</expression>
+                            <name>{HOST.NAME} 5G Channel Usage &gt; 50%</name>
+                            <priority>INFO</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                        <trigger>
+                            <expression>{avg({$UNIFI_ALERT_PERIOD})}&gt;80</expression>
+                            <name>{HOST.NAME} 5G Channel Usage &gt; 80%</name>
+                            <priority>AVERAGE</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>Hostname</name>
+                    <type>DEPENDENT</type>
+                    <key>hostname</key>
+                    <delay>0</delay>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <inventory_link>NAME</inventory_link>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.hostname</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;AP&quot;]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Load Average 1mn</name>
+                    <type>DEPENDENT</type>
+                    <key>loadavg_1</key>
+                    <delay>0</delay>
+                    <value_type>FLOAT</value_type>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.sys_stats.loadavg_1</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;AP&quot;]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Load Average 5mn</name>
+                    <type>DEPENDENT</type>
+                    <key>loadavg_5</key>
+                    <delay>0</delay>
+                    <value_type>FLOAT</value_type>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.sys_stats.loadavg_5</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;AP&quot;]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Load Average 15mn</name>
+                    <type>DEPENDENT</type>
+                    <key>loadavg_15</key>
+                    <delay>0</delay>
+                    <value_type>FLOAT</value_type>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.sys_stats.loadavg_15</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;AP&quot;]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Load Average Smooth</name>
+                    <type>CALCULATED</type>
+                    <key>loadavg_smooth</key>
+                    <value_type>FLOAT</value_type>
+                    <params>avg(loadavg_1,{$UNIFI_SMOOTHING_COUNT})</params>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>mca-dump</name>
+                    <type>EXTERNAL</type>
+                    <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;AP&quot;]</key>
+                    <delay>{$UNIFI_CHECK_FREQUENCY}</delay>
+                    <history>0</history>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                </item>
+                <item>
+                    <name>Memory Utilization</name>
+                    <type>CALCULATED</type>
+                    <key>memory</key>
+                    <value_type>FLOAT</value_type>
+                    <units>%</units>
+                    <params>100* last(&quot;mem_used&quot;) / last(&quot;mem_total&quot;)</params>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Total Memory</name>
+                    <type>DEPENDENT</type>
+                    <key>mem_total</key>
+                    <delay>0</delay>
+                    <units>bytes</units>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.sys_stats.mem_total</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;AP&quot;]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Memory Used</name>
+                    <type>DEPENDENT</type>
+                    <key>mem_used</key>
+                    <delay>0</delay>
+                    <units>bytes</units>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.sys_stats.mem_used</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;AP&quot;]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Model</name>
+                    <type>DEPENDENT</type>
+                    <key>model</key>
+                    <delay>0</delay>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <inventory_link>MODEL</inventory_link>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.model_display</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;AP&quot;]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>2G Channel Retries</name>
+                    <type>DEPENDENT</type>
+                    <key>n_tx_xretries_2g</key>
+                    <delay>0</delay>
+                    <applications>
+                        <application>
+                            <name>Radio</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.radio_table.[?(@.is_11ac != 'true')].athstats.n_tx_xretries.first()</parameter>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>SIMPLE_CHANGE</type>
+                            <parameters>
+                                <parameter/>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;AP&quot;]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>5G Channel Retries</name>
+                    <type>DEPENDENT</type>
+                    <key>n_tx_xretries_5g</key>
+                    <delay>0</delay>
+                    <applications>
+                        <application>
+                            <name>Radio</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.radio_table.[?(@.is_11ac == 'true')].athstats.n_tx_xretries.first()</parameter>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>SIMPLE_CHANGE</type>
+                            <parameters>
+                                <parameter/>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;AP&quot;]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Satisfaction</name>
+                    <type>DEPENDENT</type>
+                    <key>sat</key>
+                    <delay>0</delay>
+                    <units>%</units>
+                    <applications>
+                        <application>
+                            <name>Radio</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.satisfaction</parameter>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>STR_REPLACE</type>
+                            <parameters>
+                                <parameter>-1</parameter>
+                                <parameter>100</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;AP&quot;]</key>
+                    </master_item>
+                    <triggers>
+                        <trigger>
+                            <expression>{avg({$UNIFI_ALERT_PERIOD})}&lt;80</expression>
+                            <name>{HOST.NAME} Satisfaction &lt; 80 %</name>
+                            <priority>INFO</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
                     <name>Satisfaction Smooth</name>
                     <type>CALCULATED</type>
                     <key>sat_smooth</key>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
                     <params>avg(sat,{$UNIFI_SMOOTHING_PERIOD})</params>
+                </item>
+                <item>
+                    <name>Uptime</name>
+                    <type>DEPENDENT</type>
+                    <key>uptime</key>
+                    <delay>0</delay>
+                    <units>S</units>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.uptime</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;AP&quot;]</key>
+                    </master_item>
+                    <triggers>
+                        <trigger>
+                            <expression>{nodata({$UNIFI_ALERT_PERIOD})}=1</expression>
+                            <name>{HOST.NAME} did not report statistics</name>
+                            <priority>WARNING</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                        <trigger>
+                            <expression>{nodata(6h)}=1</expression>
+                            <name>{HOST.NAME} did not report statistics for 6h</name>
+                            <priority>AVERAGE</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>Wireless Reception Bandwidth</name>
+                    <type>DEPENDENT</type>
+                    <key>wireless_reception_bandwidth</key>
+                    <delay>0</delay>
+                    <units>bps</units>
+                    <applications>
+                        <application>
+                            <name>Radio</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.vap_table.[*].rx_bytes.sum()</parameter>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>CHANGE_PER_SECOND</type>
+                            <parameters>
+                                <parameter/>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>MULTIPLIER</type>
+                            <parameters>
+                                <parameter>8</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;AP&quot;]</key>
+                    </master_item>
                 </item>
                 <item>
                     <name>Wireless Reception Bandwidth Smooth</name>
@@ -742,6 +1206,41 @@ Assign this template to all APs in your site</description>
                     </applications>
                 </item>
                 <item>
+                    <name>Wireless Transmission Bandwidth</name>
+                    <type>DEPENDENT</type>
+                    <key>wireless_transmission_bandwidth</key>
+                    <delay>0</delay>
+                    <units>bps</units>
+                    <applications>
+                        <application>
+                            <name>Radio</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.vap_table.[*].tx_bytes.sum()</parameter>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>CHANGE_PER_SECOND</type>
+                            <parameters>
+                                <parameter/>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>MULTIPLIER</type>
+                            <parameters>
+                                <parameter>8</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;AP&quot;]</key>
+                    </master_item>
+                </item>
+                <item>
                     <name>Wireless Transmission Bandwidth Smooth</name>
                     <type>CALCULATED</type>
                     <key>wireless_transmission_bandwidth_smooth</key>
@@ -755,6 +1254,131 @@ Assign this template to all APs in your site</description>
                     </applications>
                 </item>
             </items>
+            <discovery_rules>
+                <discovery_rule>
+                    <name>Wifi Network Discovery</name>
+                    <type>DEPENDENT</type>
+                    <key>wifi_network_discovery</key>
+                    <delay>0</delay>
+                    <description>Wifi Network Discovery Rule</description>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>{#ESSID} Rx Bandwidth</name>
+                            <type>DEPENDENT</type>
+                            <key>rx_bandwidth[{#ESSID}]</key>
+                            <delay>0</delay>
+                            <units>bps</units>
+                            <applications>
+                                <application>
+                                    <name>Radio</name>
+                                </application>
+                            </applications>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <parameters>
+                                        <parameter>$.vap_table.[ ?(@.essid == '{#ESSID}' ) ].rx_bytes.first()</parameter>
+                                    </parameters>
+                                </step>
+                                <step>
+                                    <type>CHANGE_PER_SECOND</type>
+                                    <parameters>
+                                        <parameter/>
+                                    </parameters>
+                                </step>
+                                <step>
+                                    <type>MULTIPLIER</type>
+                                    <parameters>
+                                        <parameter>8</parameter>
+                                    </parameters>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;AP&quot;]</key>
+                            </master_item>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>{#ESSID} Reception Bandwidth Smooth</name>
+                            <type>CALCULATED</type>
+                            <key>rx_bandwidth_smooth[{#ESSID}]</key>
+                            <value_type>FLOAT</value_type>
+                            <units>bps</units>
+                            <params>avg(rx_bandwidth[{#ESSID}], {$UNIFI_SMOOTHING_PERIOD})</params>
+                            <applications>
+                                <application>
+                                    <name>Radio</name>
+                                </application>
+                            </applications>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>{#ESSID} Tx Bandwidth</name>
+                            <type>DEPENDENT</type>
+                            <key>tx_bandwidth[{#ESSID}]</key>
+                            <delay>0</delay>
+                            <units>bps</units>
+                            <applications>
+                                <application>
+                                    <name>Radio</name>
+                                </application>
+                            </applications>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <parameters>
+                                        <parameter>$.vap_table.[ ?(@.essid == &quot;{#ESSID}&quot;) ].tx_bytes.first()</parameter>
+                                    </parameters>
+                                </step>
+                                <step>
+                                    <type>CHANGE_PER_SECOND</type>
+                                    <parameters>
+                                        <parameter/>
+                                    </parameters>
+                                </step>
+                                <step>
+                                    <type>MULTIPLIER</type>
+                                    <parameters>
+                                        <parameter>8</parameter>
+                                    </parameters>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;AP&quot;]</key>
+                            </master_item>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>{#ESSID} Transmission Bandwidth Smooth</name>
+                            <type>CALCULATED</type>
+                            <key>tx_bandwidth_smooth[{#ESSID}]</key>
+                            <value_type>FLOAT</value_type>
+                            <units>bps</units>
+                            <params>avg(tx_bandwidth[{#ESSID}], {$UNIFI_SMOOTHING_PERIOD})</params>
+                            <applications>
+                                <application>
+                                    <name>Radio</name>
+                                </application>
+                            </applications>
+                        </item_prototype>
+                    </item_prototypes>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;AP&quot;]</key>
+                    </master_item>
+                    <lld_macro_paths>
+                        <lld_macro_path>
+                            <lld_macro>{#ESSID}</lld_macro>
+                            <path>$.essid</path>
+                        </lld_macro_path>
+                    </lld_macro_paths>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.vap_table</parameter>
+                            </parameters>
+                            <error_handler>DISCARD_VALUE</error_handler>
+                        </step>
+                    </preprocessing>
+                </discovery_rule>
+            </discovery_rules>
         </template>
         <template>
             <template>Unifi Protect Cloud Key</template>
@@ -763,6 +1387,12 @@ Assign this template to all APs in your site</description>
             <groups>
                 <group>
                     <name>Patrice</name>
+                </group>
+                <group>
+                    <name>unifiZabbix</name>
+                </group>
+                <group>
+                    <name>Unifi Zabbix Export</name>
                 </group>
             </groups>
             <applications>
@@ -785,15 +1415,21 @@ Assign this template to all APs in your site</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.kernel.IpExtInOctets</params>
+                            <parameters>
+                                <parameter>$.kernel.IpExtInOctets</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters>
+                                <parameter/>
+                            </parameters>
                         </step>
                         <step>
                             <type>MULTIPLIER</type>
-                            <params>8</params>
+                            <parameters>
+                                <parameter>8</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -849,19 +1485,23 @@ Assign this template to all APs in your site</description>
             <template>Unifi Protect NVR4</template>
             <name>Unifi Protect NVR4</name>
             <description>Assign this template to your UNVR4s running Protect</description>
-            <templates>
-                <template>
-                    <name>Unifi Protect Cloud Key</name>
-                </template>
-            </templates>
             <groups>
                 <group>
                     <name>Patrice</name>
+                </group>
+                <group>
+                    <name>unifiZabbix</name>
+                </group>
+                <group>
+                    <name>Unifi Zabbix Export</name>
                 </group>
             </groups>
             <applications>
                 <application>
                     <name>Host</name>
+                </application>
+                <application>
+                    <name>Network</name>
                 </application>
             </applications>
             <items>
@@ -880,7 +1520,9 @@ Assign this template to all APs in your site</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.sysstat.hosts[0].statistics[0].cpuload[0].idle</params>
+                            <parameters>
+                                <parameter>$.sysstat.hosts[0].statistics[0].cpuload[0].idle</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -914,6 +1556,55 @@ Assign this template to all APs in your site</description>
                     </applications>
                 </item>
                 <item>
+                    <name>Incoming Bandwidth</name>
+                    <type>DEPENDENT</type>
+                    <key>IpExtInOctets</key>
+                    <delay>0</delay>
+                    <units>bps</units>
+                    <applications>
+                        <application>
+                            <name>Network</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.kernel.IpExtInOctets</parameter>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>CHANGE_PER_SECOND</type>
+                            <parameters>
+                                <parameter/>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>MULTIPLIER</type>
+                            <parameters>
+                                <parameter>8</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>ssh.run[nstat]</key>
+                    </master_item>
+                    <triggers>
+                        <trigger>
+                            <expression>{nodata({$UNIFI_ALERT_PERIOD})}=1</expression>
+                            <name>{HOST.NAME} didn’t report statistics</name>
+                            <priority>AVERAGE</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                        <trigger>
+                            <expression>{avg(3600s)} &lt; {avg(3600s, 1d)}*.7</expression>
+                            <name>{HOST.NAME} Incoming Bandwidth Too Low</name>
+                            <priority>WARNING</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
                     <name>nodename</name>
                     <type>DEPENDENT</type>
                     <key>nodename</key>
@@ -928,7 +1619,9 @@ Assign this template to all APs in your site</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.sysstat.hosts[0].nodename</params>
+                            <parameters>
+                                <parameter>$.sysstat.hosts[0].nodename</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -943,7 +1636,7 @@ Assign this template to all APs in your site</description>
                     <history>0</history>
                     <trends>0</trends>
                     <value_type>TEXT</value_type>
-                    <params>mpstat -o JSON | sed 's/&quot;cpu-load&quot;/&quot;cpuload&quot;/'</params>
+                    <params>mpstat -o JSON 1 1 | sed 's/&quot;cpu-load&quot;/&quot;cpuload&quot;/'</params>
                     <authtype>PUBLIC_KEY</authtype>
                     <username>root</username>
                     <publickey>{$UNIFI_PUB_KEY}</publickey>
@@ -951,6 +1644,25 @@ Assign this template to all APs in your site</description>
                     <applications>
                         <application>
                             <name>Host</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>nstat</name>
+                    <type>SSH</type>
+                    <key>ssh.run[nstat]</key>
+                    <delay>{$UNIFI_CHECK_FREQUENCY}</delay>
+                    <history>0</history>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <params>nstat -j -a</params>
+                    <authtype>PUBLIC_KEY</authtype>
+                    <username>root</username>
+                    <publickey>{$UNIFI_PUB_KEY}</publickey>
+                    <privatekey>{$UNIFI_PRIV_KEY}</privatekey>
+                    <applications>
+                        <application>
+                            <name>Network</name>
                         </application>
                     </applications>
                 </item>
@@ -974,7 +1686,9 @@ Assign this template to all APs in your site</description>
                     <preprocessing>
                         <step>
                             <type>MULTIPLIER</type>
-                            <params>0.001</params>
+                            <parameters>
+                                <parameter>0.001</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                 </item>
@@ -998,7 +1712,9 @@ Assign this template to all APs in your site</description>
                     <preprocessing>
                         <step>
                             <type>MULTIPLIER</type>
-                            <params>0.001</params>
+                            <parameters>
+                                <parameter>0.001</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                 </item>
@@ -1022,9 +1738,21 @@ Assign this template to all APs in your site</description>
                     <preprocessing>
                         <step>
                             <type>MULTIPLIER</type>
-                            <params>0.001</params>
+                            <parameters>
+                                <parameter>0.001</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
+                </item>
+                <item>
+                    <name>Web Entry Point</name>
+                    <type>HTTP_AGENT</type>
+                    <key>web_app</key>
+                    <history>0</history>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <url>https://{HOST.NAME}:7443</url>
+                    <retrieve_mode>HEADERS</retrieve_mode>
                 </item>
             </items>
         </template>
@@ -1032,11 +1760,6 @@ Assign this template to all APs in your site</description>
             <template>Unifi Switch</template>
             <name>Unifi Switch</name>
             <description>Link this template to all Unifi switches</description>
-            <templates>
-                <template>
-                    <name>- Unifi Host -</name>
-                </template>
-            </templates>
             <groups>
                 <group>
                     <name>Patrice</name>
@@ -1044,8 +1767,328 @@ Assign this template to all APs in your site</description>
                 <group>
                     <name>Unifi</name>
                 </group>
+                <group>
+                    <name>unifiZabbix</name>
+                </group>
+                <group>
+                    <name>Unifi Zabbix Export</name>
+                </group>
             </groups>
+            <applications>
+                <application>
+                    <name>Host</name>
+                </application>
+            </applications>
             <items>
+                <item>
+                    <name>CPU Utilization</name>
+                    <type>DEPENDENT</type>
+                    <key>cpu</key>
+                    <delay>0</delay>
+                    <value_type>FLOAT</value_type>
+                    <units>%</units>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.['system-stats'].cpu</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>CPU Smooth</name>
+                    <type>CALCULATED</type>
+                    <key>cpu_smooth</key>
+                    <value_type>FLOAT</value_type>
+                    <units>%</units>
+                    <params>avg(cpu,{$UNIFI_SMOOTHING_COUNT})</params>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Hostname</name>
+                    <type>DEPENDENT</type>
+                    <key>hostname</key>
+                    <delay>0</delay>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <inventory_link>NAME</inventory_link>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.hostname</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Load Average 1mn</name>
+                    <type>DEPENDENT</type>
+                    <key>loadavg_1</key>
+                    <delay>0</delay>
+                    <value_type>FLOAT</value_type>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.sys_stats.loadavg_1</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Load Average 5mn</name>
+                    <type>DEPENDENT</type>
+                    <key>loadavg_5</key>
+                    <delay>0</delay>
+                    <value_type>FLOAT</value_type>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.sys_stats.loadavg_5</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Load Average 15mn</name>
+                    <type>DEPENDENT</type>
+                    <key>loadavg_15</key>
+                    <delay>0</delay>
+                    <value_type>FLOAT</value_type>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.sys_stats.loadavg_15</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Load Average Smooth</name>
+                    <type>CALCULATED</type>
+                    <key>loadavg_smooth</key>
+                    <value_type>FLOAT</value_type>
+                    <params>avg(loadavg_1,{$UNIFI_SMOOTHING_COUNT})</params>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Max Total Power</name>
+                    <type>DEPENDENT</type>
+                    <key>max_total_power</key>
+                    <delay>0</delay>
+                    <units>W</units>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.total_max_power</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>mca-dump</name>
+                    <type>EXTERNAL</type>
+                    <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;]</key>
+                    <delay>{$UNIFI_CHECK_FREQUENCY}</delay>
+                    <history>0</history>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Memory Utilization</name>
+                    <type>CALCULATED</type>
+                    <key>memory</key>
+                    <value_type>FLOAT</value_type>
+                    <units>%</units>
+                    <params>100* last(&quot;mem_used&quot;) / last(&quot;mem_total&quot;)</params>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Total Memory</name>
+                    <type>DEPENDENT</type>
+                    <key>mem_total</key>
+                    <delay>0</delay>
+                    <units>bytes</units>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.sys_stats.mem_total</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Memory Used</name>
+                    <type>DEPENDENT</type>
+                    <key>mem_used</key>
+                    <delay>0</delay>
+                    <units>bytes</units>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.sys_stats.mem_used</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Model</name>
+                    <type>DEPENDENT</type>
+                    <key>model</key>
+                    <delay>0</delay>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <inventory_link>MODEL</inventory_link>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.model_display</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Overheating</name>
+                    <type>DEPENDENT</type>
+                    <key>overheating</key>
+                    <delay>0</delay>
+                    <trends>0</trends>
+                    <value_type>CHAR</value_type>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.overheating</parameter>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>STR_REPLACE</type>
+                            <parameters>
+                                <parameter>false</parameter>
+                                <parameter>f</parameter>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>STR_REPLACE</type>
+                            <parameters>
+                                <parameter>true</parameter>
+                                <parameter>t</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;]</key>
+                    </master_item>
+                    <triggers>
+                        <trigger>
+                            <expression>{last()}&lt;&gt;&quot;f&quot;</expression>
+                            <name>{HOST.NAME} is overheating</name>
+                            <priority>HIGH</priority>
+                        </trigger>
+                    </triggers>
+                </item>
                 <item>
                     <name>Percentage Max Power</name>
                     <type>CALCULATED</type>
@@ -1060,6 +2103,30 @@ Assign this template to all APs in your site</description>
                     </applications>
                 </item>
                 <item>
+                    <name>Power Consumed</name>
+                    <type>DEPENDENT</type>
+                    <key>power_consumed</key>
+                    <delay>0</delay>
+                    <value_type>FLOAT</value_type>
+                    <units>W</units>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.port_table.[*].poe_power.sum()</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;]</key>
+                    </master_item>
+                </item>
+                <item>
                     <name>Power Consumed Smooth</name>
                     <type>CALCULATED</type>
                     <key>power_consumed_smooth</key>
@@ -1072,22 +2139,675 @@ Assign this template to all APs in your site</description>
                         </application>
                     </applications>
                 </item>
+                <item>
+                    <name>Temperature</name>
+                    <type>DEPENDENT</type>
+                    <key>temperature</key>
+                    <delay>0</delay>
+                    <value_type>FLOAT</value_type>
+                    <units>ºC</units>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.general_temperature</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;]</key>
+                    </master_item>
+                    <triggers>
+                        <trigger>
+                            <expression>{last()} &gt; {$UNIFI_ALERT_TEMP}</expression>
+                            <name>{HOST.NAME} Temperature is &gt; {$UNIFI_ALERT_TEMP}C</name>
+                            <priority>AVERAGE</priority>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>Uptime</name>
+                    <type>DEPENDENT</type>
+                    <key>uptime</key>
+                    <delay>0</delay>
+                    <units>S</units>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.uptime</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;]</key>
+                    </master_item>
+                    <triggers>
+                        <trigger>
+                            <expression>{nodata({$UNIFI_ALERT_PERIOD})}=1</expression>
+                            <name>{HOST.NAME} did not report statistics</name>
+                            <priority>WARNING</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                        <trigger>
+                            <expression>{nodata(6h)}=1</expression>
+                            <name>{HOST.NAME} did not report statistics for 6h</name>
+                            <priority>AVERAGE</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                    </triggers>
+                </item>
             </items>
         </template>
         <template>
             <template>Unifi UDMP</template>
             <name>Unifi UDMP</name>
             <description>Link this template to UDMPs</description>
-            <templates>
-                <template>
-                    <name>- Unifi Router -</name>
-                </template>
-            </templates>
             <groups>
                 <group>
                     <name>Patrice</name>
                 </group>
+                <group>
+                    <name>unifiZabbix</name>
+                </group>
+                <group>
+                    <name>Unifi Zabbix Export</name>
+                </group>
             </groups>
+            <applications>
+                <application>
+                    <name>Host</name>
+                </application>
+                <application>
+                    <name>wan</name>
+                </application>
+            </applications>
+            <items>
+                <item>
+                    <name>CPU Utilization</name>
+                    <type>DEPENDENT</type>
+                    <key>cpu</key>
+                    <delay>0</delay>
+                    <value_type>FLOAT</value_type>
+                    <units>%</units>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.['system-stats'].cpu</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>CPU Smooth</name>
+                    <type>CALCULATED</type>
+                    <key>cpu_smooth</key>
+                    <value_type>FLOAT</value_type>
+                    <units>%</units>
+                    <params>avg(cpu,{$UNIFI_SMOOTHING_COUNT})</params>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Download Bandwidth</name>
+                    <type>DEPENDENT</type>
+                    <key>download_bandwidth</key>
+                    <delay>0</delay>
+                    <units>bps</units>
+                    <applications>
+                        <application>
+                            <name>wan</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.if_table.[?(@.latency &gt; 0)].rx_bytes.first()</parameter>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>CHANGE_PER_SECOND</type>
+                            <parameters>
+                                <parameter/>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>MULTIPLIER</type>
+                            <parameters>
+                                <parameter>8</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Download Bandwidth Smooth</name>
+                    <type>CALCULATED</type>
+                    <key>download_bandwidth_smooth</key>
+                    <value_type>FLOAT</value_type>
+                    <units>bps</units>
+                    <params>avg(download_bandwidth,{$UNIFI_SMOOTHING_PERIOD})</params>
+                    <applications>
+                        <application>
+                            <name>wan</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Dropped Dowload Packets</name>
+                    <type>DEPENDENT</type>
+                    <key>dropped_dowload_packets</key>
+                    <delay>0</delay>
+                    <units>packet</units>
+                    <applications>
+                        <application>
+                            <name>wan</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.if_table.[?(@.latency &gt; 0)].rx_dropped.first()</parameter>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>SIMPLE_CHANGE</type>
+                            <parameters>
+                                <parameter/>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Dropped Upload Packets</name>
+                    <type>DEPENDENT</type>
+                    <key>dropped_upload_packets</key>
+                    <delay>0</delay>
+                    <units>packet</units>
+                    <applications>
+                        <application>
+                            <name>wan</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.if_table.[?(@.latency &gt; 0)].tx_dropped.first()</parameter>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>SIMPLE_CHANGE</type>
+                            <parameters>
+                                <parameter/>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Error Download Packets</name>
+                    <type>DEPENDENT</type>
+                    <key>error_download_packets</key>
+                    <delay>0</delay>
+                    <units>packet</units>
+                    <applications>
+                        <application>
+                            <name>wan</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.if_table.[?(@.latency &gt; 0)].rx_errors.first()</parameter>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>SIMPLE_CHANGE</type>
+                            <parameters>
+                                <parameter/>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Error Upload Packets</name>
+                    <type>DEPENDENT</type>
+                    <key>error_upload_packets</key>
+                    <delay>0</delay>
+                    <units>packet</units>
+                    <applications>
+                        <application>
+                            <name>wan</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.if_table.[?(@.latency &gt; 0)].tx_errors.first()</parameter>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>SIMPLE_CHANGE</type>
+                            <parameters>
+                                <parameter/>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Hostname</name>
+                    <type>DEPENDENT</type>
+                    <key>hostname</key>
+                    <delay>0</delay>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <inventory_link>NAME</inventory_link>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.hostname</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Load Average 1mn</name>
+                    <type>DEPENDENT</type>
+                    <key>loadavg_1</key>
+                    <delay>0</delay>
+                    <value_type>FLOAT</value_type>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.sys_stats.loadavg_1</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Load Average 5mn</name>
+                    <type>DEPENDENT</type>
+                    <key>loadavg_5</key>
+                    <delay>0</delay>
+                    <value_type>FLOAT</value_type>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.sys_stats.loadavg_5</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Load Average 15mn</name>
+                    <type>DEPENDENT</type>
+                    <key>loadavg_15</key>
+                    <delay>0</delay>
+                    <value_type>FLOAT</value_type>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.sys_stats.loadavg_15</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Load Average Smooth</name>
+                    <type>CALCULATED</type>
+                    <key>loadavg_smooth</key>
+                    <value_type>FLOAT</value_type>
+                    <params>avg(loadavg_1,{$UNIFI_SMOOTHING_COUNT})</params>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>mca-dump</name>
+                    <type>EXTERNAL</type>
+                    <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;]</key>
+                    <delay>{$UNIFI_CHECK_FREQUENCY}</delay>
+                    <history>0</history>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Memory Utilization</name>
+                    <type>CALCULATED</type>
+                    <key>memory</key>
+                    <value_type>FLOAT</value_type>
+                    <units>%</units>
+                    <params>100* last(&quot;mem_used&quot;) / last(&quot;mem_total&quot;)</params>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Total Memory</name>
+                    <type>DEPENDENT</type>
+                    <key>mem_total</key>
+                    <delay>0</delay>
+                    <units>bytes</units>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.sys_stats.mem_total</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Memory Used</name>
+                    <type>DEPENDENT</type>
+                    <key>mem_used</key>
+                    <delay>0</delay>
+                    <units>bytes</units>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.sys_stats.mem_used</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Model</name>
+                    <type>DEPENDENT</type>
+                    <key>model</key>
+                    <delay>0</delay>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <inventory_link>MODEL</inventory_link>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.model_display</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Temperature CPU</name>
+                    <type>DEPENDENT</type>
+                    <key>temperature.cpu</key>
+                    <delay>0</delay>
+                    <value_type>FLOAT</value_type>
+                    <units>ºC</units>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.temperatures.[?(@.name == 'CPU')].value.first()</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Temperature PHY</name>
+                    <type>DEPENDENT</type>
+                    <key>temperature.phy</key>
+                    <delay>0</delay>
+                    <value_type>FLOAT</value_type>
+                    <units>ºC</units>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.temperatures.[?(@.name == 'PHY')].value.first()</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Upload Bandwidth</name>
+                    <type>DEPENDENT</type>
+                    <key>upload_bandwidth</key>
+                    <delay>0</delay>
+                    <units>bps</units>
+                    <applications>
+                        <application>
+                            <name>wan</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.if_table.[?(@.latency &gt; 0)].tx_bytes.first()</parameter>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>CHANGE_PER_SECOND</type>
+                            <parameters>
+                                <parameter/>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>MULTIPLIER</type>
+                            <parameters>
+                                <parameter>8</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Upload Bandwidth Smooth</name>
+                    <type>CALCULATED</type>
+                    <key>upload_bandwidth_smooth</key>
+                    <value_type>FLOAT</value_type>
+                    <units>bps</units>
+                    <params>avg(upload_bandwidth,{$UNIFI_SMOOTHING_PERIOD})</params>
+                    <applications>
+                        <application>
+                            <name>wan</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Uptime</name>
+                    <type>DEPENDENT</type>
+                    <key>uptime</key>
+                    <delay>0</delay>
+                    <units>S</units>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.uptime</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;]</key>
+                    </master_item>
+                    <triggers>
+                        <trigger>
+                            <expression>{nodata({$UNIFI_ALERT_PERIOD})}=1</expression>
+                            <name>{HOST.NAME} did not report statistics</name>
+                            <priority>WARNING</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                        <trigger>
+                            <expression>{nodata(6h)}=1</expression>
+                            <name>{HOST.NAME} did not report statistics for 6h</name>
+                            <priority>AVERAGE</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>WAN Latency</name>
+                    <type>DEPENDENT</type>
+                    <key>wan_latency</key>
+                    <delay>0</delay>
+                    <units>ms</units>
+                    <applications>
+                        <application>
+                            <name>wan</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.if_table.[?(@.latency &gt; 0)].latency.first()</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Wan Latency Smooth</name>
+                    <type>CALCULATED</type>
+                    <key>wan_latency_smooth</key>
+                    <value_type>FLOAT</value_type>
+                    <units>ms</units>
+                    <params>avg( wan_latency, {$UNIFI_SMOOTHING_PERIOD})</params>
+                    <applications>
+                        <application>
+                            <name>wan</name>
+                        </application>
+                    </applications>
+                </item>
+            </items>
             <macros>
                 <macro>
                     <macro>{$UNIFI_USER}</macro>
@@ -1100,32 +2820,653 @@ Assign this template to all APs in your site</description>
             <template>Unifi USG</template>
             <name>Unifi USG</name>
             <description>Link this template to USGs</description>
-            <templates>
-                <template>
-                    <name>- Unifi Router -</name>
-                </template>
-            </templates>
             <groups>
                 <group>
                     <name>Patrice</name>
                 </group>
+                <group>
+                    <name>unifiZabbix</name>
+                </group>
+                <group>
+                    <name>Unifi Zabbix Export</name>
+                </group>
             </groups>
+            <applications>
+                <application>
+                    <name>Host</name>
+                </application>
+                <application>
+                    <name>wan</name>
+                </application>
+            </applications>
+            <items>
+                <item>
+                    <name>CPU Utilization</name>
+                    <type>DEPENDENT</type>
+                    <key>cpu</key>
+                    <delay>0</delay>
+                    <value_type>FLOAT</value_type>
+                    <units>%</units>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.['system-stats'].cpu</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>ssh.run[mca-dump]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>CPU Smooth</name>
+                    <type>CALCULATED</type>
+                    <key>cpu_smooth</key>
+                    <value_type>FLOAT</value_type>
+                    <units>%</units>
+                    <params>avg(cpu,{$UNIFI_SMOOTHING_COUNT})</params>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Download Bandwidth</name>
+                    <type>DEPENDENT</type>
+                    <key>download_bandwidth</key>
+                    <delay>0</delay>
+                    <units>bps</units>
+                    <applications>
+                        <application>
+                            <name>wan</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.if_table.[?(@.latency &gt; 0)].rx_bytes.first()</parameter>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>CHANGE_PER_SECOND</type>
+                            <parameters>
+                                <parameter/>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>MULTIPLIER</type>
+                            <parameters>
+                                <parameter>8</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>ssh.run[mca-dump]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Download Bandwidth Smooth</name>
+                    <type>CALCULATED</type>
+                    <key>download_bandwidth_smooth</key>
+                    <value_type>FLOAT</value_type>
+                    <units>bps</units>
+                    <params>avg(download_bandwidth,{$UNIFI_SMOOTHING_PERIOD})</params>
+                    <applications>
+                        <application>
+                            <name>wan</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Dropped Dowload Packets</name>
+                    <type>DEPENDENT</type>
+                    <key>dropped_dowload_packets</key>
+                    <delay>0</delay>
+                    <units>packet</units>
+                    <applications>
+                        <application>
+                            <name>wan</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.if_table.[?(@.latency &gt; 0)].rx_dropped.first()</parameter>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>SIMPLE_CHANGE</type>
+                            <parameters>
+                                <parameter/>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>ssh.run[mca-dump]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Dropped Upload Packets</name>
+                    <type>DEPENDENT</type>
+                    <key>dropped_upload_packets</key>
+                    <delay>0</delay>
+                    <units>packet</units>
+                    <applications>
+                        <application>
+                            <name>wan</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.if_table.[?(@.latency &gt; 0)].tx_dropped.first()</parameter>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>SIMPLE_CHANGE</type>
+                            <parameters>
+                                <parameter/>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>ssh.run[mca-dump]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Error Download Packets</name>
+                    <type>DEPENDENT</type>
+                    <key>error_download_packets</key>
+                    <delay>0</delay>
+                    <units>packet</units>
+                    <applications>
+                        <application>
+                            <name>wan</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.if_table.[?(@.latency &gt; 0)].rx_errors.first()</parameter>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>SIMPLE_CHANGE</type>
+                            <parameters>
+                                <parameter/>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>ssh.run[mca-dump]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Error Upload Packets</name>
+                    <type>DEPENDENT</type>
+                    <key>error_upload_packets</key>
+                    <delay>0</delay>
+                    <units>packet</units>
+                    <applications>
+                        <application>
+                            <name>wan</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.if_table.[?(@.latency &gt; 0)].tx_errors.first()</parameter>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>SIMPLE_CHANGE</type>
+                            <parameters>
+                                <parameter/>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>ssh.run[mca-dump]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Hostname</name>
+                    <type>DEPENDENT</type>
+                    <key>hostname</key>
+                    <delay>0</delay>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <inventory_link>NAME</inventory_link>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.hostname</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>ssh.run[mca-dump]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Load Average 1mn</name>
+                    <type>DEPENDENT</type>
+                    <key>loadavg_1</key>
+                    <delay>0</delay>
+                    <value_type>FLOAT</value_type>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.sys_stats.loadavg_1</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>ssh.run[mca-dump]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Load Average 5mn</name>
+                    <type>DEPENDENT</type>
+                    <key>loadavg_5</key>
+                    <delay>0</delay>
+                    <value_type>FLOAT</value_type>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.sys_stats.loadavg_5</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>ssh.run[mca-dump]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Load Average 15mn</name>
+                    <type>DEPENDENT</type>
+                    <key>loadavg_15</key>
+                    <delay>0</delay>
+                    <value_type>FLOAT</value_type>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.sys_stats.loadavg_15</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>ssh.run[mca-dump]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Load Average Smooth</name>
+                    <type>CALCULATED</type>
+                    <key>loadavg_smooth</key>
+                    <value_type>FLOAT</value_type>
+                    <params>avg(loadavg_1,{$UNIFI_SMOOTHING_COUNT})</params>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>mca-dump-short</name>
+                    <type>EXTERNAL</type>
+                    <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;BASE&quot;]</key>
+                    <delay>{$UNIFI_CHECK_FREQUENCY}</delay>
+                    <history>0</history>
+                    <trends>0</trends>
+                    <status>DISABLED</status>
+                    <value_type>TEXT</value_type>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Memory Utilization</name>
+                    <type>CALCULATED</type>
+                    <key>memory</key>
+                    <value_type>FLOAT</value_type>
+                    <units>%</units>
+                    <params>100* last(&quot;mem_used&quot;) / last(&quot;mem_total&quot;)</params>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Total Memory</name>
+                    <type>DEPENDENT</type>
+                    <key>mem_total</key>
+                    <delay>0</delay>
+                    <units>bytes</units>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.sys_stats.mem_total</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>ssh.run[mca-dump]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Memory Used</name>
+                    <type>DEPENDENT</type>
+                    <key>mem_used</key>
+                    <delay>0</delay>
+                    <units>bytes</units>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.sys_stats.mem_used</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>ssh.run[mca-dump]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Model</name>
+                    <type>DEPENDENT</type>
+                    <key>model</key>
+                    <delay>0</delay>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <inventory_link>MODEL</inventory_link>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.model_display</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>ssh.run[mca-dump]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>mca-dump</name>
+                    <type>SSH</type>
+                    <key>ssh.run[mca-dump]</key>
+                    <delay>{$UNIFI_CHECK_FREQUENCY}</delay>
+                    <history>0</history>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <params>mca-dump | sed 's/^[ \t]*//'</params>
+                    <authtype>PUBLIC_KEY</authtype>
+                    <username>{$UNIFI_USER}</username>
+                    <publickey>{$UNIFI_PUB_KEY}</publickey>
+                    <privatekey>{$UNIFI_PRIV_KEY}</privatekey>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Temperature CPU</name>
+                    <type>DEPENDENT</type>
+                    <key>temperature.cpu</key>
+                    <delay>0</delay>
+                    <units>ºC</units>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$..temps.CPU.first()</parameter>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>STR_REPLACE</type>
+                            <parameters>
+                                <parameter> C</parameter>
+                                <parameter/>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>ssh.run[mca-dump]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Temperature PHY</name>
+                    <type>DEPENDENT</type>
+                    <key>temperature.phy</key>
+                    <delay>0</delay>
+                    <units>ºC</units>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$..temps.PHY.first()</parameter>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>STR_REPLACE</type>
+                            <parameters>
+                                <parameter> C</parameter>
+                                <parameter/>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>ssh.run[mca-dump]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Upload Bandwidth</name>
+                    <type>DEPENDENT</type>
+                    <key>upload_bandwidth</key>
+                    <delay>0</delay>
+                    <units>bps</units>
+                    <applications>
+                        <application>
+                            <name>wan</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.if_table.[?(@.latency &gt; 0)].tx_bytes.first()</parameter>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>CHANGE_PER_SECOND</type>
+                            <parameters>
+                                <parameter/>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>MULTIPLIER</type>
+                            <parameters>
+                                <parameter>8</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>ssh.run[mca-dump]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Upload Bandwidth Smooth</name>
+                    <type>CALCULATED</type>
+                    <key>upload_bandwidth_smooth</key>
+                    <value_type>FLOAT</value_type>
+                    <units>bps</units>
+                    <params>avg(upload_bandwidth,{$UNIFI_SMOOTHING_PERIOD})</params>
+                    <applications>
+                        <application>
+                            <name>wan</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Uptime</name>
+                    <type>DEPENDENT</type>
+                    <key>uptime</key>
+                    <delay>0</delay>
+                    <units>S</units>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.uptime</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>ssh.run[mca-dump]</key>
+                    </master_item>
+                    <triggers>
+                        <trigger>
+                            <expression>{nodata({$UNIFI_ALERT_PERIOD})}=1</expression>
+                            <name>{HOST.NAME} did not report statistics</name>
+                            <priority>WARNING</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                        <trigger>
+                            <expression>{nodata(6h)}=1</expression>
+                            <name>{HOST.NAME} did not report statistics for 6h</name>
+                            <priority>AVERAGE</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>WAN Latency</name>
+                    <type>DEPENDENT</type>
+                    <key>wan_latency</key>
+                    <delay>0</delay>
+                    <units>ms</units>
+                    <applications>
+                        <application>
+                            <name>wan</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.if_table.[?(@.latency &gt; 0)].latency.first()</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>ssh.run[mca-dump]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Wan Latency Smooth</name>
+                    <type>CALCULATED</type>
+                    <key>wan_latency_smooth</key>
+                    <value_type>FLOAT</value_type>
+                    <units>ms</units>
+                    <params>avg( wan_latency, {$UNIFI_SMOOTHING_PERIOD})</params>
+                    <applications>
+                        <application>
+                            <name>wan</name>
+                        </application>
+                    </applications>
+                </item>
+            </items>
         </template>
         <template>
             <template>Unifi WiFi Site</template>
             <name>Unifi WiFi Site</name>
             <description>This template is meant to collect WiFi data across all of a site's APs.  Assign to one of the APs and set the {$UNIFI_AP_GROUP} macro to the name of a group that contains all of the APs you want to aggregate against.</description>
-            <templates>
-                <template>
-                    <name>- Unifi Base -</name>
-                </template>
-            </templates>
             <groups>
                 <group>
                     <name>Patrice</name>
                 </group>
+                <group>
+                    <name>unifiZabbix</name>
+                </group>
+                <group>
+                    <name>Unifi Zabbix Export</name>
+                </group>
             </groups>
             <applications>
+                <application>
+                    <name>Host</name>
+                </application>
                 <application>
                     <name>Radio</name>
                 </application>
@@ -1153,7 +3494,60 @@ Assign this template to all APs in your site</description>
                         </application>
                     </applications>
                 </item>
+                <item>
+                    <name>mca-dump</name>
+                    <type>EXTERNAL</type>
+                    <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;AP&quot;]</key>
+                    <delay>{$UNIFI_CHECK_FREQUENCY}</delay>
+                    <history>0</history>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                    </applications>
+                </item>
             </items>
+            <discovery_rules>
+                <discovery_rule>
+                    <name>Discover WiFi Networks</name>
+                    <type>DEPENDENT</type>
+                    <key>wifi_network_discovery_rule</key>
+                    <delay>0</delay>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>{#ESSID} Total Reception Bandwidth Smooth</name>
+                            <type>AGGREGATE</type>
+                            <key>grpsum[&quot;{$AP_GROUP}&quot;, &quot;rx_bandwidth_smooth[{#ESSID}]&quot;, avg, {$UNIFI_SMOOTHING_PERIOD}]</key>
+                            <units>bps</units>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>{#ESSID} Total Transmission Bandwidth</name>
+                            <type>AGGREGATE</type>
+                            <key>grpsum[&quot;{$AP_GROUP}&quot;, &quot;tx_bandwidth_smooth[{#ESSID}]&quot;, avg, &quot;{$UNIFI_SMOOTHING_PERIOD}&quot;]</key>
+                            <units>bps</units>
+                        </item_prototype>
+                    </item_prototypes>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;AP&quot;]</key>
+                    </master_item>
+                    <lld_macro_paths>
+                        <lld_macro_path>
+                            <lld_macro>{#ESSID}</lld_macro>
+                            <path>$.essid</path>
+                        </lld_macro_path>
+                    </lld_macro_paths>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.vap_table</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                </discovery_rule>
+            </discovery_rules>
             <macros>
                 <macro>
                     <macro>{$AP_GROUP}</macro>
@@ -1167,18 +3561,6 @@ Assign this template to all APs in your site</description>
         <trigger>
             <expression>{Unifi Protect NVR4:ssh.run[temp1].last(#1)}&gt;{$UNIFI_ALERT_TEMP} or {Unifi Protect NVR4:ssh.run[temp2].last(#1)}&gt;{$UNIFI_ALERT_TEMP} or {Unifi Protect NVR4:ssh.run[temp3].last(#1)}&gt;{$UNIFI_ALERT_TEMP}</expression>
             <name>{HOST.NAME} is hot</name>
-        </trigger>
-        <trigger>
-            <expression>{Unifi UDMP:temperature.cpu.last(#1)}&gt;{$UNIFI_ALERT_TEMP} or {Unifi UDMP:temperature.phy.last(#1)}&gt;{$UNIFI_ALERT_TEMP}</expression>
-            <name>{HOST.NAME} Temperature is &gt;{$UNIFI_ALERT_TEMP}C</name>
-            <priority>AVERAGE</priority>
-            <manual_close>YES</manual_close>
-        </trigger>
-        <trigger>
-            <expression>{Unifi USG:temperature.cpu.last(#1)}&gt;{$UNIFI_ALERT_TEMP} or {Unifi USG:temperature.phy.last(#1)}&gt;{$UNIFI_ALERT_TEMP}</expression>
-            <name>{HOST.NAME} Temperature is &gt; {$UNIFI_ALERT_TEMP}C</name>
-            <priority>AVERAGE</priority>
-            <manual_close>YES</manual_close>
         </trigger>
     </triggers>
 </zabbix_export>
