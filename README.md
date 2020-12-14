@@ -37,15 +37,15 @@ Import unifyTemplates.xml into Zabbix, from Configuration > Templates > Import
 
 You should now have the following templates available, and it should be pretty self explanatory what type of device you need to link them to in Zabbix.
 
-> Unifi AP
-> Unifi Switch
-> Unifi Router
-> Unifi USG
-> Unifi UDMP
-> UBNT AirMax
-> Unifi WiFi Site
-> Unifi Protect Cloud Key
-> Unifi Protect NVR4
+	Unifi AP
+	Unifi Switch
+	Unifi Router
+	Unifi USG
+	Unifi UDMP
+	UBNT AirMax
+	Unifi WiFi Site
+	Unifi Protect Cloud Key
+	Unifi Protect NVR4
 
 
 You will need to assign the templates with the matching type to hosts with the proper IP/fqdn that you have created in Zabbix.
