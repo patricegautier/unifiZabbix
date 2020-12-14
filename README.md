@@ -15,7 +15,7 @@ You need to install jq on your system: https://stedolan.github.io/jq/
 
 On Raspbian, this can be done with:
 
-> apt-get install jq
+	apt-get install jq
 
 ## Install mca-dump-short script as a Zabbix external script
 
@@ -23,12 +23,12 @@ You need to install mca-dump-short.sh in Zabbix's external script directory
 
 Please confirm where that directory is from the variable ExternalScripts in your zabbix server conf at /etc/zabbix/zabbix_server.conf.  On my system this is set to:
 
-> ExternalScripts=/usr/lib/zabbix/externalscripts
+	ExternalScripts=/usr/lib/zabbix/externalscripts
 
 After cp-ing the script to that directory, make sure you have the permissions necessary for zabbix to execute this script:
 
-> chown zabbix:zabbix /usr/lib/zabbix/externalscripts /usr/lib/zabbix/externalscripts/mca-dump-short.sh
-> chmod a+x /usr/lib/zabbix/externalscripts /usr/lib/zabbix/externalscripts/mca-dump-short.sh
+	chown zabbix:zabbix /usr/lib/zabbix/externalscripts /usr/lib/zabbix/externalscripts/mca-dump-short.sh
+	chmod a+x /usr/lib/zabbix/externalscripts /usr/lib/zabbix/externalscripts/mca-dump-short.sh
 
 
 ## Import the Unifi templates into Zabbix
@@ -58,7 +58,7 @@ These templates use public key SSH to access APs, Switches, Routers, AirMax stat
 
 1/ You should generate a new key pair for this.  Zabbix is finicky and this is the specific way I needed to run the generation get a workable keypair (no passphrase, pem format). From your Zabbix server, run:
 
-> ssh-keygen -P "" -t rsa  -m pem -f zb_id_rsa
+	ssh-keygen -P "" -t rsa  -m pem -f zb_id_rsa
 
 put that keypair somewhere on your zabbix server (I put it in ~/.ssh/zabbix/)
 
@@ -66,20 +66,20 @@ You will need to specifically enable SSH access on the unifi devices.  There is 
 
 Permissions can get in the way so check that your zabbix server can actually get the SSH access with:
 
-> sudo -u zabbix ssh -i my-key-pair yourUserName@oneOfYouUnifiDevicesIP
+	sudo -u zabbix ssh -i my-key-pair yourUserName@oneOfYouUnifiDevicesIP
   
 If you are set up correctly that should get you in without asking for a password
 
 You can also check that the script used to retrieve data is working correctly for a given device with:
 
-> sudo -u zabbix /usr/lib/zabbix/externalscripts/mca-dump-short.sh -d <theDeviceIP> -u <yourUnifiUserName> -i <fullPathToYourPrivateKey> -t <UDMP|AP|SWITCH|CK>
+	sudo -u zabbix /usr/lib/zabbix/externalscripts/mca-dump-short.sh -d <theDeviceIP> -u <yourUnifiUserName> -i <fullPathToYourPrivateKey> -t <UDMP|AP|SWITCH|CK>
 
 You should get a JSON document in return.
 
 
 2/ You then need to point Zabbix to those keys.  In your Zabbix conf file (/etc/zabbix/zabbix_server.conf typically) add:
 
-> SSHKeyLocation=/the/path/to/your/keys
+	SSHKeyLocation=/the/path/to/your/keys
 
 
 ## Macros
