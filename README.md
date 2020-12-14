@@ -8,58 +8,51 @@ I am currently running those on the current versions of the base software as of 
 # Setup
 
 
-## Install jq
+
+## Install jq on your Zabbix server
 
 You need to install jq on your system: https://stedolan.github.io/jq/
 
 On Raspbian, this can be done with:
 
->apt-get install jq
+> apt-get install jq
 
-## Install mca-dump-short script
+## Install mca-dump-short script as a Zabbix external script
 
 You need to install mca-dump-short.sh in Zabbix's external script directory
 
 Please confirm where that directory is from the variable ExternalScripts in your zabbix server conf at /etc/zabbix/zabbix_server.conf.  On my system this is set to:
 
->ExternalScripts=/usr/lib/zabbix/externalscripts
+> ExternalScripts=/usr/lib/zabbix/externalscripts
 
 After cp-ing the script to that directory, make sure you have the permissions necessary for zabbix to execute this script:
 
-chown zabbix:zabbix /usr/lib/zabbix/externalscripts /usr/lib/zabbix/externalscripts/mca-dump-short.sh
-chmod a+x /usr/lib/zabbix/externalscripts /usr/lib/zabbix/externalscripts/mca-dump-short.sh
+> chown zabbix:zabbix /usr/lib/zabbix/externalscripts /usr/lib/zabbix/externalscripts/mca-dump-short.sh
+> chmod a+x /usr/lib/zabbix/externalscripts /usr/lib/zabbix/externalscripts/mca-dump-short.sh
 
 
-## Templates Import
+## Import the Unifi templates into Zabbix
 
 Import unifyTemplates.xml into Zabbix, from Configuration > Templates > Import
 
 You should now have the following templates available, and it should be pretty self explanatory what type of device you need to link them to in Zabbix.
 
-### Unifi AP
-
-### Unifi Switch
-
-### Unifi Router
-
-### Unifi USG
-
-### Unifi UDMP
-
-### UBNT AirMax
-
-### Unifi WiFi Site
-
-### Unifi Protect Cloud Key
-
-### Unifi Protect NVR4
+> Unifi AP
+> Unifi Switch
+> Unifi Router
+> Unifi USG
+> Unifi UDMP
+> UBNT AirMax
+> Unifi WiFi Site
+> Unifi Protect Cloud Key
+> Unifi Protect NVR4
 
 
-You will need to assign those templates to hosts that you have created to match the different types of devices.
+You will need to assign the templates with the matching type to hosts with the proper IP/fqdn that you have created in Zabbix.
 
-Unifi Wifi Site is a bit special and meant to aggregate WiFi traffic across your wifi networks.  Just assign it to one of the APs that can see all the networks in question and assign the {$UNIFI_AP_GROUP} macro for that host to the name of a group that contains all the APs for that site.
+Unifi Wifi Site is a bit special and meant to aggregate WiFi traffic across your wifi networks for a Unifi site.  Just assign it to one of the APs that can see all the networks in question and assign the {$UNIFI_AP_GROUP} macro for that host to the name of a zabbix host group that contains all the APs for that site.
 
-## SSH via public/private keypair
+## Setup SSH from your Zabbix server to your Unifi devices via public/private keypair
 
 These templates use public key SSH to access APs, Switches, Routers, AirMax stations and retrieve data directly, using the mca-dump or mca-status command line utility.  Your zabbix server (or your proxies if you use those) will need public key SSH access to all the unifi devices they are monitoring:
 
@@ -174,13 +167,11 @@ i.e automatically created all the proper hosts connected to the proper templates
 
 ## Better SSH debugging
 
-Most of the pain in setting this up is debugging the SSH connections..  Add pre-processing to check for valid json on mca-dump-short to all templates
+Most of the pain in setting those templates up is debugging the SSH connections..  Add pre-processing to check for valid json on mca-dump-short to all templates
 
-	sudo -u zabbix /usr/lib/zabbix/externalscripts/mca-dump-short.sh -d 192.168.217.1 -u root -i ~/.ssh/zabbix/zb_id_rsa -t UDMP
-	maybe have a special disable item to get the full transcript
 
 ## Moar data!
 
-There is a mountain of information to be retrieved from devices.  I added what made most sense to me, but let me know if you would like to see added.
+There is a mountain of information to be retrieved from devices.  I added what made most sense to me, but let me know if you would like to see added.  Also there is potential for quite a few more triggers..
 
 
