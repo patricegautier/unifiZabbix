@@ -5,10 +5,11 @@ usage()
 {
 	echo "Usage "${0}"  -i privateKeyPath -u user -d targetDevice [-t AP|SWITCH|UDMP|CK]"
 	echo "-i specify private public key pair"
+	echo "-u SSH user name for Unifi device"
+	echo "-d IP or FQDN for Unifi device"
+	echo "-d Unifi device type"
 	exit 2
 }
-
-
 
 
 while getopts 'i:u:t:hd:v' OPT
@@ -38,12 +39,8 @@ fi
 	
 
 
-
-
-
-
 if ! [[ -z ${VERBOSE} ]]; then
-    echo "ssh -i ${PRIVKEY_PATH} ${USER}@${TARGET_DEVICE} mca-dump | jq --indent 0 '${JQ_OPTIONS}'"
+    echo 'ssh -o LogLevel=Error -o StrictHostKeyChecking=accept-new -i ${PRIVKEY_PATH} ${USER}@${TARGET_DEVICE} mca-dump | jq --indent 0 "${JQ_OPTIONS}"'
 fi
 
 
