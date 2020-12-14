@@ -33,7 +33,7 @@ After cp-ing the script to that directory, make sure you have the permissions ne
 
 ## Import the Unifi templates into Zabbix
 
-Import unifyTemplates.xml into Zabbix, from Configuration > Templates > Import
+Import zbx_export_templates.xml into Zabbix, from Configuration > Templates > Import
 
 You should now have the following templates available, and it should be pretty self explanatory what type of device you need to link them to in Zabbix.
 
