@@ -3,7 +3,7 @@
 
 usage()
 {
-	echo "Usage "${0}"  -i privateKeyPath -u user -d targetDevice [-t AP|SWITCH|UDMP|CK]"
+	echo "Usage "${0}"  -i privateKeyPath -u user -d targetDevice [-t AP|SWITCH|UDMP|USG|CK]"
 	echo "-i specify private public key pair"
 	echo "-u SSH user name for Unifi device"
 	echo "-d IP or FQDN for Unifi device"
@@ -29,6 +29,8 @@ if [[ ${DEVICE_TYPE} == 'AP' ]]; then
 elif [[ ${DEVICE_TYPE} == 'SWITCH' ]]; then
 	JQ_OPTIONS='del (.port_table[].mac_table)'
 elif [[ ${DEVICE_TYPE} == 'UDMP' ]]; then
+	JQ_OPTIONS='del (.dpi_stats) | del(.fingerprints)'
+elif [[ ${DEVICE_TYPE} == 'USG' ]]; then
 	JQ_OPTIONS='del (.dpi_stats) | del(.fingerprints)'
 elif [[ ${DEVICE_TYPE} == 'CK' ]]; then
 	JQ_OPTIONS= 
