@@ -165,7 +165,7 @@ Observe the tight correlation between upload bandwidt and latency.. Cable techno
 
 ## Auto-discovery of devices based on controller connection
 
-i.e automatically created all the proper hosts connected to the proper templates via a single connection to the Unifi controller
+i.e automatically create all the proper hosts connected to the proper templates via a single connection to the Unifi controller
 
 ## Better SSH debugging
 
