@@ -89,7 +89,7 @@ In Zabbix, in Administration > General > Macros, you will need to set a value fo
 ### {$UNIFI_USER}
 The username that will let the zabbix server (or proxy) log in to your unifi devices via SSH
 
-### {$UNIFI_PRIV_KEY_PATH}
+### {$UNIFI_SSH_PRIV_KEY_PATH}
 The full path private key filename to be able to SSH into your Unifi devices.  Please set this to the same value as SSHKeyLocation from your zabbix conf file.
 
 ### {$UNIFI_CHECK_FREQUENCY}
