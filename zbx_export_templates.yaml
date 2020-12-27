@@ -1,0 +1,2766 @@
+zabbix_export:
+  version: '5.2'
+  date: '2020-12-27T03:58:13Z'
+  groups:
+    -
+      name: Patrice
+    -
+      name: Unifi
+    -
+      name: unifiZabbix
+    -
+      name: 'Unifi Zabbix Export'
+  templates:
+    -
+      template: 'UBNT Airmax'
+      name: 'UBNT Airmax'
+      groups:
+        -
+          name: Patrice
+        -
+          name: unifiZabbix
+        -
+          name: 'Unifi Zabbix Export'
+      applications:
+        -
+          name: Host
+        -
+          name: Radio
+      items:
+        -
+          name: airTime
+          type: DEPENDENT
+          key: airTime
+          delay: '0'
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: Radio
+          preprocessing:
+            -
+              type: REGEX
+              parameters:
+                - 'airTime=(.*)'
+                - \1
+          master_item:
+            key: 'ssh.run[mca-status]'
+          triggers:
+            -
+              expression: '{nodata({$UNIFI_ALERT_PERIOD})}=1'
+              name: '{HOST.NAME} Device did not report statistics'
+              priority: WARNING
+              manual_close: 'YES'
+        -
+          name: 'AirTime Smooth'
+          type: CALCULATED
+          key: airTimeSmooth
+          value_type: FLOAT
+          units: '%'
+          params: 'avg(airTime,{$UNIFI_SMOOTHING_PERIOD})'
+          applications:
+            -
+              name: Radio
+        -
+          name: CPU
+          type: DEPENDENT
+          key: cpuUsage
+          delay: '0'
+          status: DISABLED
+          value_type: FLOAT
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: REGEX
+              parameters:
+                - 'cpuUsage=(.*)'
+                - \1
+          master_item:
+            key: 'ssh.run[mca-status]'
+        -
+          name: loadavg
+          type: DEPENDENT
+          key: loadavg
+          delay: '0'
+          status: DISABLED
+          value_type: FLOAT
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: REGEX
+              parameters:
+                - 'loadavg=(.*)'
+                - \1
+          master_item:
+            key: 'ssh.run[mca-status]'
+        -
+          name: noise
+          type: DEPENDENT
+          key: noise
+          delay: '0'
+          value_type: FLOAT
+          units: db
+          applications:
+            -
+              name: Radio
+          preprocessing:
+            -
+              type: REGEX
+              parameters:
+                - 'noise=(.*)'
+                - \1
+          master_item:
+            key: 'ssh.run[mca-status]'
+        -
+          name: 'Noise Smooth'
+          type: CALCULATED
+          key: noiseSmooth
+          value_type: FLOAT
+          units: dB
+          params: 'avg(noise,{$UNIFI_SMOOTHING_PERIOD})'
+          applications:
+            -
+              name: Radio
+        -
+          name: signal
+          type: DEPENDENT
+          key: signal
+          delay: '0'
+          value_type: FLOAT
+          units: db
+          applications:
+            -
+              name: Radio
+          preprocessing:
+            -
+              type: REGEX
+              parameters:
+                - 'signal=(.*)'
+                - \1
+          master_item:
+            key: 'ssh.run[mca-status]'
+        -
+          name: 'Signal Smooth'
+          type: CALCULATED
+          key: signalSmooth
+          value_type: FLOAT
+          units: dB
+          params: 'avg(signal,{$UNIFI_SMOOTHING_PERIOD})'
+          applications:
+            -
+              name: Radio
+        -
+          name: mca-status
+          type: SSH
+          key: 'ssh.run[mca-status]'
+          delay: '{$UNIFI_CHECK_FREQUENCY}'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          params: /bin/mca-status
+          authtype: PUBLIC_KEY
+          username: '{$UNIFI_USER}'
+          publickey: '{$UNIFI_PUB_KEY}'
+          privatekey: '{$UNIFI_PRIV_KEY}'
+        -
+          name: wlanDownlinkCapacity
+          type: DEPENDENT
+          key: wlanDownlinkCapacity
+          delay: '0'
+          units: bps
+          applications:
+            -
+              name: Radio
+          preprocessing:
+            -
+              type: REGEX
+              parameters:
+                - 'wlanDownlinkCapacity=(.*)'
+                - \1
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1000'
+          master_item:
+            key: 'ssh.run[mca-status]'
+        -
+          name: 'WAN Downlink Capacity Smooth'
+          type: CALCULATED
+          key: wlanDownlinkCapacitySmooth
+          value_type: FLOAT
+          units: bps
+          params: 'avg(wlanDownlinkCapacity,{$UNIFI_SMOOTHING_PERIOD})'
+          applications:
+            -
+              name: Radio
+        -
+          name: wlanRxBandwidth
+          type: DEPENDENT
+          key: wlanRxBandwidth
+          delay: '0'
+          units: bps
+          applications:
+            -
+              name: Radio
+          preprocessing:
+            -
+              type: REGEX
+              parameters:
+                - 'wlanRxBytes=(.*)'
+                - \1
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+            -
+              type: MULTIPLIER
+              parameters:
+                - '8'
+          master_item:
+            key: 'ssh.run[mca-status]'
+        -
+          name: 'WAN Reception Bandwidth Smooth'
+          type: CALCULATED
+          key: wlanRxBandwidthSmooth
+          value_type: FLOAT
+          units: bps
+          params: 'avg(wlanRxBandwidth,{$UNIFI_SMOOTHING_PERIOD})'
+          applications:
+            -
+              name: Radio
+        -
+          name: wlanRxErrors
+          type: DEPENDENT
+          key: wlanRxErrors
+          delay: '0'
+          applications:
+            -
+              name: Radio
+          preprocessing:
+            -
+              type: REGEX
+              parameters:
+                - 'wlanRxErrors=(.*)'
+                - \1
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'ssh.run[mca-status]'
+        -
+          name: wlanTxBandwidth
+          type: DEPENDENT
+          key: wlanTxBandwidth
+          delay: '0'
+          units: bps
+          applications:
+            -
+              name: Radio
+          preprocessing:
+            -
+              type: REGEX
+              parameters:
+                - 'wlanTxBytes=(.*)'
+                - \1
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+            -
+              type: MULTIPLIER
+              parameters:
+                - '8'
+          master_item:
+            key: 'ssh.run[mca-status]'
+        -
+          name: 'WAN Transmission Bandwidth Smooth'
+          type: CALCULATED
+          key: wlanTxBandwidthSmooth
+          value_type: FLOAT
+          units: bps
+          params: 'avg(wlanTxBandwidth,{$UNIFI_SMOOTHING_PERIOD})'
+          applications:
+            -
+              name: Radio
+        -
+          name: wlanTxErrors
+          type: DEPENDENT
+          key: wlanTxErrors
+          delay: '0'
+          applications:
+            -
+              name: Radio
+          preprocessing:
+            -
+              type: REGEX
+              parameters:
+                - 'wlanTxErrors=(.*)'
+                - \1
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'ssh.run[mca-status]'
+        -
+          name: wlanUplinkCapacity
+          type: DEPENDENT
+          key: wlanUplinkCapacity
+          delay: '0'
+          units: bps
+          applications:
+            -
+              name: Radio
+          preprocessing:
+            -
+              type: REGEX
+              parameters:
+                - 'wlanUplinkCapacity=(.*)'
+                - \1
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1000'
+          master_item:
+            key: 'ssh.run[mca-status]'
+        -
+          name: 'WAN Uplink Capacity Smooth'
+          type: CALCULATED
+          key: wlanUplinkCapacitySmooth
+          value_type: FLOAT
+          units: bps
+          params: 'avg(wlanUplinkCapacity,{$UNIFI_SMOOTHING_PERIOD})'
+          applications:
+            -
+              name: Radio
+    -
+      template: 'Unifi AP'
+      name: 'Unifi AP'
+      description: |
+        uses mca-dump via ssh to get AP info.
+        
+        Assign this template to all APs in your site
+      groups:
+        -
+          name: Patrice
+        -
+          name: Unifi
+        -
+          name: unifiZabbix
+        -
+          name: 'Unifi Zabbix Export'
+      applications:
+        -
+          name: Host
+        -
+          name: Radio
+      items:
+        -
+          name: '2G Channel Interference'
+          type: CALCULATED
+          key: 2g_interference
+          units: '%'
+          params: '(last(2g_interference_raw)>0)*last(2g_interference_raw)'
+          applications:
+            -
+              name: Radio
+        -
+          name: '2G Channel Interference raw'
+          type: CALCULATED
+          key: 2g_interference_raw
+          units: '%'
+          params: '((last(cu_total_2g)- last(cu_self_tx_2g) - last(cu_self_rx_2g))>0)*(last(cu_total_2g)- last(cu_self_tx_2g) - last(cu_self_rx_2g))'
+          applications:
+            -
+              name: Radio
+          triggers:
+            -
+              expression: '{avg({$UNIFI_ALERT_PERIOD})}>40'
+              name: '{HOST.NAME} 2G Interference > 40%'
+              priority: AVERAGE
+              manual_close: 'YES'
+        -
+          name: '2G Channel Interference Smooth'
+          type: CALCULATED
+          key: 2g_interference_smooth
+          value_type: FLOAT
+          units: '%'
+          params: 'avg(2g_interference,{$UNIFI_SMOOTHING_PERIOD})'
+          applications:
+            -
+              name: Radio
+        -
+          name: '5G Channel Interference'
+          type: CALCULATED
+          key: 5g_interference
+          units: '%'
+          params: '(last(5g_interference_raw)>0)*last(5g_interference_raw)'
+          applications:
+            -
+              name: Radio
+        -
+          name: '5G Channel Interference Raw'
+          type: CALCULATED
+          key: 5g_interference_raw
+          value_type: FLOAT
+          units: '%'
+          params: 'last(cu_total_5g) - last(cu_self_rx_5g) - last(cu_self_tx_5g)'
+          applications:
+            -
+              name: Radio
+          triggers:
+            -
+              expression: '{avg({$UNIFI_ALERT_PERIOD})}>20'
+              name: '{HOST.NAME} 5G Interference > 20%'
+              priority: AVERAGE
+              manual_close: 'YES'
+        -
+          name: '5G Channel Interference Smooth'
+          type: CALCULATED
+          key: 5g_interference_smooth
+          value_type: FLOAT
+          units: '%'
+          params: 'avg(5g_interference,{$UNIFI_SMOOTHING_PERIOD})'
+          applications:
+            -
+              name: Radio
+        -
+          name: 'CPU Utilization'
+          type: DEPENDENT
+          key: cpu
+          delay: '0'
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.[''system-stats''].cpu'
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP"]'
+        -
+          name: 'CPU Smooth'
+          type: CALCULATED
+          key: cpu_smooth
+          value_type: FLOAT
+          units: '%'
+          params: 'avg(cpu,{$UNIFI_SMOOTHING_COUNT})'
+          applications:
+            -
+              name: Host
+        -
+          name: '2G Channel Utilization Smooth'
+          type: CALCULATED
+          key: cu_avg_5mn_2g
+          value_type: FLOAT
+          units: '%'
+          params: 'avg(cu_total_2g,{$UNIFI_SMOOTHING_PERIOD})'
+          applications:
+            -
+              name: Radio
+        -
+          name: '5G Channel Utilization Smooth'
+          type: CALCULATED
+          key: cu_avg_5mn_5g
+          value_type: FLOAT
+          units: '%'
+          params: 'avg(cu_total_5g,{$UNIFI_SMOOTHING_PERIOD})'
+          applications:
+            -
+              name: Radio
+        -
+          name: '2G Channel Usage Reception'
+          type: DEPENDENT
+          key: cu_self_rx_2g
+          delay: '0'
+          units: '%'
+          applications:
+            -
+              name: Radio
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.radio_table.[?(@.is_11ac != ''true'')].athstats.cu_self_rx.first()'
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP"]'
+        -
+          name: '5G Channel Usage Reception'
+          type: DEPENDENT
+          key: cu_self_rx_5g
+          delay: '0'
+          units: '%'
+          applications:
+            -
+              name: Radio
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.radio_table.[?(@.is_11ac == ''true'')].athstats.cu_self_rx.first()'
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP"]'
+        -
+          name: '2G Channel Usage Transmission'
+          type: DEPENDENT
+          key: cu_self_tx_2g
+          delay: '0'
+          units: '%'
+          applications:
+            -
+              name: Radio
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.radio_table.[?(@.is_11ac != ''true'')].athstats.cu_self_tx.first()'
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP"]'
+        -
+          name: '5G Channel Usage Transmission'
+          type: DEPENDENT
+          key: cu_self_tx_5g
+          delay: '0'
+          units: '%'
+          applications:
+            -
+              name: Radio
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.radio_table.[?(@.is_11ac == ''true'')].athstats.cu_self_tx.first()'
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP"]'
+        -
+          name: '2G Channel Usage Total'
+          type: DEPENDENT
+          key: cu_total_2g
+          delay: '0'
+          units: '%'
+          applications:
+            -
+              name: Radio
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.radio_table.[?(@.is_11ac != ''true'')].athstats.cu_total.first()'
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP"]'
+          triggers:
+            -
+              expression: '{avg({$UNIFI_ALERT_PERIOD})}>50'
+              name: '{HOST.NAME} 2G Channel Usage > 50%'
+              priority: INFO
+              manual_close: 'YES'
+            -
+              expression: '{avg({$UNIFI_ALERT_PERIOD})}>80'
+              name: '{HOST.NAME} 2G Channel Usage > 80%'
+              priority: AVERAGE
+              manual_close: 'YES'
+        -
+          name: '5G Channel Usage Total'
+          type: DEPENDENT
+          key: cu_total_5g
+          delay: '0'
+          units: '%'
+          applications:
+            -
+              name: Radio
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.radio_table.[?(@.is_11ac == ''true'')].athstats.cu_total.first()'
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP"]'
+          triggers:
+            -
+              expression: '{avg({$UNIFI_ALERT_PERIOD})}>50'
+              name: '{HOST.NAME} 5G Channel Usage > 50%'
+              priority: INFO
+              manual_close: 'YES'
+            -
+              expression: '{avg({$UNIFI_ALERT_PERIOD})}>80'
+              name: '{HOST.NAME} 5G Channel Usage > 80%'
+              priority: AVERAGE
+              manual_close: 'YES'
+        -
+          name: Hostname
+          type: DEPENDENT
+          key: hostname
+          delay: '0'
+          trends: '0'
+          value_type: TEXT
+          inventory_link: NAME
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.hostname
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP"]'
+        -
+          name: 'Load Average 1mn'
+          type: DEPENDENT
+          key: loadavg_1
+          delay: '0'
+          value_type: FLOAT
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.sys_stats.loadavg_1
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP"]'
+        -
+          name: 'Load Average 5mn'
+          type: DEPENDENT
+          key: loadavg_5
+          delay: '0'
+          value_type: FLOAT
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.sys_stats.loadavg_5
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP"]'
+        -
+          name: 'Load Average 15mn'
+          type: DEPENDENT
+          key: loadavg_15
+          delay: '0'
+          value_type: FLOAT
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.sys_stats.loadavg_15
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP"]'
+        -
+          name: 'Load Average Smooth'
+          type: CALCULATED
+          key: loadavg_smooth
+          value_type: FLOAT
+          params: 'avg(loadavg_1,{$UNIFI_SMOOTHING_COUNT})'
+          applications:
+            -
+              name: Host
+        -
+          name: mca-dump
+          type: EXTERNAL
+          key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP"]'
+          delay: '{$UNIFI_CHECK_FREQUENCY}'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+        -
+          name: 'Memory Utilization'
+          type: CALCULATED
+          key: memory
+          value_type: FLOAT
+          units: '%'
+          params: '100* last("mem_used") / last("mem_total")'
+          applications:
+            -
+              name: Host
+        -
+          name: 'Total Memory'
+          type: DEPENDENT
+          key: mem_total
+          delay: '0'
+          units: bytes
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.sys_stats.mem_total
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP"]'
+        -
+          name: 'Memory Used'
+          type: DEPENDENT
+          key: mem_used
+          delay: '0'
+          units: bytes
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.sys_stats.mem_used
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP"]'
+        -
+          name: Model
+          type: DEPENDENT
+          key: model
+          delay: '0'
+          trends: '0'
+          value_type: TEXT
+          inventory_link: MODEL
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.model_display
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP"]'
+        -
+          name: '2G Channel Retries'
+          type: DEPENDENT
+          key: n_tx_xretries_2g
+          delay: '0'
+          applications:
+            -
+              name: Radio
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.radio_table.[?(@.is_11ac != ''true'')].athstats.n_tx_xretries.first()'
+            -
+              type: SIMPLE_CHANGE
+              parameters:
+                - ''
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP"]'
+        -
+          name: '5G Channel Retries'
+          type: DEPENDENT
+          key: n_tx_xretries_5g
+          delay: '0'
+          applications:
+            -
+              name: Radio
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.radio_table.[?(@.is_11ac == ''true'')].athstats.n_tx_xretries.first()'
+            -
+              type: SIMPLE_CHANGE
+              parameters:
+                - ''
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP"]'
+        -
+          name: Satisfaction
+          type: DEPENDENT
+          key: sat
+          delay: '0'
+          units: '%'
+          applications:
+            -
+              name: Radio
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.satisfaction
+            -
+              type: STR_REPLACE
+              parameters:
+                - '-1'
+                - '100'
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP"]'
+          triggers:
+            -
+              expression: '{avg({$UNIFI_ALERT_PERIOD})}<80'
+              name: '{HOST.NAME} Satisfaction < 80 %'
+              priority: INFO
+              manual_close: 'YES'
+        -
+          name: 'Satisfaction Smooth'
+          type: CALCULATED
+          key: sat_smooth
+          value_type: FLOAT
+          units: '%'
+          params: 'avg(sat,{$UNIFI_SMOOTHING_PERIOD})'
+        -
+          name: Uptime
+          type: DEPENDENT
+          key: uptime
+          delay: '0'
+          units: S
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.uptime
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP"]'
+          triggers:
+            -
+              expression: '{nodata({$UNIFI_ALERT_PERIOD})}=1'
+              name: '{HOST.NAME} did not report statistics'
+              priority: WARNING
+              manual_close: 'YES'
+            -
+              expression: '{nodata(6h)}=1'
+              name: '{HOST.NAME} did not report statistics for 6h'
+              priority: AVERAGE
+              manual_close: 'YES'
+        -
+          name: 'Wireless Reception Bandwidth'
+          type: DEPENDENT
+          key: wireless_reception_bandwidth
+          delay: '0'
+          units: bps
+          applications:
+            -
+              name: Radio
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.vap_table.[*].rx_bytes.sum()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+            -
+              type: MULTIPLIER
+              parameters:
+                - '8'
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP"]'
+        -
+          name: 'Wireless Reception Bandwidth Smooth'
+          type: CALCULATED
+          key: wireless_reception_bandwidth_smooth
+          value_type: FLOAT
+          units: bps
+          params: 'avg(wireless_reception_bandwidth,{$UNIFI_SMOOTHING_PERIOD})'
+          applications:
+            -
+              name: Radio
+        -
+          name: 'Wireless Transmission Bandwidth'
+          type: DEPENDENT
+          key: wireless_transmission_bandwidth
+          delay: '0'
+          units: bps
+          applications:
+            -
+              name: Radio
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.vap_table.[*].tx_bytes.sum()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+            -
+              type: MULTIPLIER
+              parameters:
+                - '8'
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP"]'
+        -
+          name: 'Wireless Transmission Bandwidth Smooth'
+          type: CALCULATED
+          key: wireless_transmission_bandwidth_smooth
+          value_type: FLOAT
+          units: bps
+          params: 'avg(wireless_transmission_bandwidth,{$UNIFI_SMOOTHING_PERIOD})'
+          applications:
+            -
+              name: Radio
+      discovery_rules:
+        -
+          name: 'Wifi Network Discovery'
+          type: DEPENDENT
+          key: wifi_network_discovery
+          delay: '0'
+          description: 'Wifi Network Discovery Rule'
+          item_prototypes:
+            -
+              name: '{#ESSID} Rx Bandwidth'
+              type: DEPENDENT
+              key: 'rx_bandwidth[{#ESSID}]'
+              delay: '0'
+              units: bps
+              applications:
+                -
+                  name: Radio
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.vap_table.[ ?(@.essid == ''{#ESSID}'' ) ].rx_bytes.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+              master_item:
+                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP"]'
+            -
+              name: '{#ESSID} Reception Bandwidth Smooth'
+              type: CALCULATED
+              key: 'rx_bandwidth_smooth[{#ESSID}]'
+              value_type: FLOAT
+              units: bps
+              params: 'avg(rx_bandwidth[{#ESSID}], {$UNIFI_SMOOTHING_PERIOD})'
+              applications:
+                -
+                  name: Radio
+            -
+              name: '{#ESSID} Tx Bandwidth'
+              type: DEPENDENT
+              key: 'tx_bandwidth[{#ESSID}]'
+              delay: '0'
+              units: bps
+              applications:
+                -
+                  name: Radio
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.vap_table.[ ?(@.essid == "{#ESSID}") ].tx_bytes.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+              master_item:
+                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP"]'
+            -
+              name: '{#ESSID} Transmission Bandwidth Smooth'
+              type: CALCULATED
+              key: 'tx_bandwidth_smooth[{#ESSID}]'
+              value_type: FLOAT
+              units: bps
+              params: 'avg(tx_bandwidth[{#ESSID}], {$UNIFI_SMOOTHING_PERIOD})'
+              applications:
+                -
+                  name: Radio
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP"]'
+          lld_macro_paths:
+            -
+              lld_macro: '{#ESSID}'
+              path: $.essid
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.vap_table
+              error_handler: DISCARD_VALUE
+    -
+      template: 'Unifi Protect Cloud Key'
+      name: 'Unifi Protect Cloud Key'
+      description: 'Assign this template to your Cloud Keys running Protect'
+      groups:
+        -
+          name: Patrice
+        -
+          name: unifiZabbix
+        -
+          name: 'Unifi Zabbix Export'
+      applications:
+        -
+          name: Network
+      items:
+        -
+          name: 'Incoming Bandwidth'
+          type: DEPENDENT
+          key: IpExtInOctets
+          delay: '0'
+          units: bps
+          applications:
+            -
+              name: Network
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.kernel.IpExtInOctets
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+            -
+              type: MULTIPLIER
+              parameters:
+                - '8'
+          master_item:
+            key: 'ssh.run[nstat]'
+          triggers:
+            -
+              expression: '{nodata({$UNIFI_ALERT_PERIOD})}=1'
+              name: '{HOST.NAME} didn’t report statistics'
+              priority: AVERAGE
+              manual_close: 'YES'
+            -
+              expression: '{avg(3600s)} < {avg(3600s, 1d)}*.7'
+              name: '{HOST.NAME} Incoming Bandwidth Too Low'
+              priority: WARNING
+              manual_close: 'YES'
+        -
+          name: nstat
+          type: SSH
+          key: 'ssh.run[nstat]'
+          delay: '{$UNIFI_CHECK_FREQUENCY}'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          params: 'nstat -j -a'
+          authtype: PUBLIC_KEY
+          username: '{$UNIFI_USER}'
+          publickey: '{$UNIFI_PUB_KEY}'
+          privatekey: '{$UNIFI_PRIV_KEY}'
+          applications:
+            -
+              name: Network
+        -
+          name: 'Web Entry Point'
+          type: HTTP_AGENT
+          key: web_app
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          url: 'https://{HOST.NAME}:7443'
+          retrieve_mode: HEADERS
+    -
+      template: 'Unifi Protect NVR4'
+      name: 'Unifi Protect NVR4'
+      description: 'Assign this template to your UNVR4s running Protect'
+      groups:
+        -
+          name: Patrice
+        -
+          name: unifiZabbix
+        -
+          name: 'Unifi Zabbix Export'
+      applications:
+        -
+          name: Host
+        -
+          name: Network
+      items:
+        -
+          name: 'CPU Idle'
+          type: DEPENDENT
+          key: cpu_idle
+          delay: '0'
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.sysstat.hosts[0].statistics[0].cpuload[0].idle'
+          master_item:
+            key: 'ssh.run[mpstat]'
+        -
+          name: 'CPU smooth'
+          type: CALCULATED
+          key: cpu_smooth
+          value_type: FLOAT
+          units: '%'
+          params: 'avg("cpu_utilization", {$UNIFI_SMOOTHING_PERIOD})'
+          applications:
+            -
+              name: Host
+        -
+          name: 'CPU Utlization'
+          type: CALCULATED
+          key: cpu_utilization
+          value_type: FLOAT
+          units: '%'
+          params: '100 - last("cpu_idle")'
+          applications:
+            -
+              name: Host
+        -
+          name: 'Incoming Bandwidth'
+          type: DEPENDENT
+          key: IpExtInOctets
+          delay: '0'
+          units: bps
+          applications:
+            -
+              name: Network
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.kernel.IpExtInOctets
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+            -
+              type: MULTIPLIER
+              parameters:
+                - '8'
+          master_item:
+            key: 'ssh.run[nstat]'
+          triggers:
+            -
+              expression: '{nodata({$UNIFI_ALERT_PERIOD})}=1'
+              name: '{HOST.NAME} didn’t report statistics'
+              priority: AVERAGE
+              manual_close: 'YES'
+            -
+              expression: '{avg(3600s)} < {avg(3600s, 1d)}*.7'
+              name: '{HOST.NAME} Incoming Bandwidth Too Low'
+              priority: WARNING
+              manual_close: 'YES'
+        -
+          name: nodename
+          type: DEPENDENT
+          key: nodename
+          delay: '0'
+          trends: '0'
+          value_type: TEXT
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.sysstat.hosts[0].nodename'
+          master_item:
+            key: 'ssh.run[mpstat]'
+        -
+          name: mpstat
+          type: SSH
+          key: 'ssh.run[mpstat]'
+          delay: '{$UNIFI_CHECK_FREQUENCY}'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          params: 'mpstat -o JSON 1 1 | sed ''s/"cpu-load"/"cpuload"/'''
+          authtype: PUBLIC_KEY
+          username: root
+          publickey: '{$UNIFI_PUB_KEY}'
+          privatekey: '{$UNIFI_PRIV_KEY}'
+          applications:
+            -
+              name: Host
+        -
+          name: nstat
+          type: SSH
+          key: 'ssh.run[nstat]'
+          delay: '{$UNIFI_CHECK_FREQUENCY}'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          params: 'nstat -j -a'
+          authtype: PUBLIC_KEY
+          username: root
+          publickey: '{$UNIFI_PUB_KEY}'
+          privatekey: '{$UNIFI_PRIV_KEY}'
+          applications:
+            -
+              name: Network
+        -
+          name: 'Temp 1'
+          type: SSH
+          key: 'ssh.run[temp1]'
+          delay: '{$UNIFI_CHECK_FREQUENCY}'
+          value_type: FLOAT
+          units: ºC
+          params: 'cat /sys/bus/i2c/drivers/adt7475/4-002e/hwmon/hwmon0/device/temp1_input'
+          authtype: PUBLIC_KEY
+          username: root
+          publickey: '{$UNIFI_PUB_KEY}'
+          privatekey: '{$UNIFI_PRIV_KEY}'
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.001'
+        -
+          name: 'Temp 2'
+          type: SSH
+          key: 'ssh.run[temp2]'
+          delay: '{$UNIFI_CHECK_FREQUENCY}'
+          value_type: FLOAT
+          units: ºC
+          params: 'cat /sys/bus/i2c/drivers/adt7475/4-002e/hwmon/hwmon0/device/temp2_input'
+          authtype: PUBLIC_KEY
+          username: root
+          publickey: '{$UNIFI_PUB_KEY}'
+          privatekey: '{$UNIFI_PRIV_KEY}'
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.001'
+        -
+          name: 'Temp 3'
+          type: SSH
+          key: 'ssh.run[temp3]'
+          delay: '{$UNIFI_CHECK_FREQUENCY}'
+          value_type: FLOAT
+          units: ºC
+          params: 'cat /sys/bus/i2c/drivers/adt7475/4-002e/hwmon/hwmon0/device/temp3_input'
+          authtype: PUBLIC_KEY
+          username: root
+          publickey: '{$UNIFI_PUB_KEY}'
+          privatekey: '{$UNIFI_PRIV_KEY}'
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.001'
+        -
+          name: 'Web Entry Point'
+          type: HTTP_AGENT
+          key: web_app
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          url: 'https://{HOST.NAME}:7443'
+          retrieve_mode: HEADERS
+    -
+      template: 'Unifi Switch'
+      name: 'Unifi Switch'
+      description: 'Link this template to all Unifi switches'
+      groups:
+        -
+          name: Patrice
+        -
+          name: Unifi
+        -
+          name: unifiZabbix
+        -
+          name: 'Unifi Zabbix Export'
+      applications:
+        -
+          name: Host
+        -
+          name: Traffic
+      items:
+        -
+          name: 'CPU Utilization'
+          type: DEPENDENT
+          key: cpu
+          delay: '0'
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.[''system-stats''].cpu'
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "SWITCH"]'
+        -
+          name: 'CPU Smooth'
+          type: CALCULATED
+          key: cpu_smooth
+          value_type: FLOAT
+          units: '%'
+          params: 'avg(cpu,{$UNIFI_SMOOTHING_COUNT})'
+          applications:
+            -
+              name: Host
+        -
+          name: Hostname
+          type: DEPENDENT
+          key: hostname
+          delay: '0'
+          trends: '0'
+          value_type: TEXT
+          inventory_link: NAME
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.hostname
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "SWITCH"]'
+        -
+          name: 'Load Average 1mn'
+          type: DEPENDENT
+          key: loadavg_1
+          delay: '0'
+          value_type: FLOAT
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.sys_stats.loadavg_1
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "SWITCH"]'
+        -
+          name: 'Load Average 5mn'
+          type: DEPENDENT
+          key: loadavg_5
+          delay: '0'
+          value_type: FLOAT
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.sys_stats.loadavg_5
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "SWITCH"]'
+        -
+          name: 'Load Average 15mn'
+          type: DEPENDENT
+          key: loadavg_15
+          delay: '0'
+          value_type: FLOAT
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.sys_stats.loadavg_15
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "SWITCH"]'
+        -
+          name: 'Load Average Smooth'
+          type: CALCULATED
+          key: loadavg_smooth
+          value_type: FLOAT
+          params: 'avg(loadavg_1,{$UNIFI_SMOOTHING_COUNT})'
+          applications:
+            -
+              name: Host
+        -
+          name: 'Max Total Power'
+          type: DEPENDENT
+          key: max_total_power
+          delay: '0'
+          units: W
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.total_max_power
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "SWITCH"]'
+        -
+          name: mca-dump
+          type: EXTERNAL
+          key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "SWITCH"]'
+          delay: '{$UNIFI_CHECK_FREQUENCY}'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          applications:
+            -
+              name: Host
+        -
+          name: 'Memory Utilization'
+          type: CALCULATED
+          key: memory
+          value_type: FLOAT
+          units: '%'
+          params: '100* last("mem_used") / last("mem_total")'
+          applications:
+            -
+              name: Host
+        -
+          name: 'Total Memory'
+          type: DEPENDENT
+          key: mem_total
+          delay: '0'
+          units: bytes
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.sys_stats.mem_total
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "SWITCH"]'
+        -
+          name: 'Memory Used'
+          type: DEPENDENT
+          key: mem_used
+          delay: '0'
+          units: bytes
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.sys_stats.mem_used
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "SWITCH"]'
+        -
+          name: Model
+          type: DEPENDENT
+          key: model
+          delay: '0'
+          trends: '0'
+          value_type: TEXT
+          inventory_link: MODEL
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.model_display
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "SWITCH"]'
+        -
+          name: Overheating
+          type: DEPENDENT
+          key: overheating
+          delay: '0'
+          trends: '0'
+          value_type: CHAR
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.overheating
+            -
+              type: STR_REPLACE
+              parameters:
+                - 'false'
+                - f
+            -
+              type: STR_REPLACE
+              parameters:
+                - 'true'
+                - t
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "SWITCH"]'
+          triggers:
+            -
+              expression: '{last()}<>"f"'
+              name: '{HOST.NAME} is overheating'
+              priority: HIGH
+        -
+          name: 'Percentage Max Power'
+          type: CALCULATED
+          key: percentage_max_power
+          value_type: FLOAT
+          units: '%'
+          params: '100*last("power_consumed_smooth")/last("max_total_power")'
+          applications:
+            -
+              name: Host
+        -
+          name: 'Power Consumed'
+          type: DEPENDENT
+          key: power_consumed
+          delay: '0'
+          value_type: FLOAT
+          units: W
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.port_table.[*].poe_power.sum()'
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "SWITCH"]'
+        -
+          name: 'Power Consumed Smooth'
+          type: CALCULATED
+          key: power_consumed_smooth
+          value_type: FLOAT
+          units: W
+          params: 'avg(power_consumed,{$UNIFI_SMOOTHING_PERIOD})'
+          applications:
+            -
+              name: Host
+        -
+          name: Temperature
+          type: DEPENDENT
+          key: temperature
+          delay: '0'
+          value_type: FLOAT
+          units: ºC
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.general_temperature
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "SWITCH"]'
+          triggers:
+            -
+              expression: '{last()} > {$UNIFI_ALERT_TEMP}'
+              name: '{HOST.NAME} Temperature is > {$UNIFI_ALERT_TEMP}C'
+              priority: AVERAGE
+        -
+          name: 'Total Rx Bandwidth'
+          type: DEPENDENT
+          key: total_rx_bandwidth
+          delay: '0'
+          units: bps
+          applications:
+            -
+              name: Traffic
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.port_table[*].rx_bytes.sum()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+            -
+              type: MULTIPLIER
+              parameters:
+                - '8'
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "SWITCH"]'
+        -
+          name: 'Total Tx Bandwidth'
+          type: DEPENDENT
+          key: total_tx_bandwidth
+          delay: '0'
+          units: bps
+          applications:
+            -
+              name: Traffic
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.port_table[*].tx_bytes.sum()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+            -
+              type: MULTIPLIER
+              parameters:
+                - '8'
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "SWITCH"]'
+        -
+          name: Uptime
+          type: DEPENDENT
+          key: uptime
+          delay: '0'
+          units: S
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.uptime
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "SWITCH"]'
+          triggers:
+            -
+              expression: '{nodata({$UNIFI_ALERT_PERIOD})}=1'
+              name: '{HOST.NAME} did not report statistics'
+              priority: WARNING
+              manual_close: 'YES'
+            -
+              expression: '{nodata(6h)}=1'
+              name: '{HOST.NAME} did not report statistics for 6h'
+              priority: AVERAGE
+              manual_close: 'YES'
+    -
+      template: 'Unifi UDMP'
+      name: 'Unifi UDMP'
+      description: 'Link this template to UDMPs'
+      groups:
+        -
+          name: Patrice
+        -
+          name: unifiZabbix
+        -
+          name: 'Unifi Zabbix Export'
+      applications:
+        -
+          name: Host
+        -
+          name: wan
+      items:
+        -
+          name: 'CPU Utilization'
+          type: DEPENDENT
+          key: cpu
+          delay: '0'
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.[''system-stats''].cpu'
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP"]'
+        -
+          name: 'CPU Smooth'
+          type: CALCULATED
+          key: cpu_smooth
+          value_type: FLOAT
+          units: '%'
+          params: 'avg(cpu,{$UNIFI_SMOOTHING_COUNT})'
+          applications:
+            -
+              name: Host
+        -
+          name: 'Download Bandwidth'
+          type: DEPENDENT
+          key: download_bandwidth
+          delay: '0'
+          units: bps
+          applications:
+            -
+              name: wan
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.if_table.[?(@.latency > 0)].rx_bytes.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+            -
+              type: MULTIPLIER
+              parameters:
+                - '8'
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP"]'
+        -
+          name: 'Download Bandwidth Smooth'
+          type: CALCULATED
+          key: download_bandwidth_smooth
+          value_type: FLOAT
+          units: bps
+          params: 'avg(download_bandwidth,{$UNIFI_SMOOTHING_PERIOD})'
+          applications:
+            -
+              name: wan
+        -
+          name: 'Dropped Dowload Packets'
+          type: DEPENDENT
+          key: dropped_dowload_packets
+          delay: '0'
+          units: packet
+          applications:
+            -
+              name: wan
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.if_table.[?(@.latency > 0)].rx_dropped.first()'
+            -
+              type: SIMPLE_CHANGE
+              parameters:
+                - ''
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP"]'
+        -
+          name: 'Dropped Upload Packets'
+          type: DEPENDENT
+          key: dropped_upload_packets
+          delay: '0'
+          units: packet
+          applications:
+            -
+              name: wan
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.if_table.[?(@.latency > 0)].tx_dropped.first()'
+            -
+              type: SIMPLE_CHANGE
+              parameters:
+                - ''
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP"]'
+        -
+          name: 'Error Download Packets'
+          type: DEPENDENT
+          key: error_download_packets
+          delay: '0'
+          units: packet
+          applications:
+            -
+              name: wan
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.if_table.[?(@.latency > 0)].rx_errors.first()'
+            -
+              type: SIMPLE_CHANGE
+              parameters:
+                - ''
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP"]'
+        -
+          name: 'Error Upload Packets'
+          type: DEPENDENT
+          key: error_upload_packets
+          delay: '0'
+          units: packet
+          applications:
+            -
+              name: wan
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.if_table.[?(@.latency > 0)].tx_errors.first()'
+            -
+              type: SIMPLE_CHANGE
+              parameters:
+                - ''
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP"]'
+        -
+          name: Hostname
+          type: DEPENDENT
+          key: hostname
+          delay: '0'
+          trends: '0'
+          value_type: TEXT
+          inventory_link: NAME
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.hostname
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP"]'
+        -
+          name: 'Load Average 1mn'
+          type: DEPENDENT
+          key: loadavg_1
+          delay: '0'
+          value_type: FLOAT
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.sys_stats.loadavg_1
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP"]'
+        -
+          name: 'Load Average 5mn'
+          type: DEPENDENT
+          key: loadavg_5
+          delay: '0'
+          value_type: FLOAT
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.sys_stats.loadavg_5
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP"]'
+        -
+          name: 'Load Average 15mn'
+          type: DEPENDENT
+          key: loadavg_15
+          delay: '0'
+          value_type: FLOAT
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.sys_stats.loadavg_15
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP"]'
+        -
+          name: 'Load Average Smooth'
+          type: CALCULATED
+          key: loadavg_smooth
+          value_type: FLOAT
+          params: 'avg(loadavg_1,{$UNIFI_SMOOTHING_COUNT})'
+          applications:
+            -
+              name: Host
+        -
+          name: mca-dump
+          type: EXTERNAL
+          key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP"]'
+          delay: '{$UNIFI_CHECK_FREQUENCY}'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          applications:
+            -
+              name: Host
+        -
+          name: 'Memory Utilization'
+          type: CALCULATED
+          key: memory
+          value_type: FLOAT
+          units: '%'
+          params: '100* last("mem_used") / last("mem_total")'
+          applications:
+            -
+              name: Host
+        -
+          name: 'Total Memory'
+          type: DEPENDENT
+          key: mem_total
+          delay: '0'
+          units: bytes
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.sys_stats.mem_total
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP"]'
+        -
+          name: 'Memory Used'
+          type: DEPENDENT
+          key: mem_used
+          delay: '0'
+          units: bytes
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.sys_stats.mem_used
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP"]'
+        -
+          name: Model
+          type: DEPENDENT
+          key: model
+          delay: '0'
+          trends: '0'
+          value_type: TEXT
+          inventory_link: MODEL
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.model_display
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP"]'
+        -
+          name: 'Temperature CPU'
+          type: DEPENDENT
+          key: temperature.cpu
+          delay: '0'
+          value_type: FLOAT
+          units: ºC
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.temperatures.[?(@.name == ''CPU'')].value.first()'
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP"]'
+        -
+          name: 'Temperature PHY'
+          type: DEPENDENT
+          key: temperature.phy
+          delay: '0'
+          value_type: FLOAT
+          units: ºC
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.temperatures.[?(@.name == ''PHY'')].value.first()'
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP"]'
+        -
+          name: 'Upload Bandwidth'
+          type: DEPENDENT
+          key: upload_bandwidth
+          delay: '0'
+          units: bps
+          applications:
+            -
+              name: wan
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.if_table.[?(@.latency > 0)].tx_bytes.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+            -
+              type: MULTIPLIER
+              parameters:
+                - '8'
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP"]'
+        -
+          name: 'Upload Bandwidth Smooth'
+          type: CALCULATED
+          key: upload_bandwidth_smooth
+          value_type: FLOAT
+          units: bps
+          params: 'avg(upload_bandwidth,{$UNIFI_SMOOTHING_PERIOD})'
+          applications:
+            -
+              name: wan
+        -
+          name: Uptime
+          type: DEPENDENT
+          key: uptime
+          delay: '0'
+          units: S
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.uptime
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP"]'
+          triggers:
+            -
+              expression: '{nodata({$UNIFI_ALERT_PERIOD})}=1'
+              name: '{HOST.NAME} did not report statistics'
+              priority: WARNING
+              manual_close: 'YES'
+            -
+              expression: '{nodata(6h)}=1'
+              name: '{HOST.NAME} did not report statistics for 6h'
+              priority: AVERAGE
+              manual_close: 'YES'
+        -
+          name: 'WAN Latency'
+          type: DEPENDENT
+          key: wan_latency
+          delay: '0'
+          units: ms
+          applications:
+            -
+              name: wan
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.if_table.[?(@.latency > 0)].latency.first()'
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP"]'
+        -
+          name: 'Wan Latency Smooth'
+          type: CALCULATED
+          key: wan_latency_smooth
+          value_type: FLOAT
+          units: ms
+          params: 'avg( wan_latency, {$UNIFI_SMOOTHING_PERIOD})'
+          applications:
+            -
+              name: wan
+      macros:
+        -
+          macro: '{$UNIFI_USER}'
+          value: root
+          description: 'AP Zabbix SSH Username - UDMP only supports root'
+    -
+      template: 'Unifi USG'
+      name: 'Unifi USG'
+      description: 'Link this template to USGs'
+      groups:
+        -
+          name: Patrice
+        -
+          name: unifiZabbix
+        -
+          name: 'Unifi Zabbix Export'
+      applications:
+        -
+          name: Host
+        -
+          name: wan
+      items:
+        -
+          name: 'CPU Utilization'
+          type: DEPENDENT
+          key: cpu
+          delay: '0'
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.[''system-stats''].cpu'
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG"]'
+        -
+          name: 'CPU Smooth'
+          type: CALCULATED
+          key: cpu_smooth
+          value_type: FLOAT
+          units: '%'
+          params: 'avg(cpu,{$UNIFI_SMOOTHING_COUNT})'
+          applications:
+            -
+              name: Host
+        -
+          name: 'Download Bandwidth'
+          type: DEPENDENT
+          key: download_bandwidth
+          delay: '0'
+          units: bps
+          applications:
+            -
+              name: wan
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.if_table.[?(@.latency > 0)].rx_bytes.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+            -
+              type: MULTIPLIER
+              parameters:
+                - '8'
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG"]'
+        -
+          name: 'Download Bandwidth Smooth'
+          type: CALCULATED
+          key: download_bandwidth_smooth
+          value_type: FLOAT
+          units: bps
+          params: 'avg(download_bandwidth,{$UNIFI_SMOOTHING_PERIOD})'
+          applications:
+            -
+              name: wan
+        -
+          name: 'Dropped Dowload Packets'
+          type: DEPENDENT
+          key: dropped_dowload_packets
+          delay: '0'
+          units: packet
+          applications:
+            -
+              name: wan
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.if_table.[?(@.latency > 0)].rx_dropped.first()'
+            -
+              type: SIMPLE_CHANGE
+              parameters:
+                - ''
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG"]'
+        -
+          name: 'Dropped Upload Packets'
+          type: DEPENDENT
+          key: dropped_upload_packets
+          delay: '0'
+          units: packet
+          applications:
+            -
+              name: wan
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.if_table.[?(@.latency > 0)].tx_dropped.first()'
+            -
+              type: SIMPLE_CHANGE
+              parameters:
+                - ''
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG"]'
+        -
+          name: 'Error Download Packets'
+          type: DEPENDENT
+          key: error_download_packets
+          delay: '0'
+          units: packet
+          applications:
+            -
+              name: wan
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.if_table.[?(@.latency > 0)].rx_errors.first()'
+            -
+              type: SIMPLE_CHANGE
+              parameters:
+                - ''
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG"]'
+        -
+          name: 'Error Upload Packets'
+          type: DEPENDENT
+          key: error_upload_packets
+          delay: '0'
+          units: packet
+          applications:
+            -
+              name: wan
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.if_table.[?(@.latency > 0)].tx_errors.first()'
+            -
+              type: SIMPLE_CHANGE
+              parameters:
+                - ''
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG"]'
+        -
+          name: Hostname
+          type: DEPENDENT
+          key: hostname
+          delay: '0'
+          trends: '0'
+          value_type: TEXT
+          inventory_link: NAME
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.hostname
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG"]'
+        -
+          name: 'Load Average 1mn'
+          type: DEPENDENT
+          key: loadavg_1
+          delay: '0'
+          value_type: FLOAT
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.sys_stats.loadavg_1
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG"]'
+        -
+          name: 'Load Average 5mn'
+          type: DEPENDENT
+          key: loadavg_5
+          delay: '0'
+          value_type: FLOAT
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.sys_stats.loadavg_5
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG"]'
+        -
+          name: 'Load Average 15mn'
+          type: DEPENDENT
+          key: loadavg_15
+          delay: '0'
+          value_type: FLOAT
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.sys_stats.loadavg_15
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG"]'
+        -
+          name: 'Load Average Smooth'
+          type: CALCULATED
+          key: loadavg_smooth
+          value_type: FLOAT
+          params: 'avg(loadavg_1,{$UNIFI_SMOOTHING_COUNT})'
+          applications:
+            -
+              name: Host
+        -
+          name: mca-dump
+          type: EXTERNAL
+          key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG"]'
+          delay: '{$UNIFI_CHECK_FREQUENCY}'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          applications:
+            -
+              name: Host
+        -
+          name: 'Memory Utilization'
+          type: CALCULATED
+          key: memory
+          value_type: FLOAT
+          units: '%'
+          params: '100* last("mem_used") / last("mem_total")'
+          applications:
+            -
+              name: Host
+        -
+          name: 'Total Memory'
+          type: DEPENDENT
+          key: mem_total
+          delay: '0'
+          units: bytes
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.sys_stats.mem_total
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG"]'
+        -
+          name: 'Memory Used'
+          type: DEPENDENT
+          key: mem_used
+          delay: '0'
+          units: bytes
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.sys_stats.mem_used
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG"]'
+        -
+          name: Model
+          type: DEPENDENT
+          key: model
+          delay: '0'
+          trends: '0'
+          value_type: TEXT
+          inventory_link: MODEL
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.model_display
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG"]'
+        -
+          name: 'Temperature CPU'
+          type: DEPENDENT
+          key: temperature.cpu
+          delay: '0'
+          units: ºC
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $..temps.CPU.first()
+            -
+              type: STR_REPLACE
+              parameters:
+                - ' C'
+                - ''
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG"]'
+        -
+          name: 'Temperature PHY'
+          type: DEPENDENT
+          key: temperature.phy
+          delay: '0'
+          units: ºC
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $..temps.PHY.first()
+            -
+              type: STR_REPLACE
+              parameters:
+                - ' C'
+                - ''
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG"]'
+        -
+          name: 'Upload Bandwidth'
+          type: DEPENDENT
+          key: upload_bandwidth
+          delay: '0'
+          units: bps
+          applications:
+            -
+              name: wan
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.if_table.[?(@.latency > 0)].tx_bytes.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+            -
+              type: MULTIPLIER
+              parameters:
+                - '8'
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG"]'
+        -
+          name: 'Upload Bandwidth Smooth'
+          type: CALCULATED
+          key: upload_bandwidth_smooth
+          value_type: FLOAT
+          units: bps
+          params: 'avg(upload_bandwidth,{$UNIFI_SMOOTHING_PERIOD})'
+          applications:
+            -
+              name: wan
+        -
+          name: Uptime
+          type: DEPENDENT
+          key: uptime
+          delay: '0'
+          units: S
+          applications:
+            -
+              name: Host
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.uptime
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG"]'
+          triggers:
+            -
+              expression: '{nodata({$UNIFI_ALERT_PERIOD})}=1'
+              name: '{HOST.NAME} did not report statistics'
+              priority: WARNING
+              manual_close: 'YES'
+            -
+              expression: '{nodata(6h)}=1'
+              name: '{HOST.NAME} did not report statistics for 6h'
+              priority: AVERAGE
+              manual_close: 'YES'
+        -
+          name: 'WAN Latency'
+          type: DEPENDENT
+          key: wan_latency
+          delay: '0'
+          units: ms
+          applications:
+            -
+              name: wan
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.if_table.[?(@.latency > 0)].latency.first()'
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG"]'
+        -
+          name: 'Wan Latency Smooth'
+          type: CALCULATED
+          key: wan_latency_smooth
+          value_type: FLOAT
+          units: ms
+          params: 'avg( wan_latency, {$UNIFI_SMOOTHING_PERIOD})'
+          applications:
+            -
+              name: wan
+    -
+      template: 'Unifi WiFi Site'
+      name: 'Unifi WiFi Site'
+      description: 'This template is meant to collect WiFi data across all of a site''s APs.  Assign to one of the APs and set the {$UNIFI_AP_GROUP} macro to the name of a group that contains all of the APs you want to aggregate against.'
+      groups:
+        -
+          name: Patrice
+        -
+          name: unifiZabbix
+        -
+          name: 'Unifi Zabbix Export'
+      applications:
+        -
+          name: Host
+        -
+          name: Radio
+      items:
+        -
+          name: 'Total Reception Wireless Bandwidth'
+          type: AGGREGATE
+          key: 'grpsum["{$AP_GROUP}", "wireless_reception_bandwidth",avg, {$UNIFI_SMOOTHING_PERIOD}]'
+          units: bps
+          applications:
+            -
+              name: Radio
+        -
+          name: 'Total Transmission Wireless Bandwidth'
+          type: AGGREGATE
+          key: 'grpsum["{$AP_GROUP}", "wireless_transmission_bandwidth",avg, {$UNIFI_SMOOTHING_PERIOD}]'
+          units: bps
+          applications:
+            -
+              name: Radio
+        -
+          name: mca-dump
+          type: EXTERNAL
+          key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP"]'
+          delay: '{$UNIFI_CHECK_FREQUENCY}'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          applications:
+            -
+              name: Host
+      discovery_rules:
+        -
+          name: 'Discover WiFi Networks'
+          type: DEPENDENT
+          key: wifi_network_discovery_rule
+          delay: '0'
+          item_prototypes:
+            -
+              name: '{#ESSID} Total Reception Bandwidth Smooth'
+              type: AGGREGATE
+              key: 'grpsum["{$AP_GROUP}", "rx_bandwidth_smooth[{#ESSID}]", avg, {$UNIFI_SMOOTHING_PERIOD}]'
+              units: bps
+            -
+              name: '{#ESSID} Total Transmission Bandwidth'
+              type: AGGREGATE
+              key: 'grpsum["{$AP_GROUP}", "tx_bandwidth_smooth[{#ESSID}]", avg, "{$UNIFI_SMOOTHING_PERIOD}"]'
+              units: bps
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP"]'
+          lld_macro_paths:
+            -
+              lld_macro: '{#ESSID}'
+              path: $.essid
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.vap_table
+      macros:
+        -
+          macro: '{$AP_GROUP}'
+          value: 'Override me!'
+          description: 'The name of the group containing the site MAPs'
+  triggers:
+    -
+      expression: '{Unifi Protect NVR4:ssh.run[temp1].last(#1)}>{$UNIFI_ALERT_TEMP} or {Unifi Protect NVR4:ssh.run[temp2].last(#1)}>{$UNIFI_ALERT_TEMP} or {Unifi Protect NVR4:ssh.run[temp3].last(#1)}>{$UNIFI_ALERT_TEMP}'
+      name: '{HOST.NAME} is hot'
+  graphs:
+    -
+      name: 'Air Time'
+      graph_items:
+        -
+          sortorder: '1'
+          color: 1A7C11
+          item:
+            host: 'UBNT Airmax'
+            key: airTimeSmooth
+    -
+      name: Bandwidth
+      graph_items:
+        -
+          sortorder: '1'
+          color: 1A7C11
+          item:
+            host: 'Unifi UDMP'
+            key: download_bandwidth
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Unifi UDMP'
+            key: upload_bandwidth
+    -
+      name: Bandwidth
+      graph_items:
+        -
+          sortorder: '1'
+          color: 1A7C11
+          item:
+            host: 'Unifi USG'
+            key: download_bandwidth_smooth
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Unifi USG'
+            key: upload_bandwidth_smooth
+    -
+      name: 'Bandwidth Used'
+      graph_items:
+        -
+          sortorder: '1'
+          color: 1A7C11
+          item:
+            host: 'UBNT Airmax'
+            key: wlanRxBandwidthSmooth
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'UBNT Airmax'
+            key: wlanTxBandwidthSmooth
+    -
+      name: 'CPU and Memory'
+      graph_items:
+        -
+          sortorder: '1'
+          color: 1A7C11
+          item:
+            host: 'Unifi UDMP'
+            key: cpu
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Unifi UDMP'
+            key: memory
+    -
+      name: 'CPU and Memory'
+      graph_items:
+        -
+          sortorder: '1'
+          color: 1A7C11
+          item:
+            host: 'Unifi Switch'
+            key: cpu_smooth
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Unifi Switch'
+            key: memory
+    -
+      name: 'CPU and Memory'
+      graph_items:
+        -
+          sortorder: '1'
+          color: 1A7C11
+          item:
+            host: 'Unifi USG'
+            key: cpu_smooth
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Unifi USG'
+            key: memory
+    -
+      name: Latency
+      graph_items:
+        -
+          sortorder: '1'
+          color: 1A7C11
+          item:
+            host: 'Unifi UDMP'
+            key: wan_latency
+    -
+      name: 'Load Average'
+      graph_items:
+        -
+          sortorder: '1'
+          color: 1A7C11
+          item:
+            host: 'Unifi UDMP'
+            key: loadavg_1
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Unifi UDMP'
+            key: loadavg_5
+        -
+          sortorder: '3'
+          color: 2774A4
+          item:
+            host: 'Unifi UDMP'
+            key: loadavg_15
+    -
+      name: 'Load Average'
+      graph_items:
+        -
+          sortorder: '1'
+          color: 1A7C11
+          item:
+            host: 'Unifi Switch'
+            key: loadavg_smooth
+    -
+      name: 'Load Average'
+      graph_items:
+        -
+          sortorder: '1'
+          color: 1A7C11
+          item:
+            host: 'Unifi USG'
+            key: loadavg_smooth
+    -
+      name: 'Signal and Noise'
+      graph_items:
+        -
+          sortorder: '1'
+          color: 1A7C11
+          item:
+            host: 'UBNT Airmax'
+            key: noiseSmooth
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'UBNT Airmax'
+            key: signalSmooth
+    -
+      name: 'Total Traffic'
+      graph_items:
+        -
+          sortorder: '1'
+          color: 1A7C11
+          item:
+            host: 'Unifi Switch'
+            key: total_rx_bandwidth

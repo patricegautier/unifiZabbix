@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.2</version>
-    <date>2020-12-14T00:57:34Z</date>
+    <date>2020-12-27T03:58:16Z</date>
     <groups>
         <group>
             <name>Patrice</name>
@@ -1778,6 +1778,9 @@ Assign this template to all APs in your site</description>
                 <application>
                     <name>Host</name>
                 </application>
+                <application>
+                    <name>Traffic</name>
+                </application>
             </applications>
             <items>
                 <item>
@@ -2169,6 +2172,76 @@ Assign this template to all APs in your site</description>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
+                </item>
+                <item>
+                    <name>Total Rx Bandwidth</name>
+                    <type>DEPENDENT</type>
+                    <key>total_rx_bandwidth</key>
+                    <delay>0</delay>
+                    <units>bps</units>
+                    <applications>
+                        <application>
+                            <name>Traffic</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.port_table[*].rx_bytes.sum()</parameter>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>CHANGE_PER_SECOND</type>
+                            <parameters>
+                                <parameter/>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>MULTIPLIER</type>
+                            <parameters>
+                                <parameter>8</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Total Tx Bandwidth</name>
+                    <type>DEPENDENT</type>
+                    <key>total_tx_bandwidth</key>
+                    <delay>0</delay>
+                    <units>bps</units>
+                    <applications>
+                        <application>
+                            <name>Traffic</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.port_table[*].tx_bytes.sum()</parameter>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>CHANGE_PER_SECOND</type>
+                            <parameters>
+                                <parameter/>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>MULTIPLIER</type>
+                            <parameters>
+                                <parameter>8</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;]</key>
+                    </master_item>
                 </item>
                 <item>
                     <name>Uptime</name>
@@ -2861,7 +2934,7 @@ Assign this template to all APs in your site</description>
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>ssh.run[mca-dump]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;]</key>
                     </master_item>
                 </item>
                 <item>
@@ -2909,7 +2982,7 @@ Assign this template to all APs in your site</description>
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>ssh.run[mca-dump]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;]</key>
                     </master_item>
                 </item>
                 <item>
@@ -2951,7 +3024,7 @@ Assign this template to all APs in your site</description>
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>ssh.run[mca-dump]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;]</key>
                     </master_item>
                 </item>
                 <item>
@@ -2980,7 +3053,7 @@ Assign this template to all APs in your site</description>
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>ssh.run[mca-dump]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;]</key>
                     </master_item>
                 </item>
                 <item>
@@ -3009,7 +3082,7 @@ Assign this template to all APs in your site</description>
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>ssh.run[mca-dump]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;]</key>
                     </master_item>
                 </item>
                 <item>
@@ -3038,7 +3111,7 @@ Assign this template to all APs in your site</description>
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>ssh.run[mca-dump]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;]</key>
                     </master_item>
                 </item>
                 <item>
@@ -3063,7 +3136,7 @@ Assign this template to all APs in your site</description>
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>ssh.run[mca-dump]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;]</key>
                     </master_item>
                 </item>
                 <item>
@@ -3086,7 +3159,7 @@ Assign this template to all APs in your site</description>
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>ssh.run[mca-dump]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;]</key>
                     </master_item>
                 </item>
                 <item>
@@ -3109,7 +3182,7 @@ Assign this template to all APs in your site</description>
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>ssh.run[mca-dump]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;]</key>
                     </master_item>
                 </item>
                 <item>
@@ -3132,7 +3205,7 @@ Assign this template to all APs in your site</description>
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>ssh.run[mca-dump]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;]</key>
                     </master_item>
                 </item>
                 <item>
@@ -3148,13 +3221,12 @@ Assign this template to all APs in your site</description>
                     </applications>
                 </item>
                 <item>
-                    <name>mca-dump-short</name>
+                    <name>mca-dump</name>
                     <type>EXTERNAL</type>
-                    <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;BASE&quot;]</key>
+                    <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;]</key>
                     <delay>{$UNIFI_CHECK_FREQUENCY}</delay>
                     <history>0</history>
                     <trends>0</trends>
-                    <status>DISABLED</status>
                     <value_type>TEXT</value_type>
                     <applications>
                         <application>
@@ -3195,7 +3267,7 @@ Assign this template to all APs in your site</description>
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>ssh.run[mca-dump]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;]</key>
                     </master_item>
                 </item>
                 <item>
@@ -3218,7 +3290,7 @@ Assign this template to all APs in your site</description>
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>ssh.run[mca-dump]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;]</key>
                     </master_item>
                 </item>
                 <item>
@@ -3243,27 +3315,8 @@ Assign this template to all APs in your site</description>
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>ssh.run[mca-dump]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;]</key>
                     </master_item>
-                </item>
-                <item>
-                    <name>mca-dump</name>
-                    <type>SSH</type>
-                    <key>ssh.run[mca-dump]</key>
-                    <delay>{$UNIFI_CHECK_FREQUENCY}</delay>
-                    <history>0</history>
-                    <trends>0</trends>
-                    <value_type>TEXT</value_type>
-                    <params>mca-dump | sed 's/^[ \t]*//'</params>
-                    <authtype>PUBLIC_KEY</authtype>
-                    <username>{$UNIFI_USER}</username>
-                    <publickey>{$UNIFI_PUB_KEY}</publickey>
-                    <privatekey>{$UNIFI_PRIV_KEY}</privatekey>
-                    <applications>
-                        <application>
-                            <name>Host</name>
-                        </application>
-                    </applications>
                 </item>
                 <item>
                     <name>Temperature CPU</name>
@@ -3292,7 +3345,7 @@ Assign this template to all APs in your site</description>
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>ssh.run[mca-dump]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;]</key>
                     </master_item>
                 </item>
                 <item>
@@ -3322,7 +3375,7 @@ Assign this template to all APs in your site</description>
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>ssh.run[mca-dump]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;]</key>
                     </master_item>
                 </item>
                 <item>
@@ -3357,7 +3410,7 @@ Assign this template to all APs in your site</description>
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>ssh.run[mca-dump]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;]</key>
                     </master_item>
                 </item>
                 <item>
@@ -3393,7 +3446,7 @@ Assign this template to all APs in your site</description>
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>ssh.run[mca-dump]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;]</key>
                     </master_item>
                     <triggers>
                         <trigger>
@@ -3430,7 +3483,7 @@ Assign this template to all APs in your site</description>
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>ssh.run[mca-dump]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;]</key>
                     </master_item>
                 </item>
                 <item>
@@ -3563,4 +3616,247 @@ Assign this template to all APs in your site</description>
             <name>{HOST.NAME} is hot</name>
         </trigger>
     </triggers>
+    <graphs>
+        <graph>
+            <name>Air Time</name>
+            <graph_items>
+                <graph_item>
+                    <sortorder>1</sortorder>
+                    <color>1A7C11</color>
+                    <item>
+                        <host>UBNT Airmax</host>
+                        <key>airTimeSmooth</key>
+                    </item>
+                </graph_item>
+            </graph_items>
+        </graph>
+        <graph>
+            <name>Bandwidth</name>
+            <graph_items>
+                <graph_item>
+                    <sortorder>1</sortorder>
+                    <color>1A7C11</color>
+                    <item>
+                        <host>Unifi UDMP</host>
+                        <key>download_bandwidth</key>
+                    </item>
+                </graph_item>
+                <graph_item>
+                    <sortorder>2</sortorder>
+                    <color>F63100</color>
+                    <item>
+                        <host>Unifi UDMP</host>
+                        <key>upload_bandwidth</key>
+                    </item>
+                </graph_item>
+            </graph_items>
+        </graph>
+        <graph>
+            <name>Bandwidth</name>
+            <graph_items>
+                <graph_item>
+                    <sortorder>1</sortorder>
+                    <color>1A7C11</color>
+                    <item>
+                        <host>Unifi USG</host>
+                        <key>download_bandwidth_smooth</key>
+                    </item>
+                </graph_item>
+                <graph_item>
+                    <sortorder>2</sortorder>
+                    <color>F63100</color>
+                    <item>
+                        <host>Unifi USG</host>
+                        <key>upload_bandwidth_smooth</key>
+                    </item>
+                </graph_item>
+            </graph_items>
+        </graph>
+        <graph>
+            <name>Bandwidth Used</name>
+            <graph_items>
+                <graph_item>
+                    <sortorder>1</sortorder>
+                    <color>1A7C11</color>
+                    <item>
+                        <host>UBNT Airmax</host>
+                        <key>wlanRxBandwidthSmooth</key>
+                    </item>
+                </graph_item>
+                <graph_item>
+                    <sortorder>2</sortorder>
+                    <color>F63100</color>
+                    <item>
+                        <host>UBNT Airmax</host>
+                        <key>wlanTxBandwidthSmooth</key>
+                    </item>
+                </graph_item>
+            </graph_items>
+        </graph>
+        <graph>
+            <name>CPU and Memory</name>
+            <graph_items>
+                <graph_item>
+                    <sortorder>1</sortorder>
+                    <color>1A7C11</color>
+                    <item>
+                        <host>Unifi UDMP</host>
+                        <key>cpu</key>
+                    </item>
+                </graph_item>
+                <graph_item>
+                    <sortorder>2</sortorder>
+                    <color>F63100</color>
+                    <item>
+                        <host>Unifi UDMP</host>
+                        <key>memory</key>
+                    </item>
+                </graph_item>
+            </graph_items>
+        </graph>
+        <graph>
+            <name>CPU and Memory</name>
+            <graph_items>
+                <graph_item>
+                    <sortorder>1</sortorder>
+                    <color>1A7C11</color>
+                    <item>
+                        <host>Unifi Switch</host>
+                        <key>cpu_smooth</key>
+                    </item>
+                </graph_item>
+                <graph_item>
+                    <sortorder>2</sortorder>
+                    <color>F63100</color>
+                    <item>
+                        <host>Unifi Switch</host>
+                        <key>memory</key>
+                    </item>
+                </graph_item>
+            </graph_items>
+        </graph>
+        <graph>
+            <name>CPU and Memory</name>
+            <graph_items>
+                <graph_item>
+                    <sortorder>1</sortorder>
+                    <color>1A7C11</color>
+                    <item>
+                        <host>Unifi USG</host>
+                        <key>cpu_smooth</key>
+                    </item>
+                </graph_item>
+                <graph_item>
+                    <sortorder>2</sortorder>
+                    <color>F63100</color>
+                    <item>
+                        <host>Unifi USG</host>
+                        <key>memory</key>
+                    </item>
+                </graph_item>
+            </graph_items>
+        </graph>
+        <graph>
+            <name>Latency</name>
+            <graph_items>
+                <graph_item>
+                    <sortorder>1</sortorder>
+                    <color>1A7C11</color>
+                    <item>
+                        <host>Unifi UDMP</host>
+                        <key>wan_latency</key>
+                    </item>
+                </graph_item>
+            </graph_items>
+        </graph>
+        <graph>
+            <name>Load Average</name>
+            <graph_items>
+                <graph_item>
+                    <sortorder>1</sortorder>
+                    <color>1A7C11</color>
+                    <item>
+                        <host>Unifi UDMP</host>
+                        <key>loadavg_1</key>
+                    </item>
+                </graph_item>
+                <graph_item>
+                    <sortorder>2</sortorder>
+                    <color>F63100</color>
+                    <item>
+                        <host>Unifi UDMP</host>
+                        <key>loadavg_5</key>
+                    </item>
+                </graph_item>
+                <graph_item>
+                    <sortorder>3</sortorder>
+                    <color>2774A4</color>
+                    <item>
+                        <host>Unifi UDMP</host>
+                        <key>loadavg_15</key>
+                    </item>
+                </graph_item>
+            </graph_items>
+        </graph>
+        <graph>
+            <name>Load Average</name>
+            <graph_items>
+                <graph_item>
+                    <sortorder>1</sortorder>
+                    <color>1A7C11</color>
+                    <item>
+                        <host>Unifi Switch</host>
+                        <key>loadavg_smooth</key>
+                    </item>
+                </graph_item>
+            </graph_items>
+        </graph>
+        <graph>
+            <name>Load Average</name>
+            <graph_items>
+                <graph_item>
+                    <sortorder>1</sortorder>
+                    <color>1A7C11</color>
+                    <item>
+                        <host>Unifi USG</host>
+                        <key>loadavg_smooth</key>
+                    </item>
+                </graph_item>
+            </graph_items>
+        </graph>
+        <graph>
+            <name>Signal and Noise</name>
+            <graph_items>
+                <graph_item>
+                    <sortorder>1</sortorder>
+                    <color>1A7C11</color>
+                    <item>
+                        <host>UBNT Airmax</host>
+                        <key>noiseSmooth</key>
+                    </item>
+                </graph_item>
+                <graph_item>
+                    <sortorder>2</sortorder>
+                    <color>F63100</color>
+                    <item>
+                        <host>UBNT Airmax</host>
+                        <key>signalSmooth</key>
+                    </item>
+                </graph_item>
+            </graph_items>
+        </graph>
+        <graph>
+            <name>Total Traffic</name>
+            <graph_items>
+                <graph_item>
+                    <sortorder>1</sortorder>
+                    <color>1A7C11</color>
+                    <item>
+                        <host>Unifi Switch</host>
+                        <key>total_rx_bandwidth</key>
+                    </item>
+                </graph_item>
+            </graph_items>
+        </graph>
+    </graphs>
 </zabbix_export>
