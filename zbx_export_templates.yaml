@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2020-12-27T03:58:13Z'
+  date: '2020-12-28T04:31:12Z'
   groups:
     -
       name: Patrice
@@ -1663,6 +1663,8 @@ zabbix_export:
         -
           name: Host
         -
+          name: Traffic
+        -
           name: wan
       items:
         -
@@ -2073,6 +2075,89 @@ zabbix_export:
           applications:
             -
               name: wan
+      discovery_rules:
+        -
+          name: 'Network Discovery'
+          type: DEPENDENT
+          key: network_discovery
+          delay: '0'
+          description: 'Network Discovery'
+          item_prototypes:
+            -
+              name: '{#NETWORK_NAME} VLAN Reception Bandwidth'
+              type: DEPENDENT
+              key: 'vlan_rx_bandwitdh[{#NETWORK_NAME}]'
+              delay: '0'
+              units: bps
+              applications:
+                -
+                  name: Traffic
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.network_table[ ?(@.address == ''{#NETWORK_NAME}'' ) ].stats.rx_bytes.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+              master_item:
+                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP"]'
+            -
+              name: '{#NETWORK_NAME} VLAN Transmission Bandwidth'
+              type: DEPENDENT
+              key: 'vlan_tx_bandwitdh[{#NETWORK_NAME}]'
+              delay: '0'
+              units: bps
+              applications:
+                -
+                  name: Traffic
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.network_table[ ?(@.address == ''{#NETWORK_NAME}'' ) ].stats.tx_bytes.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+              master_item:
+                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP"]'
+          graph_prototypes:
+            -
+              name: '{#NETWORK_NAME} VLAN External Bandwidth'
+              graph_items:
+                -
+                  sortorder: '1'
+                  color: 1A7C11
+                  item:
+                    host: 'Unifi UDMP'
+                    key: 'vlan_rx_bandwitdh[{#NETWORK_NAME}]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'Unifi UDMP'
+                    key: 'vlan_tx_bandwitdh[{#NETWORK_NAME}]'
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP"]'
+          lld_macro_paths:
+            -
+              lld_macro: '{#NETWORK_NAME}'
+              path: $.address
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.network_table[?(@.active_dhcp_lease_count>0)]'
       macros:
         -
           macro: '{$UNIFI_USER}'
@@ -2092,6 +2177,8 @@ zabbix_export:
       applications:
         -
           name: Host
+        -
+          name: Traffic
         -
           name: wan
       items:
@@ -2511,6 +2598,88 @@ zabbix_export:
           applications:
             -
               name: wan
+      discovery_rules:
+        -
+          name: 'Network Discovery'
+          type: DEPENDENT
+          key: network_discovery
+          delay: '0'
+          item_prototypes:
+            -
+              name: '{#NETWORK_NAME} VLAN Reception Bandwidth'
+              type: DEPENDENT
+              key: 'vlan_rx_bandwitdh[{#NETWORK_NAME}]'
+              delay: '0'
+              units: bps
+              applications:
+                -
+                  name: Traffic
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.network_table[ ?(@.name == ''{#NETWORK_NAME}'' ) ].stats.rx_bytes.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+              master_item:
+                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG"]'
+            -
+              name: '{#NETWORK_NAME} VLAN Transmission Bandwidth'
+              type: DEPENDENT
+              key: 'vlan_tx_bandwitdh[{#NETWORK_NAME}]'
+              delay: '0'
+              units: bps
+              applications:
+                -
+                  name: Traffic
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.network_table[ ?(@.name == ''{#NETWORK_NAME}'' ) ].stats.tx_bytes.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+              master_item:
+                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG"]'
+          graph_prototypes:
+            -
+              name: '{#NETWORK_NAME} VLAN External Bandwidth'
+              graph_items:
+                -
+                  sortorder: '1'
+                  color: 1A7C11
+                  item:
+                    host: 'Unifi USG'
+                    key: 'vlan_rx_bandwitdh[{#NETWORK_NAME}]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'Unifi USG'
+                    key: 'vlan_tx_bandwitdh[{#NETWORK_NAME}]'
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG"]'
+          lld_macro_paths:
+            -
+              lld_macro: '{#NETWORK_NAME}'
+              path: $.name
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.network_table[?(@.up=="true")]'
     -
       template: 'Unifi WiFi Site'
       name: 'Unifi WiFi Site'
