@@ -122,28 +122,28 @@ If you got this far, congratulations the install is complete!  Now for the funne
 If everything is working you should be able to see data flowing in the Monitoring > Latest Data section of Zabbix.  Time to set up some graphs..  Unfortunately Zabbix doesn't to have a good way to share graphs as it does for templates, so here is a quick rundown of what I have setup..:
 
 
-## Wan Download
+## UDMP|USG Wan Download
 ![Wan Download](/images/wanDownload.png)
 
-## Wan Upload
+## UDMP|USG Wan Upload
 ![Wan Upload](/images/wanUpload.png)
 
 Observe the tight correlation between upload bandwidt and latency.. Cable technology at its finest!
+
+## Router: InterVLAN traffic by network
+![InterVLAN](/images/intervlan.png)
+
+I have found this one to be useful to get router usage down
 
 ## Total Switch Traffic by Switch
 ![Switch Traffic](/images/totalSwitch.png)
 
 Useful to point to potential bottlenecks
 
-## InterVLAN traffic by network
-![InterVLAN](/images/intervlan.png)
-
-I have found this one to be useful to get router usage down
-
-## WiFi Channel Usage
+## WiFi Channel Usage by AP
 ![Channel Interference](/images/channelUsage.png)
 
-## WiFi Channel Interference
+## WiFi Channel Interference bu AP
 ![Channel Interference](/images/channelInterference.png)
 
 ## WiFi Transmission by Network
@@ -152,7 +152,7 @@ I have found this one to be useful to get router usage down
 ## WiFi Retries
 ![Retries](/images/retries.png)
 
-## Airmax S/N and Airtime
+## Airmax S/N and Airtime by AirMax device
 ![Airmad](/images/airmaxSN.png)
 
 
@@ -181,8 +181,11 @@ i.e automatically create all the proper hosts connected to the proper templates 
 
 Most of the pain in setting those templates up is debugging the SSH connections..  Add pre-processing to check for valid json on mca-dump-short to all templates
 
+## Auto Switch Port discovery, alert on traffic > % of capacity
 
-## Moar data!
+## SolarPoint support
+
+## Even Moar data!
 
 There is a mountain of information to be retrieved from devices.  I added what made most sense to me, but let me know if you would like to see added.  Also there is potential for quite a few more triggers..
 
