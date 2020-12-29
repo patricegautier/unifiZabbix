@@ -130,10 +130,20 @@ If everything is working you should be able to see data flowing in the Monitorin
 
 Observe the tight correlation between upload bandwidt and latency.. Cable technology at its finest!
 
-## Channel Usage
+## Total Switch Traffic by Switch
+![Switch Traffic](/images/totalSwitch.png)
+
+Useful to point to potential bottlenecks
+
+## InterVLAN traffic by network
+![InterVLAN](/images/intervlan.png)
+
+I have found this one to be useful to get router usage down
+
+## WiFi Channel Usage
 ![Channel Interference](/images/channelUsage.png)
 
-## Channel Interference
+## WiFi Channel Interference
 ![Channel Interference](/images/channelInterference.png)
 
 ## WiFi Transmission by Network
