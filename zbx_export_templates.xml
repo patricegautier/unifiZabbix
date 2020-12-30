@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.2</version>
-    <date>2020-12-30T06:56:43Z</date>
+    <date>2020-12-30T08:19:20Z</date>
     <groups>
         <group>
             <name>Patrice</name>
@@ -31,6 +31,19 @@
                 </application>
             </applications>
             <items>
+                <item>
+                    <name>Net Power Consumption</name>
+                    <type>CALCULATED</type>
+                    <key>net_power_consumption</key>
+                    <value_type>FLOAT</value_type>
+                    <units>W</units>
+                    <params>last(pvInputPower) - last(powerOutput)</params>
+                    <applications>
+                        <application>
+                            <name>Battery</name>
+                        </application>
+                    </applications>
+                </item>
                 <item>
                     <name>powerOutput</name>
                     <type>DEPENDENT</type>
@@ -66,7 +79,8 @@
                     <type>DEPENDENT</type>
                     <key>pvInputPower</key>
                     <delay>0</delay>
-                    <units>mA</units>
+                    <value_type>FLOAT</value_type>
+                    <units>W</units>
                     <applications>
                         <application>
                             <name>Battery</name>
@@ -2553,6 +2567,138 @@ Assign this template to all APs in your site</description>
                     </triggers>
                 </item>
             </items>
+            <discovery_rules>
+                <discovery_rule>
+                    <name>Switch Port Discovery</name>
+                    <type>DEPENDENT</type>
+                    <key>switch_port_discovery</key>
+                    <delay>0</delay>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>Port {#PORT_IDX} Rx Bandwidth</name>
+                            <type>DEPENDENT</type>
+                            <key>rx_port_[{#PORT_IDX}]</key>
+                            <delay>0</delay>
+                            <units>bps</units>
+                            <applications>
+                                <application>
+                                    <name>Traffic</name>
+                                </application>
+                            </applications>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <parameters>
+                                        <parameter>$.port_table[ ?(@.port_idx=='{#PORT_IDX}')].rx_bytes.first()</parameter>
+                                    </parameters>
+                                </step>
+                                <step>
+                                    <type>CHANGE_PER_SECOND</type>
+                                    <parameters>
+                                        <parameter/>
+                                    </parameters>
+                                </step>
+                                <step>
+                                    <type>MULTIPLIER</type>
+                                    <parameters>
+                                        <parameter>8</parameter>
+                                    </parameters>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;]</key>
+                            </master_item>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Port {#PORT_IDX} Tx Bandwidth</name>
+                            <type>DEPENDENT</type>
+                            <key>tx_port_[{#PORT_IDX}]</key>
+                            <delay>0</delay>
+                            <units>bps</units>
+                            <applications>
+                                <application>
+                                    <name>Traffic</name>
+                                </application>
+                            </applications>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <parameters>
+                                        <parameter>$.port_table[ ?(@.port_idx=='{#PORT_IDX}')].tx_bytes.first()</parameter>
+                                    </parameters>
+                                </step>
+                                <step>
+                                    <type>CHANGE_PER_SECOND</type>
+                                    <parameters>
+                                        <parameter/>
+                                    </parameters>
+                                </step>
+                                <step>
+                                    <type>MULTIPLIER</type>
+                                    <parameters>
+                                        <parameter>8</parameter>
+                                    </parameters>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;]</key>
+                            </master_item>
+                        </item_prototype>
+                    </item_prototypes>
+                    <trigger_prototypes>
+                        <trigger_prototype>
+                            <expression>{Unifi Switch:rx_port_[{#PORT_IDX}].last(#1)}&gt;100000000 or {Unifi Switch:tx_port_[{#PORT_IDX}].last(#1)}&gt;100000000</expression>
+                            <name>Port {#PORT_IDX} above 100 Mbps</name>
+                            <priority>INFO</priority>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                            <expression>{Unifi Switch:rx_port_[{#PORT_IDX}].last(#1)}&gt;500000000 or {Unifi Switch:tx_port_[{#PORT_IDX}].last(#1)}&gt;500000000</expression>
+                            <name>Port {#PORT_IDX} above 500 Mbps</name>
+                            <priority>WARNING</priority>
+                        </trigger_prototype>
+                    </trigger_prototypes>
+                    <graph_prototypes>
+                        <graph_prototype>
+                            <name>Port I/O</name>
+                            <graph_items>
+                                <graph_item>
+                                    <sortorder>1</sortorder>
+                                    <color>1A7C11</color>
+                                    <item>
+                                        <host>Unifi Switch</host>
+                                        <key>rx_port_[{#PORT_IDX}]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>2</sortorder>
+                                    <color>F63100</color>
+                                    <item>
+                                        <host>Unifi Switch</host>
+                                        <key>tx_port_[{#PORT_IDX}]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                    </graph_prototypes>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;]</key>
+                    </master_item>
+                    <lld_macro_paths>
+                        <lld_macro_path>
+                            <lld_macro>{#PORT_IDX}</lld_macro>
+                            <path>$.port_idx</path>
+                        </lld_macro_path>
+                    </lld_macro_paths>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.port_table</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                </discovery_rule>
+            </discovery_rules>
         </template>
         <template>
             <template>Unifi UDMP</template>
@@ -4348,18 +4494,10 @@ Assign this template to all APs in your site</description>
             <graph_items>
                 <graph_item>
                     <sortorder>1</sortorder>
-                    <color>E53935</color>
+                    <color>2774A4</color>
                     <item>
                         <host>SunMAX SolarPoint</host>
-                        <key>powerOutput</key>
-                    </item>
-                </graph_item>
-                <graph_item>
-                    <sortorder>2</sortorder>
-                    <color>43A047</color>
-                    <item>
-                        <host>SunMAX SolarPoint</host>
-                        <key>pvInputPower</key>
+                        <key>net_power_consumption</key>
                     </item>
                 </graph_item>
             </graph_items>

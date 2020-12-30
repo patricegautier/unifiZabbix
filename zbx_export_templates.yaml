@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2020-12-30T06:56:41Z'
+  date: '2020-12-30T08:19:17Z'
   groups:
     -
       name: Patrice
@@ -21,6 +21,16 @@ zabbix_export:
         -
           name: Battery
       items:
+        -
+          name: 'Net Power Consumption'
+          type: CALCULATED
+          key: net_power_consumption
+          value_type: FLOAT
+          units: W
+          params: 'last(pvInputPower) - last(powerOutput)'
+          applications:
+            -
+              name: Battery
         -
           name: powerOutput
           type: DEPENDENT
@@ -47,7 +57,8 @@ zabbix_export:
           type: DEPENDENT
           key: pvInputPower
           delay: '0'
-          units: mA
+          value_type: FLOAT
+          units: W
           applications:
             -
               name: Battery
@@ -1838,6 +1849,97 @@ zabbix_export:
               name: '{HOST.NAME} did not report statistics for 6h'
               priority: AVERAGE
               manual_close: 'YES'
+      discovery_rules:
+        -
+          name: 'Switch Port Discovery'
+          type: DEPENDENT
+          key: switch_port_discovery
+          delay: '0'
+          item_prototypes:
+            -
+              name: 'Port {#PORT_IDX} Rx Bandwidth'
+              type: DEPENDENT
+              key: 'rx_port_[{#PORT_IDX}]'
+              delay: '0'
+              units: bps
+              applications:
+                -
+                  name: Traffic
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.port_table[ ?(@.port_idx==''{#PORT_IDX}'')].rx_bytes.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+              master_item:
+                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "SWITCH"]'
+            -
+              name: 'Port {#PORT_IDX} Tx Bandwidth'
+              type: DEPENDENT
+              key: 'tx_port_[{#PORT_IDX}]'
+              delay: '0'
+              units: bps
+              applications:
+                -
+                  name: Traffic
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.port_table[ ?(@.port_idx==''{#PORT_IDX}'')].tx_bytes.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+              master_item:
+                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "SWITCH"]'
+          trigger_prototypes:
+            -
+              expression: '{Unifi Switch:rx_port_[{#PORT_IDX}].last(#1)}>100000000 or {Unifi Switch:tx_port_[{#PORT_IDX}].last(#1)}>100000000'
+              name: 'Port {#PORT_IDX} above 100 Mbps'
+              priority: INFO
+            -
+              expression: '{Unifi Switch:rx_port_[{#PORT_IDX}].last(#1)}>500000000 or {Unifi Switch:tx_port_[{#PORT_IDX}].last(#1)}>500000000'
+              name: 'Port {#PORT_IDX} above 500 Mbps'
+              priority: WARNING
+          graph_prototypes:
+            -
+              name: 'Port I/O'
+              graph_items:
+                -
+                  sortorder: '1'
+                  color: 1A7C11
+                  item:
+                    host: 'Unifi Switch'
+                    key: 'rx_port_[{#PORT_IDX}]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'Unifi Switch'
+                    key: 'tx_port_[{#PORT_IDX}]'
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "SWITCH"]'
+          lld_macro_paths:
+            -
+              lld_macro: '{#PORT_IDX}'
+              path: $.port_idx
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.port_table
     -
       template: 'Unifi UDMP'
       name: 'Unifi UDMP'
@@ -3104,16 +3206,10 @@ zabbix_export:
       graph_items:
         -
           sortorder: '1'
-          color: E53935
+          color: 2774A4
           item:
             host: 'SunMAX SolarPoint'
-            key: powerOutput
-        -
-          sortorder: '2'
-          color: 43A047
-          item:
-            host: 'SunMAX SolarPoint'
-            key: pvInputPower
+            key: net_power_consumption
     -
       name: 'Signal and Noise'
       graph_items:
