@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2020-12-28T04:31:12Z'
+  date: '2020-12-30T06:56:41Z'
   groups:
     -
       name: Patrice
@@ -11,6 +11,196 @@ zabbix_export:
     -
       name: 'Unifi Zabbix Export'
   templates:
+    -
+      template: 'SunMAX SolarPoint'
+      name: 'SunMAX SolarPoint'
+      groups:
+        -
+          name: 'Unifi Zabbix Export'
+      applications:
+        -
+          name: Battery
+      items:
+        -
+          name: powerOutput
+          type: DEPENDENT
+          key: powerOutput
+          delay: '0'
+          value_type: FLOAT
+          units: W
+          applications:
+            -
+              name: Battery
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.result[1].results.output.power'
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.001'
+          master_item:
+            key: 'solarpointBattery.sh["-u", "{$SOLARPOINT_USERNAME}", "-p", "{$SOLARPOINT_PASSWORD}", {HOST.CONN}]'
+        -
+          name: pvInputPower
+          type: DEPENDENT
+          key: pvInputPower
+          delay: '0'
+          units: mA
+          applications:
+            -
+              name: Battery
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.result[1].results.pv.power'
+          master_item:
+            key: 'solarpointBattery.sh["-u", "{$SOLARPOINT_USERNAME}", "-p", "{$SOLARPOINT_PASSWORD}", {HOST.CONN}]'
+        -
+          name: pvInputVoltage
+          type: DEPENDENT
+          key: pvInputVoltage
+          delay: '0'
+          units: V
+          applications:
+            -
+              name: Battery
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.result[1].results.pv.voltage'
+          master_item:
+            key: 'solarpointBattery.sh["-u", "{$SOLARPOINT_USERNAME}", "-p", "{$SOLARPOINT_PASSWORD}", {HOST.CONN}]'
+        -
+          name: batteryJson
+          type: EXTERNAL
+          key: 'solarpointBattery.sh["-u", "{$SOLARPOINT_USERNAME}", "-p", "{$SOLARPOINT_PASSWORD}", {HOST.CONN}]'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          applications:
+            -
+              name: Battery
+        -
+          name: voltageOutput
+          type: DEPENDENT
+          key: voltageOutput
+          delay: '0'
+          value_type: FLOAT
+          units: V
+          applications:
+            -
+              name: Battery
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.result[1].results.output.voltage'
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.001'
+          master_item:
+            key: 'solarpointBattery.sh["-u", "{$SOLARPOINT_USERNAME}", "-p", "{$SOLARPOINT_PASSWORD}", {HOST.CONN}]'
+      discovery_rules:
+        -
+          name: 'Power Port Discovery'
+          type: DEPENDENT
+          key: power_port_discovery
+          delay: '0'
+          item_prototypes:
+            -
+              name: '{#PORT_NAME} Port Enabled'
+              type: DEPENDENT
+              key: 'port__enabled_[{#PORT_NAME}]'
+              delay: '0'
+              trends: '0'
+              value_type: CHAR
+              applications:
+                -
+                  name: Battery
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.result[1].results.output.pins[ ?(@.name==''{#PORT_NAME}'') ].enabled.first()'
+              master_item:
+                key: 'solarpointBattery.sh["-u", "{$SOLARPOINT_USERNAME}", "-p", "{$SOLARPOINT_PASSWORD}", {HOST.CONN}]'
+            -
+              name: '{#PORT_NAME} Port Low Voltage'
+              type: DEPENDENT
+              key: 'port__low_voltage_[{#PORT_NAME}]'
+              delay: '0'
+              trends: '0'
+              value_type: CHAR
+              applications:
+                -
+                  name: Battery
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.result[1].results.output.pins[ ?(@.name==''{#PORT_NAME}'') ].low_voltage.first()'
+              master_item:
+                key: 'solarpointBattery.sh["-u", "{$SOLARPOINT_USERNAME}", "-p", "{$SOLARPOINT_PASSWORD}", {HOST.CONN}]'
+              trigger_prototypes:
+                -
+                  expression: '{last(#1)}="true"'
+                  name: '{#PORT_NAME} Port is Low Voltage'
+                  priority: INFO
+            -
+              name: '{#PORT_NAME} Port On'
+              type: DEPENDENT
+              key: 'port__on_[{#PORT_NAME}]'
+              delay: '0'
+              trends: '0'
+              value_type: CHAR
+              applications:
+                -
+                  name: Battery
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.result[1].results.output.pins[ ?(@.name==''{#PORT_NAME}'') ].on.first()'
+              master_item:
+                key: 'solarpointBattery.sh["-u", "{$SOLARPOINT_USERNAME}", "-p", "{$SOLARPOINT_PASSWORD}", {HOST.CONN}]'
+            -
+              name: '{#PORT_NAME} Port Suspended'
+              type: DEPENDENT
+              key: 'port__suspended_[{#PORT_NAME}]'
+              delay: '0'
+              trends: '0'
+              value_type: CHAR
+              applications:
+                -
+                  name: Battery
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.result[1].results.output.pins[ ?(@.name==''{#PORT_NAME}'') ].suspended.first()'
+              master_item:
+                key: 'solarpointBattery.sh["-u", "{$SOLARPOINT_USERNAME}", "-p", "{$SOLARPOINT_PASSWORD}", {HOST.CONN}]'
+              trigger_prototypes:
+                -
+                  expression: '{last(#1)}="true"'
+                  name: '{#PORT_NAME} Port is Suspended'
+                  priority: WARNING
+          master_item:
+            key: 'solarpointBattery.sh["-u", "{$SOLARPOINT_USERNAME}", "-p", "{$SOLARPOINT_PASSWORD}", {HOST.CONN}]'
+          lld_macro_paths:
+            -
+              lld_macro: '{#PORT_NAME}'
+              path: $.name
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.result[1].results.output.pins'
     -
       template: 'UBNT Airmax'
       name: 'UBNT Airmax'
@@ -2909,6 +3099,21 @@ zabbix_export:
           item:
             host: 'Unifi USG'
             key: loadavg_smooth
+    -
+      name: 'Power I/O'
+      graph_items:
+        -
+          sortorder: '1'
+          color: E53935
+          item:
+            host: 'SunMAX SolarPoint'
+            key: powerOutput
+        -
+          sortorder: '2'
+          color: 43A047
+          item:
+            host: 'SunMAX SolarPoint'
+            key: pvInputPower
     -
       name: 'Signal and Noise'
       graph_items:

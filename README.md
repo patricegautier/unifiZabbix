@@ -46,6 +46,7 @@ You should now have the following templates available, and it should be pretty s
 	Unifi WiFi Site
 	Unifi Protect Cloud Key
 	Unifi Protect NVR4
+	SunMax SolarPoint
 
 
 You will need to assign the templates with the matching type to hosts with the proper IP/fqdn that you have created in Zabbix.
@@ -111,7 +112,6 @@ Those last two are used to create moving averages that make graphs far easier to
 
 
 
-
 # SUCCESS!
 
 If you got this far, congratulations the install is complete!  Now for the funner part:
@@ -155,6 +155,24 @@ Useful to point to potential bottlenecks
 ## Airmax S/N and Airtime by AirMax device
 ![Airmad](/images/airmaxSN.png)
 
+
+# SunMax Solarpoint Support
+
+## Install solarpointBattery.sh
+
+Following the same steps as mca-dump-short.sh above, install solarpointBattery.sh as a Zabbix external script
+
+## Macros
+
+The SunMax SolarPoints do not support SSH, so you'll have to set up the following macros seperately, either in Administration > General > Macros or on the host directly depending on your case:
+
+### {$SOLARPOINT_USERNAME}
+The username that will let the zabbix server (or proxy) log in to the SolarPoint device
+
+### {$SOLARPOINT_PASSWORD}
+The password that will let the zabbix server (or proxy) log in to the SolarPoint device
+
+That will give you access to power production and consumption, as well as set a trigger on PoE ports being suspended
 
 
 

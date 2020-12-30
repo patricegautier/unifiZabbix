@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.2</version>
-    <date>2020-12-28T04:31:14Z</date>
+    <date>2020-12-30T06:56:43Z</date>
     <groups>
         <group>
             <name>Patrice</name>
@@ -17,6 +17,278 @@
         </group>
     </groups>
     <templates>
+        <template>
+            <template>SunMAX SolarPoint</template>
+            <name>SunMAX SolarPoint</name>
+            <groups>
+                <group>
+                    <name>Unifi Zabbix Export</name>
+                </group>
+            </groups>
+            <applications>
+                <application>
+                    <name>Battery</name>
+                </application>
+            </applications>
+            <items>
+                <item>
+                    <name>powerOutput</name>
+                    <type>DEPENDENT</type>
+                    <key>powerOutput</key>
+                    <delay>0</delay>
+                    <value_type>FLOAT</value_type>
+                    <units>W</units>
+                    <applications>
+                        <application>
+                            <name>Battery</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.result[1].results.output.power</parameter>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>MULTIPLIER</type>
+                            <parameters>
+                                <parameter>0.001</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>solarpointBattery.sh[&quot;-u&quot;, &quot;{$SOLARPOINT_USERNAME}&quot;, &quot;-p&quot;, &quot;{$SOLARPOINT_PASSWORD}&quot;, {HOST.CONN}]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>pvInputPower</name>
+                    <type>DEPENDENT</type>
+                    <key>pvInputPower</key>
+                    <delay>0</delay>
+                    <units>mA</units>
+                    <applications>
+                        <application>
+                            <name>Battery</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.result[1].results.pv.power</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>solarpointBattery.sh[&quot;-u&quot;, &quot;{$SOLARPOINT_USERNAME}&quot;, &quot;-p&quot;, &quot;{$SOLARPOINT_PASSWORD}&quot;, {HOST.CONN}]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>pvInputVoltage</name>
+                    <type>DEPENDENT</type>
+                    <key>pvInputVoltage</key>
+                    <delay>0</delay>
+                    <units>V</units>
+                    <applications>
+                        <application>
+                            <name>Battery</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.result[1].results.pv.voltage</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>solarpointBattery.sh[&quot;-u&quot;, &quot;{$SOLARPOINT_USERNAME}&quot;, &quot;-p&quot;, &quot;{$SOLARPOINT_PASSWORD}&quot;, {HOST.CONN}]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>batteryJson</name>
+                    <type>EXTERNAL</type>
+                    <key>solarpointBattery.sh[&quot;-u&quot;, &quot;{$SOLARPOINT_USERNAME}&quot;, &quot;-p&quot;, &quot;{$SOLARPOINT_PASSWORD}&quot;, {HOST.CONN}]</key>
+                    <history>0</history>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <applications>
+                        <application>
+                            <name>Battery</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>voltageOutput</name>
+                    <type>DEPENDENT</type>
+                    <key>voltageOutput</key>
+                    <delay>0</delay>
+                    <value_type>FLOAT</value_type>
+                    <units>V</units>
+                    <applications>
+                        <application>
+                            <name>Battery</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.result[1].results.output.voltage</parameter>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>MULTIPLIER</type>
+                            <parameters>
+                                <parameter>0.001</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>solarpointBattery.sh[&quot;-u&quot;, &quot;{$SOLARPOINT_USERNAME}&quot;, &quot;-p&quot;, &quot;{$SOLARPOINT_PASSWORD}&quot;, {HOST.CONN}]</key>
+                    </master_item>
+                </item>
+            </items>
+            <discovery_rules>
+                <discovery_rule>
+                    <name>Power Port Discovery</name>
+                    <type>DEPENDENT</type>
+                    <key>power_port_discovery</key>
+                    <delay>0</delay>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>{#PORT_NAME} Port Enabled</name>
+                            <type>DEPENDENT</type>
+                            <key>port__enabled_[{#PORT_NAME}]</key>
+                            <delay>0</delay>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <applications>
+                                <application>
+                                    <name>Battery</name>
+                                </application>
+                            </applications>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <parameters>
+                                        <parameter>$.result[1].results.output.pins[ ?(@.name=='{#PORT_NAME}') ].enabled.first()</parameter>
+                                    </parameters>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>solarpointBattery.sh[&quot;-u&quot;, &quot;{$SOLARPOINT_USERNAME}&quot;, &quot;-p&quot;, &quot;{$SOLARPOINT_PASSWORD}&quot;, {HOST.CONN}]</key>
+                            </master_item>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>{#PORT_NAME} Port Low Voltage</name>
+                            <type>DEPENDENT</type>
+                            <key>port__low_voltage_[{#PORT_NAME}]</key>
+                            <delay>0</delay>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <applications>
+                                <application>
+                                    <name>Battery</name>
+                                </application>
+                            </applications>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <parameters>
+                                        <parameter>$.result[1].results.output.pins[ ?(@.name=='{#PORT_NAME}') ].low_voltage.first()</parameter>
+                                    </parameters>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>solarpointBattery.sh[&quot;-u&quot;, &quot;{$SOLARPOINT_USERNAME}&quot;, &quot;-p&quot;, &quot;{$SOLARPOINT_PASSWORD}&quot;, {HOST.CONN}]</key>
+                            </master_item>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last(#1)}=&quot;true&quot;</expression>
+                                    <name>{#PORT_NAME} Port is Low Voltage</name>
+                                    <priority>INFO</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>{#PORT_NAME} Port On</name>
+                            <type>DEPENDENT</type>
+                            <key>port__on_[{#PORT_NAME}]</key>
+                            <delay>0</delay>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <applications>
+                                <application>
+                                    <name>Battery</name>
+                                </application>
+                            </applications>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <parameters>
+                                        <parameter>$.result[1].results.output.pins[ ?(@.name=='{#PORT_NAME}') ].on.first()</parameter>
+                                    </parameters>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>solarpointBattery.sh[&quot;-u&quot;, &quot;{$SOLARPOINT_USERNAME}&quot;, &quot;-p&quot;, &quot;{$SOLARPOINT_PASSWORD}&quot;, {HOST.CONN}]</key>
+                            </master_item>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>{#PORT_NAME} Port Suspended</name>
+                            <type>DEPENDENT</type>
+                            <key>port__suspended_[{#PORT_NAME}]</key>
+                            <delay>0</delay>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <applications>
+                                <application>
+                                    <name>Battery</name>
+                                </application>
+                            </applications>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <parameters>
+                                        <parameter>$.result[1].results.output.pins[ ?(@.name=='{#PORT_NAME}') ].suspended.first()</parameter>
+                                    </parameters>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>solarpointBattery.sh[&quot;-u&quot;, &quot;{$SOLARPOINT_USERNAME}&quot;, &quot;-p&quot;, &quot;{$SOLARPOINT_PASSWORD}&quot;, {HOST.CONN}]</key>
+                            </master_item>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last(#1)}=&quot;true&quot;</expression>
+                                    <name>{#PORT_NAME} Port is Suspended</name>
+                                    <priority>WARNING</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                    </item_prototypes>
+                    <master_item>
+                        <key>solarpointBattery.sh[&quot;-u&quot;, &quot;{$SOLARPOINT_USERNAME}&quot;, &quot;-p&quot;, &quot;{$SOLARPOINT_PASSWORD}&quot;, {HOST.CONN}]</key>
+                    </master_item>
+                    <lld_macro_paths>
+                        <lld_macro_path>
+                            <lld_macro>{#PORT_NAME}</lld_macro>
+                            <path>$.name</path>
+                        </lld_macro_path>
+                    </lld_macro_paths>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.result[1].results.output.pins</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                </discovery_rule>
+            </discovery_rules>
+        </template>
         <template>
             <template>UBNT Airmax</template>
             <name>UBNT Airmax</name>
@@ -4067,6 +4339,27 @@ Assign this template to all APs in your site</description>
                     <item>
                         <host>Unifi USG</host>
                         <key>loadavg_smooth</key>
+                    </item>
+                </graph_item>
+            </graph_items>
+        </graph>
+        <graph>
+            <name>Power I/O</name>
+            <graph_items>
+                <graph_item>
+                    <sortorder>1</sortorder>
+                    <color>E53935</color>
+                    <item>
+                        <host>SunMAX SolarPoint</host>
+                        <key>powerOutput</key>
+                    </item>
+                </graph_item>
+                <graph_item>
+                    <sortorder>2</sortorder>
+                    <color>43A047</color>
+                    <item>
+                        <host>SunMAX SolarPoint</host>
+                        <key>pvInputPower</key>
                     </item>
                 </graph_item>
             </graph_items>
