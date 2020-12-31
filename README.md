@@ -174,6 +174,14 @@ The password that will let the zabbix server (or proxy) log in to the SolarPoint
 
 That will give you access to power production and consumption, as well as set a trigger on PoE ports being suspended
 
+## Some Graph Examples
+
+## Power Production and Consumption
+![Wan Download](/images/power.png)
+
+## Battery Voltage
+![Wan Download](/images/voltage.png)
+
 
 
 # Troubleshooting - Notes
@@ -200,6 +208,7 @@ i.e automatically create all the proper hosts connected to the proper templates 
 Most of the pain in setting those templates up is debugging the SSH connections..  Add pre-processing to check for valid json on mca-dump-short to all templates
 
 ## Auto Switch Port discovery, alert on traffic > % of capacity
+in progress - need to add macros to set alert levels and durations
 
 ## SolarPoint support
 
