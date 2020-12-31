@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# This script will retrieve battery information from a SunMax SolarPoint device in JSON format
+#
+# With thanks to @pfanntec in the UI community who got the JSON RPC access rolling
+#
+
+
+
 usage()
 {
 	echo "Usage "${0}"  -u userName -p password [-v] targetDevice"
