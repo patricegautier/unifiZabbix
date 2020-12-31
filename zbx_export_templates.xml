@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.2</version>
-    <date>2020-12-31T02:31:27Z</date>
+    <date>2020-12-31T03:36:00Z</date>
     <groups>
         <group>
             <name>Patrice</name>
@@ -32,6 +32,59 @@
             </applications>
             <items>
                 <item>
+                    <name>Battery Charge</name>
+                    <type>DEPENDENT</type>
+                    <key>batteryCharge</key>
+                    <delay>0</delay>
+                    <value_type>FLOAT</value_type>
+                    <applications>
+                        <application>
+                            <name>Battery</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.result[1].results.batteries[0].charge</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>solarpointBattery.sh[&quot;-u&quot;, &quot;{$SOLARPOINT_USERNAME}&quot;, &quot;-p&quot;, &quot;{$SOLARPOINT_PASSWORD}&quot;, {HOST.CONN}]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Battery Voltage</name>
+                    <type>DEPENDENT</type>
+                    <key>batteryVoltage</key>
+                    <delay>0</delay>
+                    <value_type>FLOAT</value_type>
+                    <units>V</units>
+                    <applications>
+                        <application>
+                            <name>Battery</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.result[1].results.batteries[0].voltage</parameter>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>MULTIPLIER</type>
+                            <parameters>
+                                <parameter>0.001</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>solarpointBattery.sh[&quot;-u&quot;, &quot;{$SOLARPOINT_USERNAME}&quot;, &quot;-p&quot;, &quot;{$SOLARPOINT_PASSWORD}&quot;, {HOST.CONN}]</key>
+                    </master_item>
+                </item>
+                <item>
                     <name>Net Power Consumption</name>
                     <type>CALCULATED</type>
                     <key>net_power_consumption</key>
@@ -45,7 +98,7 @@
                     </applications>
                 </item>
                 <item>
-                    <name>powerOutput</name>
+                    <name>Power Output</name>
                     <type>DEPENDENT</type>
                     <key>powerOutput</key>
                     <delay>0</delay>
@@ -75,7 +128,7 @@
                     </master_item>
                 </item>
                 <item>
-                    <name>pvInputPower</name>
+                    <name>Power Input from Solar Array</name>
                     <type>DEPENDENT</type>
                     <key>pvInputPower</key>
                     <delay>0</delay>
@@ -105,7 +158,7 @@
                     </master_item>
                 </item>
                 <item>
-                    <name>pvInputVoltage</name>
+                    <name>Voltage from Solar Array</name>
                     <type>DEPENDENT</type>
                     <key>pvInputVoltage</key>
                     <delay>0</delay>
@@ -141,7 +194,7 @@
                     </applications>
                 </item>
                 <item>
-                    <name>voltageOutput</name>
+                    <name>Output Voltage</name>
                     <type>DEPENDENT</type>
                     <key>voltageOutput</key>
                     <delay>0</delay>

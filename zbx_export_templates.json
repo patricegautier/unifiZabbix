@@ -1,7 +1,7 @@
 {
     "zabbix_export": {
         "version": "5.2",
-        "date": "2020-12-31T02:31:29Z",
+        "date": "2020-12-31T03:36:03Z",
         "groups": [
             {
                 "name": "Patrice"
@@ -32,6 +32,59 @@
                 ],
                 "items": [
                     {
+                        "name": "Battery Charge",
+                        "type": "DEPENDENT",
+                        "key": "batteryCharge",
+                        "delay": "0",
+                        "value_type": "FLOAT",
+                        "applications": [
+                            {
+                                "name": "Battery"
+                            }
+                        ],
+                        "preprocessing": [
+                            {
+                                "type": "JSONPATH",
+                                "parameters": [
+                                    "$.result[1].results.batteries[0].charge"
+                                ]
+                            }
+                        ],
+                        "master_item": {
+                            "key": "solarpointBattery.sh[\"-u\", \"{$SOLARPOINT_USERNAME}\", \"-p\", \"{$SOLARPOINT_PASSWORD}\", {HOST.CONN}]"
+                        }
+                    },
+                    {
+                        "name": "Battery Voltage",
+                        "type": "DEPENDENT",
+                        "key": "batteryVoltage",
+                        "delay": "0",
+                        "value_type": "FLOAT",
+                        "units": "V",
+                        "applications": [
+                            {
+                                "name": "Battery"
+                            }
+                        ],
+                        "preprocessing": [
+                            {
+                                "type": "JSONPATH",
+                                "parameters": [
+                                    "$.result[1].results.batteries[0].voltage"
+                                ]
+                            },
+                            {
+                                "type": "MULTIPLIER",
+                                "parameters": [
+                                    "0.001"
+                                ]
+                            }
+                        ],
+                        "master_item": {
+                            "key": "solarpointBattery.sh[\"-u\", \"{$SOLARPOINT_USERNAME}\", \"-p\", \"{$SOLARPOINT_PASSWORD}\", {HOST.CONN}]"
+                        }
+                    },
+                    {
                         "name": "Net Power Consumption",
                         "type": "CALCULATED",
                         "key": "net_power_consumption",
@@ -45,7 +98,7 @@
                         ]
                     },
                     {
-                        "name": "powerOutput",
+                        "name": "Power Output",
                         "type": "DEPENDENT",
                         "key": "powerOutput",
                         "delay": "0",
@@ -75,7 +128,7 @@
                         }
                     },
                     {
-                        "name": "pvInputPower",
+                        "name": "Power Input from Solar Array",
                         "type": "DEPENDENT",
                         "key": "pvInputPower",
                         "delay": "0",
@@ -105,7 +158,7 @@
                         }
                     },
                     {
-                        "name": "pvInputVoltage",
+                        "name": "Voltage from Solar Array",
                         "type": "DEPENDENT",
                         "key": "pvInputVoltage",
                         "delay": "0",
@@ -141,7 +194,7 @@
                         ]
                     },
                     {
-                        "name": "voltageOutput",
+                        "name": "Output Voltage",
                         "type": "DEPENDENT",
                         "key": "voltageOutput",
                         "delay": "0",
