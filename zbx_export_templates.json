@@ -1,7 +1,7 @@
 {
     "zabbix_export": {
         "version": "5.2",
-        "date": "2020-12-30T08:19:22Z",
+        "date": "2020-12-31T02:31:29Z",
         "groups": [
             {
                 "name": "Patrice"
@@ -91,6 +91,12 @@
                                 "type": "JSONPATH",
                                 "parameters": [
                                     "$.result[1].results.pv.power"
+                                ]
+                            },
+                            {
+                                "type": "MULTIPLIER",
+                                "parameters": [
+                                    "0.001"
                                 ]
                             }
                         ],

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2020-12-30T08:19:17Z'
+  date: '2020-12-31T02:31:24Z'
   groups:
     -
       name: Patrice
@@ -67,6 +67,10 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - '$.result[1].results.pv.power'
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.001'
           master_item:
             key: 'solarpointBattery.sh["-u", "{$SOLARPOINT_USERNAME}", "-p", "{$SOLARPOINT_PASSWORD}", {HOST.CONN}]'
         -

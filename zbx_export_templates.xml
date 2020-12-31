@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.2</version>
-    <date>2020-12-30T08:19:20Z</date>
+    <date>2020-12-31T02:31:27Z</date>
     <groups>
         <group>
             <name>Patrice</name>
@@ -91,6 +91,12 @@
                             <type>JSONPATH</type>
                             <parameters>
                                 <parameter>$.result[1].results.pv.power</parameter>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>MULTIPLIER</type>
+                            <parameters>
+                                <parameter>0.001</parameter>
                             </parameters>
                         </step>
                     </preprocessing>
