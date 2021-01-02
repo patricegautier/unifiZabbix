@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.2</version>
-    <date>2020-12-31T03:36:00Z</date>
+    <date>2021-01-02T04:37:17Z</date>
     <groups>
         <group>
             <name>Patrice</name>
@@ -283,6 +283,7 @@
                                     <expression>{last(#1)}=&quot;true&quot;</expression>
                                     <name>{#PORT_NAME} Port is Low Voltage</name>
                                     <priority>INFO</priority>
+                                    <manual_close>YES</manual_close>
                                 </trigger_prototype>
                             </trigger_prototypes>
                         </item_prototype>
@@ -2634,6 +2635,35 @@ Assign this template to all APs in your site</description>
                     <delay>0</delay>
                     <item_prototypes>
                         <item_prototype>
+                            <name>Port {#PORT_IDX} Connection Speed</name>
+                            <type>DEPENDENT</type>
+                            <key>connection_speed_[{#PORT_IDX}]</key>
+                            <delay>0</delay>
+                            <units>bps</units>
+                            <applications>
+                                <application>
+                                    <name>Traffic</name>
+                                </application>
+                            </applications>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <parameters>
+                                        <parameter>$.port_table[ ?(@.port_idx=='{#PORT_IDX}')].speed.first()</parameter>
+                                    </parameters>
+                                </step>
+                                <step>
+                                    <type>MULTIPLIER</type>
+                                    <parameters>
+                                        <parameter>1000000</parameter>
+                                    </parameters>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;]</key>
+                            </master_item>
+                        </item_prototype>
+                        <item_prototype>
                             <name>Port {#PORT_IDX} Rx Bandwidth</name>
                             <type>DEPENDENT</type>
                             <key>rx_port_[{#PORT_IDX}]</key>
@@ -2703,16 +2733,46 @@ Assign this template to all APs in your site</description>
                                 <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;]</key>
                             </master_item>
                         </item_prototype>
+                        <item_prototype>
+                            <name>Port {#PORT_IDX} Up</name>
+                            <type>DEPENDENT</type>
+                            <key>up_[{#PORT_IDX}]</key>
+                            <delay>0</delay>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <applications>
+                                <application>
+                                    <name>Traffic</name>
+                                </application>
+                            </applications>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <parameters>
+                                        <parameter>$.port_table[ ?(@.port_idx=='{#PORT_IDX}')].up.first()</parameter>
+                                    </parameters>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;]</key>
+                            </master_item>
+                        </item_prototype>
                     </item_prototypes>
                     <trigger_prototypes>
                         <trigger_prototype>
-                            <expression>{Unifi Switch:rx_port_[{#PORT_IDX}].last(#1)}&gt;100000000 or {Unifi Switch:tx_port_[{#PORT_IDX}].last(#1)}&gt;100000000</expression>
-                            <name>Port {#PORT_IDX} above 100 Mbps</name>
+                            <expression>{Unifi Switch:up_[{#PORT_IDX}].last(#1)}=&quot;true&quot; and ( {Unifi Switch:rx_port_[{#PORT_IDX}].last(#1)}&gt;{Unifi Switch:connection_speed_[{#PORT_IDX}].last(#1)}*.25 or {Unifi Switch:tx_port_[{#PORT_IDX}].last(#1)}&gt;{Unifi Switch:connection_speed_[{#PORT_IDX}].last(#1)}*.25 )</expression>
+                            <name>Port {#PORT_IDX} above 25%</name>
                             <priority>INFO</priority>
+                            <dependencies>
+                                <dependency>
+                                    <name>Port {#PORT_IDX} above 50%</name>
+                                    <expression>{Unifi Switch:up_[{#PORT_IDX}].last(#1)}=&quot;true&quot; and (  {Unifi Switch:rx_port_[{#PORT_IDX}].last(#1)}&gt;{Unifi Switch:connection_speed_[{#PORT_IDX}].last(#1)}*.5 or {Unifi Switch:tx_port_[{#PORT_IDX}].last(#1)}&gt;{Unifi Switch:connection_speed_[{#PORT_IDX}].last(#1)}*.5 )</expression>
+                                </dependency>
+                            </dependencies>
                         </trigger_prototype>
                         <trigger_prototype>
-                            <expression>{Unifi Switch:rx_port_[{#PORT_IDX}].last(#1)}&gt;500000000 or {Unifi Switch:tx_port_[{#PORT_IDX}].last(#1)}&gt;500000000</expression>
-                            <name>Port {#PORT_IDX} above 500 Mbps</name>
+                            <expression>{Unifi Switch:up_[{#PORT_IDX}].last(#1)}=&quot;true&quot; and (  {Unifi Switch:rx_port_[{#PORT_IDX}].last(#1)}&gt;{Unifi Switch:connection_speed_[{#PORT_IDX}].last(#1)}*.5 or {Unifi Switch:tx_port_[{#PORT_IDX}].last(#1)}&gt;{Unifi Switch:connection_speed_[{#PORT_IDX}].last(#1)}*.5 )</expression>
+                            <name>Port {#PORT_IDX} above 50%</name>
                             <priority>WARNING</priority>
                         </trigger_prototype>
                     </trigger_prototypes>

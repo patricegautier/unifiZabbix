@@ -1,7 +1,7 @@
 {
     "zabbix_export": {
         "version": "5.2",
-        "date": "2020-12-31T03:36:03Z",
+        "date": "2021-01-02T04:37:19Z",
         "groups": [
             {
                 "name": "Patrice"
@@ -282,7 +282,8 @@
                                     {
                                         "expression": "{last(#1)}=\"true\"",
                                         "name": "{#PORT_NAME} Port is Low Voltage",
-                                        "priority": "INFO"
+                                        "priority": "INFO",
+                                        "manual_close": "YES"
                                     }
                                 ]
                             },
@@ -2632,6 +2633,35 @@
                         "delay": "0",
                         "item_prototypes": [
                             {
+                                "name": "Port {#PORT_IDX} Connection Speed",
+                                "type": "DEPENDENT",
+                                "key": "connection_speed_[{#PORT_IDX}]",
+                                "delay": "0",
+                                "units": "bps",
+                                "applications": [
+                                    {
+                                        "name": "Traffic"
+                                    }
+                                ],
+                                "preprocessing": [
+                                    {
+                                        "type": "JSONPATH",
+                                        "parameters": [
+                                            "$.port_table[ ?(@.port_idx=='{#PORT_IDX}')].speed.first()"
+                                        ]
+                                    },
+                                    {
+                                        "type": "MULTIPLIER",
+                                        "parameters": [
+                                            "1000000"
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "mca-dump-short.sh[\"-d\",\"{HOST.CONN}\", \"-u\", \"{$UNIFI_USER}\", \"-i\", \"{$UNIFI_SSH_PRIV_KEY_PATH}\", \"-t\", \"SWITCH\"]"
+                                }
+                            },
+                            {
                                 "name": "Port {#PORT_IDX} Rx Bandwidth",
                                 "type": "DEPENDENT",
                                 "key": "rx_port_[{#PORT_IDX}]",
@@ -2700,17 +2730,47 @@
                                 "master_item": {
                                     "key": "mca-dump-short.sh[\"-d\",\"{HOST.CONN}\", \"-u\", \"{$UNIFI_USER}\", \"-i\", \"{$UNIFI_SSH_PRIV_KEY_PATH}\", \"-t\", \"SWITCH\"]"
                                 }
+                            },
+                            {
+                                "name": "Port {#PORT_IDX} Up",
+                                "type": "DEPENDENT",
+                                "key": "up_[{#PORT_IDX}]",
+                                "delay": "0",
+                                "trends": "0",
+                                "value_type": "CHAR",
+                                "applications": [
+                                    {
+                                        "name": "Traffic"
+                                    }
+                                ],
+                                "preprocessing": [
+                                    {
+                                        "type": "JSONPATH",
+                                        "parameters": [
+                                            "$.port_table[ ?(@.port_idx=='{#PORT_IDX}')].up.first()"
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "mca-dump-short.sh[\"-d\",\"{HOST.CONN}\", \"-u\", \"{$UNIFI_USER}\", \"-i\", \"{$UNIFI_SSH_PRIV_KEY_PATH}\", \"-t\", \"SWITCH\"]"
+                                }
                             }
                         ],
                         "trigger_prototypes": [
                             {
-                                "expression": "{Unifi Switch:rx_port_[{#PORT_IDX}].last(#1)}>100000000 or {Unifi Switch:tx_port_[{#PORT_IDX}].last(#1)}>100000000",
-                                "name": "Port {#PORT_IDX} above 100 Mbps",
-                                "priority": "INFO"
+                                "expression": "{Unifi Switch:up_[{#PORT_IDX}].last(#1)}=\"true\" and ( {Unifi Switch:rx_port_[{#PORT_IDX}].last(#1)}>{Unifi Switch:connection_speed_[{#PORT_IDX}].last(#1)}*.25 or {Unifi Switch:tx_port_[{#PORT_IDX}].last(#1)}>{Unifi Switch:connection_speed_[{#PORT_IDX}].last(#1)}*.25 )",
+                                "name": "Port {#PORT_IDX} above 25%",
+                                "priority": "INFO",
+                                "dependencies": [
+                                    {
+                                        "name": "Port {#PORT_IDX} above 50%",
+                                        "expression": "{Unifi Switch:up_[{#PORT_IDX}].last(#1)}=\"true\" and (  {Unifi Switch:rx_port_[{#PORT_IDX}].last(#1)}>{Unifi Switch:connection_speed_[{#PORT_IDX}].last(#1)}*.5 or {Unifi Switch:tx_port_[{#PORT_IDX}].last(#1)}>{Unifi Switch:connection_speed_[{#PORT_IDX}].last(#1)}*.5 )"
+                                    }
+                                ]
                             },
                             {
-                                "expression": "{Unifi Switch:rx_port_[{#PORT_IDX}].last(#1)}>500000000 or {Unifi Switch:tx_port_[{#PORT_IDX}].last(#1)}>500000000",
-                                "name": "Port {#PORT_IDX} above 500 Mbps",
+                                "expression": "{Unifi Switch:up_[{#PORT_IDX}].last(#1)}=\"true\" and (  {Unifi Switch:rx_port_[{#PORT_IDX}].last(#1)}>{Unifi Switch:connection_speed_[{#PORT_IDX}].last(#1)}*.5 or {Unifi Switch:tx_port_[{#PORT_IDX}].last(#1)}>{Unifi Switch:connection_speed_[{#PORT_IDX}].last(#1)}*.5 )",
+                                "name": "Port {#PORT_IDX} above 50%",
                                 "priority": "WARNING"
                             }
                         ],
