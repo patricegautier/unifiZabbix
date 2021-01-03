@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2021-01-02T04:37:14Z'
+  date: '2021-01-03T02:20:39Z'
   groups:
     -
       name: Patrice
@@ -1899,7 +1899,7 @@ zabbix_export:
           delay: '0'
           item_prototypes:
             -
-              name: 'Port {#PORT_IDX} Connection Speed'
+              name: '{{#PORT_IS_UPLINK}.regsub("true", "Uplink")} {{#PORT_MEDIA}.regsub("SFP", \0)} Port {#PORT_IDX} Connection Speed'
               type: DEPENDENT
               key: 'connection_speed_[{#PORT_IDX}]'
               delay: '0'
@@ -1919,7 +1919,24 @@ zabbix_export:
               master_item:
                 key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "SWITCH"]'
             -
-              name: 'Port {#PORT_IDX} Rx Bandwidth'
+              name: '{{#PORT_IS_UPLINK}.regsub("true", "Uplink")} {{#PORT_MEDIA}.regsub("SFP", \0)} Port {#PORT_IDX} Uplink'
+              type: DEPENDENT
+              key: 'is_uplink_[{#PORT_IDX}]'
+              delay: '0'
+              trends: '0'
+              value_type: CHAR
+              applications:
+                -
+                  name: Traffic
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.port_table[ ?(@.port_idx==''{#PORT_IDX}'')].is_uplink.first()'
+              master_item:
+                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "SWITCH"]'
+            -
+              name: '{{#PORT_IS_UPLINK}.regsub("true", "Uplink")} {{#PORT_MEDIA}.regsub("SFP", \0)} Port {#PORT_IDX} Rx Bandwidth'
               type: DEPENDENT
               key: 'rx_port_[{#PORT_IDX}]'
               delay: '0'
@@ -1943,7 +1960,24 @@ zabbix_export:
               master_item:
                 key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "SWITCH"]'
             -
-              name: 'Port {#PORT_IDX} Tx Bandwidth'
+              name: '{{#PORT_IS_UPLINK}.regsub("true", "Uplink")} {{#PORT_MEDIA}.regsub("SFP", \0)} Port {#PORT_IDX} STP State'
+              type: DEPENDENT
+              key: 'stp_state_[{#PORT_IDX}]'
+              delay: '0'
+              trends: '0'
+              value_type: CHAR
+              applications:
+                -
+                  name: Traffic
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.port_table[ ?(@.port_idx==''{#PORT_IDX}'')].stp_state.first()'
+              master_item:
+                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "SWITCH"]'
+            -
+              name: '{{#PORT_IS_UPLINK}.regsub("true", "Uplink")} {{#PORT_MEDIA}.regsub("SFP", \0)} Port {#PORT_IDX} Tx Bandwidth'
               type: DEPENDENT
               key: 'tx_port_[{#PORT_IDX}]'
               delay: '0'
@@ -1967,7 +2001,7 @@ zabbix_export:
               master_item:
                 key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "SWITCH"]'
             -
-              name: 'Port {#PORT_IDX} Up'
+              name: '{{#PORT_IS_UPLINK}.regsub("true", "Uplink")} {{#PORT_MEDIA}.regsub("SFP", \0)} Port {#PORT_IDX} Up'
               type: DEPENDENT
               key: 'up_[{#PORT_IDX}]'
               delay: '0'
@@ -1985,20 +2019,28 @@ zabbix_export:
                 key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "SWITCH"]'
           trigger_prototypes:
             -
-              expression: '{Unifi Switch:up_[{#PORT_IDX}].last(#1)}="true" and ( {Unifi Switch:rx_port_[{#PORT_IDX}].last(#1)}>{Unifi Switch:connection_speed_[{#PORT_IDX}].last(#1)}*.25 or {Unifi Switch:tx_port_[{#PORT_IDX}].last(#1)}>{Unifi Switch:connection_speed_[{#PORT_IDX}].last(#1)}*.25 )'
-              name: 'Port {#PORT_IDX} above 25%'
+              expression: '{Unifi Switch:up_[{#PORT_IDX}].last(#1)}="true" and {Unifi Switch:stp_state_[{#PORT_IDX}].last(#1)}="forwarding" and ( {Unifi Switch:rx_port_[{#PORT_IDX}].last(#1)}>{Unifi Switch:connection_speed_[{#PORT_IDX}].last(#1)}*.25 or {Unifi Switch:tx_port_[{#PORT_IDX}].last(#1)}>{Unifi Switch:connection_speed_[{#PORT_IDX}].last(#1)}*.25 )'
+              name: '{{#PORT_IS_UPLINK}.regsub("true", "Uplink")} {{#PORT_MEDIA}.regsub("SFP", \0)} Port {#PORT_IDX} above 25%'
               priority: INFO
               dependencies:
                 -
-                  name: 'Port {#PORT_IDX} above 50%'
-                  expression: '{Unifi Switch:up_[{#PORT_IDX}].last(#1)}="true" and (  {Unifi Switch:rx_port_[{#PORT_IDX}].last(#1)}>{Unifi Switch:connection_speed_[{#PORT_IDX}].last(#1)}*.5 or {Unifi Switch:tx_port_[{#PORT_IDX}].last(#1)}>{Unifi Switch:connection_speed_[{#PORT_IDX}].last(#1)}*.5 )'
+                  name: '{{#PORT_IS_UPLINK}.regsub("true", "Uplink")} {{#PORT_MEDIA}.regsub("SFP", \0)} Port {#PORT_IDX} above 50%'
+                  expression: '{Unifi Switch:up_[{#PORT_IDX}].last(#1)}="true" and {Unifi Switch:stp_state_[{#PORT_IDX}].last(#1)}="forwarding" and (  {Unifi Switch:rx_port_[{#PORT_IDX}].last(#1)}>{Unifi Switch:connection_speed_[{#PORT_IDX}].last(#1)}*.5 or {Unifi Switch:tx_port_[{#PORT_IDX}].last(#1)}>{Unifi Switch:connection_speed_[{#PORT_IDX}].last(#1)}*.5 )'
             -
-              expression: '{Unifi Switch:up_[{#PORT_IDX}].last(#1)}="true" and (  {Unifi Switch:rx_port_[{#PORT_IDX}].last(#1)}>{Unifi Switch:connection_speed_[{#PORT_IDX}].last(#1)}*.5 or {Unifi Switch:tx_port_[{#PORT_IDX}].last(#1)}>{Unifi Switch:connection_speed_[{#PORT_IDX}].last(#1)}*.5 )'
-              name: 'Port {#PORT_IDX} above 50%'
+              expression: '{Unifi Switch:up_[{#PORT_IDX}].last(#1)}="true" and {Unifi Switch:stp_state_[{#PORT_IDX}].last(#1)}="forwarding" and (  {Unifi Switch:rx_port_[{#PORT_IDX}].last(#1)}>{Unifi Switch:connection_speed_[{#PORT_IDX}].last(#1)}*.5 or {Unifi Switch:tx_port_[{#PORT_IDX}].last(#1)}>{Unifi Switch:connection_speed_[{#PORT_IDX}].last(#1)}*.5 )'
+              name: '{{#PORT_IS_UPLINK}.regsub("true", "Uplink")} {{#PORT_MEDIA}.regsub("SFP", \0)} Port {#PORT_IDX} above 50%'
               priority: WARNING
+              dependencies:
+                -
+                  name: '{{#PORT_IS_UPLINK}.regsub("true", "Uplink")} {{#PORT_MEDIA}.regsub("SFP", \0)} Port {#PORT_IDX} above 75%'
+                  expression: '{Unifi Switch:up_[{#PORT_IDX}].last(#1)}="true" and {Unifi Switch:stp_state_[{#PORT_IDX}].last(#1)}="forwarding" and ( {Unifi Switch:rx_port_[{#PORT_IDX}].last(#1)}>{Unifi Switch:connection_speed_[{#PORT_IDX}].last(#1)}*.75 or {Unifi Switch:tx_port_[{#PORT_IDX}].last(#1)}>{Unifi Switch:connection_speed_[{#PORT_IDX}].last(#1)}*.75 )'
+            -
+              expression: '{Unifi Switch:up_[{#PORT_IDX}].last(#1)}="true" and {Unifi Switch:stp_state_[{#PORT_IDX}].last(#1)}="forwarding" and ( {Unifi Switch:rx_port_[{#PORT_IDX}].last(#1)}>{Unifi Switch:connection_speed_[{#PORT_IDX}].last(#1)}*.75 or {Unifi Switch:tx_port_[{#PORT_IDX}].last(#1)}>{Unifi Switch:connection_speed_[{#PORT_IDX}].last(#1)}*.75 )'
+              name: '{{#PORT_IS_UPLINK}.regsub("true", "Uplink")} {{#PORT_MEDIA}.regsub("SFP", \0)} Port {#PORT_IDX} above 75%'
+              priority: AVERAGE
           graph_prototypes:
             -
-              name: 'Port I/O'
+              name: '{{#PORT_IS_UPLINK}.regsub("true", "Uplink")} {{#PORT_MEDIA}.regsub("SFP", \0)} Port {#PORT_IDX} Port I/O'
               graph_items:
                 -
                   sortorder: '1'
@@ -2018,6 +2060,12 @@ zabbix_export:
             -
               lld_macro: '{#PORT_IDX}'
               path: $.port_idx
+            -
+              lld_macro: '{#PORT_IS_UPLINK}'
+              path: $.is_uplink
+            -
+              lld_macro: '{#PORT_MEDIA}'
+              path: $.media
           preprocessing:
             -
               type: JSONPATH
