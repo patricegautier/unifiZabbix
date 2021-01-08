@@ -7,6 +7,9 @@ I am currently running those on the current versions of the base software as of 
 
 # Setup
 
+## Zabbix 5.2 
+
+given I am exporting those templates from 5.2.3 as of now, you will need 5.2 minimum to be able to import the templates. 
 
 
 ## Install jq on your Zabbix server
