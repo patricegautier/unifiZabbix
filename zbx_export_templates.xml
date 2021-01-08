@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.2</version>
-    <date>2021-01-03T02:20:42Z</date>
+    <date>2021-01-08T22:31:33Z</date>
     <groups>
         <group>
             <name>Patrice</name>
@@ -1623,7 +1623,7 @@ Assign this template to all APs in your site</description>
                                 <step>
                                     <type>JSONPATH</type>
                                     <parameters>
-                                        <parameter>$.vap_table.[ ?(@.essid == '{#ESSID}' ) ].rx_bytes.first()</parameter>
+                                        <parameter>$.vap_table.[ ?(@.essid == '{#ESSID}' ) ].rx_bytes.sum()</parameter>
                                     </parameters>
                                 </step>
                                 <step>
@@ -1671,7 +1671,7 @@ Assign this template to all APs in your site</description>
                                 <step>
                                     <type>JSONPATH</type>
                                     <parameters>
-                                        <parameter>$.vap_table.[ ?(@.essid == &quot;{#ESSID}&quot;) ].tx_bytes.first()</parameter>
+                                        <parameter>$.vap_table.[ ?(@.essid == &quot;{#ESSID}&quot;) ].tx_bytes.sum()</parameter>
                                     </parameters>
                                 </step>
                                 <step>
@@ -4421,16 +4421,28 @@ Assign this template to all APs in your site</description>
                     <delay>0</delay>
                     <item_prototypes>
                         <item_prototype>
-                            <name>{#ESSID} Total Reception Bandwidth Smooth</name>
+                            <name>{#ESSID} Total Reception Bandwidth</name>
                             <type>AGGREGATE</type>
-                            <key>grpsum[&quot;{$AP_GROUP}&quot;, &quot;rx_bandwidth_smooth[{#ESSID}]&quot;, avg, {$UNIFI_SMOOTHING_PERIOD}]</key>
+                            <key>grpsum[&quot;{$AP_GROUP}&quot;, &quot;rx_bandwidth[{#ESSID}]&quot;, avg, {$UNIFI_SMOOTHING_PERIOD}]</key>
+                            <value_type>FLOAT</value_type>
                             <units>bps</units>
+                            <applications>
+                                <application>
+                                    <name>Radio</name>
+                                </application>
+                            </applications>
                         </item_prototype>
                         <item_prototype>
                             <name>{#ESSID} Total Transmission Bandwidth</name>
                             <type>AGGREGATE</type>
-                            <key>grpsum[&quot;{$AP_GROUP}&quot;, &quot;tx_bandwidth_smooth[{#ESSID}]&quot;, avg, &quot;{$UNIFI_SMOOTHING_PERIOD}&quot;]</key>
+                            <key>grpsum[&quot;{$AP_GROUP}&quot;, &quot;tx_bandwidth[{#ESSID}]&quot;, avg, &quot;{$UNIFI_SMOOTHING_PERIOD}&quot;]</key>
+                            <value_type>FLOAT</value_type>
                             <units>bps</units>
+                            <applications>
+                                <application>
+                                    <name>Radio</name>
+                                </application>
+                            </applications>
                         </item_prototype>
                     </item_prototypes>
                     <master_item>

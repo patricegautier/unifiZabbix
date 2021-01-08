@@ -1,7 +1,7 @@
 {
     "zabbix_export": {
         "version": "5.2",
-        "date": "2021-01-03T02:20:44Z",
+        "date": "2021-01-08T22:31:35Z",
         "groups": [
             {
                 "name": "Patrice"
@@ -1621,7 +1621,7 @@
                                     {
                                         "type": "JSONPATH",
                                         "parameters": [
-                                            "$.vap_table.[ ?(@.essid == '{#ESSID}' ) ].rx_bytes.first()"
+                                            "$.vap_table.[ ?(@.essid == '{#ESSID}' ) ].rx_bytes.sum()"
                                         ]
                                     },
                                     {
@@ -1669,7 +1669,7 @@
                                     {
                                         "type": "JSONPATH",
                                         "parameters": [
-                                            "$.vap_table.[ ?(@.essid == \"{#ESSID}\") ].tx_bytes.first()"
+                                            "$.vap_table.[ ?(@.essid == \"{#ESSID}\") ].tx_bytes.sum()"
                                         ]
                                     },
                                     {
@@ -4419,16 +4419,28 @@
                         "delay": "0",
                         "item_prototypes": [
                             {
-                                "name": "{#ESSID} Total Reception Bandwidth Smooth",
+                                "name": "{#ESSID} Total Reception Bandwidth",
                                 "type": "AGGREGATE",
-                                "key": "grpsum[\"{$AP_GROUP}\", \"rx_bandwidth_smooth[{#ESSID}]\", avg, {$UNIFI_SMOOTHING_PERIOD}]",
-                                "units": "bps"
+                                "key": "grpsum[\"{$AP_GROUP}\", \"rx_bandwidth[{#ESSID}]\", avg, {$UNIFI_SMOOTHING_PERIOD}]",
+                                "value_type": "FLOAT",
+                                "units": "bps",
+                                "applications": [
+                                    {
+                                        "name": "Radio"
+                                    }
+                                ]
                             },
                             {
                                 "name": "{#ESSID} Total Transmission Bandwidth",
                                 "type": "AGGREGATE",
-                                "key": "grpsum[\"{$AP_GROUP}\", \"tx_bandwidth_smooth[{#ESSID}]\", avg, \"{$UNIFI_SMOOTHING_PERIOD}\"]",
-                                "units": "bps"
+                                "key": "grpsum[\"{$AP_GROUP}\", \"tx_bandwidth[{#ESSID}]\", avg, \"{$UNIFI_SMOOTHING_PERIOD}\"]",
+                                "value_type": "FLOAT",
+                                "units": "bps",
+                                "applications": [
+                                    {
+                                        "name": "Radio"
+                                    }
+                                ]
                             }
                         ],
                         "master_item": {
