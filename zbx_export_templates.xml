@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.2</version>
-    <date>2021-01-13T18:09:17Z</date>
+    <date>2021-01-13T18:19:47Z</date>
     <groups>
         <group>
             <name>Patrice</name>
@@ -1705,6 +1705,29 @@ Assign this template to all APs in your site</description>
                             </applications>
                         </item_prototype>
                     </item_prototypes>
+                    <graph_prototypes>
+                        <graph_prototype>
+                            <name>{#ESSID} Bandwidth</name>
+                            <graph_items>
+                                <graph_item>
+                                    <sortorder>1</sortorder>
+                                    <color>1A7C11</color>
+                                    <item>
+                                        <host>Unifi AP</host>
+                                        <key>rx_bandwidth[{#ESSID}]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>2</sortorder>
+                                    <color>F63100</color>
+                                    <item>
+                                        <host>Unifi AP</host>
+                                        <key>tx_bandwidth[{#ESSID}]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                    </graph_prototypes>
                     <master_item>
                         <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;AP&quot;]</key>
                     </master_item>
@@ -3569,7 +3592,7 @@ Assign this template to all APs in your site</description>
                     </item_prototypes>
                     <graph_prototypes>
                         <graph_prototype>
-                            <name>{#NETWORK_NAME} VLAN External Bandwidth</name>
+                            <name>{#NETWORK_NAME} Inter-VLAN Bandwidth</name>
                             <graph_items>
                                 <graph_item>
                                     <sortorder>1</sortorder>
@@ -4311,7 +4334,7 @@ Assign this template to all APs in your site</description>
                     </item_prototypes>
                     <graph_prototypes>
                         <graph_prototype>
-                            <name>{#NETWORK_NAME} VLAN External Bandwidth</name>
+                            <name>{#NETWORK_NAME} Inter-VLAN Bandwidth</name>
                             <graph_items>
                                 <graph_item>
                                     <sortorder>1</sortorder>
@@ -4445,6 +4468,29 @@ Assign this template to all APs in your site</description>
                             </applications>
                         </item_prototype>
                     </item_prototypes>
+                    <graph_prototypes>
+                        <graph_prototype>
+                            <name>{#ESSID} Bandwidth</name>
+                            <graph_items>
+                                <graph_item>
+                                    <sortorder>1</sortorder>
+                                    <color>1A7C11</color>
+                                    <item>
+                                        <host>Unifi WiFi Site</host>
+                                        <key>grpsum[&quot;{$AP_GROUP}&quot;, &quot;rx_bandwidth[{#ESSID}]&quot;, avg, {$UNIFI_SMOOTHING_PERIOD}]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>2</sortorder>
+                                    <color>F63100</color>
+                                    <item>
+                                        <host>Unifi WiFi Site</host>
+                                        <key>grpsum[&quot;{$AP_GROUP}&quot;, &quot;tx_bandwidth[{#ESSID}]&quot;, avg, &quot;{$UNIFI_SMOOTHING_PERIOD}&quot;]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                    </graph_prototypes>
                     <master_item>
                         <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;AP&quot;]</key>
                     </master_item>
@@ -4521,6 +4567,27 @@ Assign this template to all APs in your site</description>
                     <sortorder>1</sortorder>
                     <color>1A7C11</color>
                     <item>
+                        <host>Unifi AP</host>
+                        <key>wireless_reception_bandwidth</key>
+                    </item>
+                </graph_item>
+                <graph_item>
+                    <sortorder>2</sortorder>
+                    <color>F63100</color>
+                    <item>
+                        <host>Unifi AP</host>
+                        <key>wireless_transmission_bandwidth</key>
+                    </item>
+                </graph_item>
+            </graph_items>
+        </graph>
+        <graph>
+            <name>Bandwidth</name>
+            <graph_items>
+                <graph_item>
+                    <sortorder>1</sortorder>
+                    <color>1A7C11</color>
+                    <item>
                         <host>Unifi USG</host>
                         <key>download_bandwidth_smooth</key>
                     </item>
@@ -4563,6 +4630,48 @@ Assign this template to all APs in your site</description>
                     <sortorder>1</sortorder>
                     <color>1A7C11</color>
                     <item>
+                        <host>Unifi USG</host>
+                        <key>cpu_smooth</key>
+                    </item>
+                </graph_item>
+                <graph_item>
+                    <sortorder>2</sortorder>
+                    <color>F63100</color>
+                    <item>
+                        <host>Unifi USG</host>
+                        <key>memory</key>
+                    </item>
+                </graph_item>
+            </graph_items>
+        </graph>
+        <graph>
+            <name>CPU and Memory</name>
+            <graph_items>
+                <graph_item>
+                    <sortorder>1</sortorder>
+                    <color>1A7C11</color>
+                    <item>
+                        <host>Unifi Switch</host>
+                        <key>cpu_smooth</key>
+                    </item>
+                </graph_item>
+                <graph_item>
+                    <sortorder>2</sortorder>
+                    <color>F63100</color>
+                    <item>
+                        <host>Unifi Switch</host>
+                        <key>memory</key>
+                    </item>
+                </graph_item>
+            </graph_items>
+        </graph>
+        <graph>
+            <name>CPU and Memory</name>
+            <graph_items>
+                <graph_item>
+                    <sortorder>1</sortorder>
+                    <color>1A7C11</color>
+                    <item>
                         <host>Unifi UDMP</host>
                         <key>cpu</key>
                     </item>
@@ -4578,43 +4687,64 @@ Assign this template to all APs in your site</description>
             </graph_items>
         </graph>
         <graph>
-            <name>CPU and Memory</name>
+            <name>Incoming Bandwidth</name>
             <graph_items>
                 <graph_item>
                     <sortorder>1</sortorder>
                     <color>1A7C11</color>
                     <item>
-                        <host>Unifi Switch</host>
-                        <key>cpu_smooth</key>
-                    </item>
-                </graph_item>
-                <graph_item>
-                    <sortorder>2</sortorder>
-                    <color>F63100</color>
-                    <item>
-                        <host>Unifi Switch</host>
-                        <key>memory</key>
+                        <host>Unifi Protect NVR4</host>
+                        <key>IpExtInOctets</key>
                     </item>
                 </graph_item>
             </graph_items>
         </graph>
         <graph>
-            <name>CPU and Memory</name>
+            <name>Incoming Bandwidth</name>
             <graph_items>
                 <graph_item>
                     <sortorder>1</sortorder>
                     <color>1A7C11</color>
                     <item>
-                        <host>Unifi USG</host>
-                        <key>cpu_smooth</key>
+                        <host>Unifi Protect Cloud Key</host>
+                        <key>IpExtInOctets</key>
+                    </item>
+                </graph_item>
+            </graph_items>
+        </graph>
+        <graph>
+            <name>Interference and Channel Usage</name>
+            <graph_items>
+                <graph_item>
+                    <sortorder>1</sortorder>
+                    <color>1A7C11</color>
+                    <item>
+                        <host>Unifi AP</host>
+                        <key>2g_interference_raw</key>
                     </item>
                 </graph_item>
                 <graph_item>
                     <sortorder>2</sortorder>
                     <color>F63100</color>
                     <item>
-                        <host>Unifi USG</host>
-                        <key>memory</key>
+                        <host>Unifi AP</host>
+                        <key>cu_total_2g</key>
+                    </item>
+                </graph_item>
+                <graph_item>
+                    <sortorder>3</sortorder>
+                    <color>2774A4</color>
+                    <item>
+                        <host>Unifi AP</host>
+                        <key>5g_interference</key>
+                    </item>
+                </graph_item>
+                <graph_item>
+                    <sortorder>4</sortorder>
+                    <color>A54F10</color>
+                    <item>
+                        <host>Unifi AP</host>
+                        <key>cu_total_5g</key>
                     </item>
                 </graph_item>
             </graph_items>
@@ -4730,6 +4860,27 @@ Assign this template to all APs in your site</description>
                     <item>
                         <host>Unifi Switch</host>
                         <key>total_rx_bandwidth</key>
+                    </item>
+                </graph_item>
+            </graph_items>
+        </graph>
+        <graph>
+            <name>Total WiFi Bandwidth</name>
+            <graph_items>
+                <graph_item>
+                    <sortorder>1</sortorder>
+                    <color>1A7C11</color>
+                    <item>
+                        <host>Unifi WiFi Site</host>
+                        <key>grpsum[&quot;{$AP_GROUP}&quot;, &quot;wireless_reception_bandwidth&quot;,avg, {$UNIFI_SMOOTHING_PERIOD}]</key>
+                    </item>
+                </graph_item>
+                <graph_item>
+                    <sortorder>2</sortorder>
+                    <color>F63100</color>
+                    <item>
+                        <host>Unifi WiFi Site</host>
+                        <key>grpsum[&quot;{$AP_GROUP}&quot;, &quot;wireless_transmission_bandwidth&quot;,avg, {$UNIFI_SMOOTHING_PERIOD}]</key>
                     </item>
                 </graph_item>
             </graph_items>

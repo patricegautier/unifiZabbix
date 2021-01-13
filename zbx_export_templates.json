@@ -1,7 +1,7 @@
 {
     "zabbix_export": {
         "version": "5.2",
-        "date": "2021-01-13T18:09:19Z",
+        "date": "2021-01-13T18:19:48Z",
         "groups": [
             {
                 "name": "Patrice"
@@ -1699,6 +1699,29 @@
                                 "applications": [
                                     {
                                         "name": "Radio"
+                                    }
+                                ]
+                            }
+                        ],
+                        "graph_prototypes": [
+                            {
+                                "name": "{#ESSID} Bandwidth",
+                                "graph_items": [
+                                    {
+                                        "sortorder": "1",
+                                        "color": "1A7C11",
+                                        "item": {
+                                            "host": "Unifi AP",
+                                            "key": "rx_bandwidth[{#ESSID}]"
+                                        }
+                                    },
+                                    {
+                                        "sortorder": "2",
+                                        "color": "F63100",
+                                        "item": {
+                                            "host": "Unifi AP",
+                                            "key": "tx_bandwidth[{#ESSID}]"
+                                        }
                                     }
                                 ]
                             }
@@ -3567,7 +3590,7 @@
                         ],
                         "graph_prototypes": [
                             {
-                                "name": "{#NETWORK_NAME} VLAN External Bandwidth",
+                                "name": "{#NETWORK_NAME} Inter-VLAN Bandwidth",
                                 "graph_items": [
                                     {
                                         "sortorder": "1",
@@ -4309,7 +4332,7 @@
                         ],
                         "graph_prototypes": [
                             {
-                                "name": "{#NETWORK_NAME} VLAN External Bandwidth",
+                                "name": "{#NETWORK_NAME} Inter-VLAN Bandwidth",
                                 "graph_items": [
                                     {
                                         "sortorder": "1",
@@ -4443,6 +4466,29 @@
                                 ]
                             }
                         ],
+                        "graph_prototypes": [
+                            {
+                                "name": "{#ESSID} Bandwidth",
+                                "graph_items": [
+                                    {
+                                        "sortorder": "1",
+                                        "color": "1A7C11",
+                                        "item": {
+                                            "host": "Unifi WiFi Site",
+                                            "key": "grpsum[\"{$AP_GROUP}\", \"rx_bandwidth[{#ESSID}]\", avg, {$UNIFI_SMOOTHING_PERIOD}]"
+                                        }
+                                    },
+                                    {
+                                        "sortorder": "2",
+                                        "color": "F63100",
+                                        "item": {
+                                            "host": "Unifi WiFi Site",
+                                            "key": "grpsum[\"{$AP_GROUP}\", \"tx_bandwidth[{#ESSID}]\", avg, \"{$UNIFI_SMOOTHING_PERIOD}\"]"
+                                        }
+                                    }
+                                ]
+                            }
+                        ],
                         "master_item": {
                             "key": "mca-dump-short.sh[\"-d\",\"{HOST.CONN}\", \"-u\", \"{$UNIFI_USER}\", \"-i\", \"{$UNIFI_SSH_PRIV_KEY_PATH}\", \"-t\", \"AP\"]"
                         },
@@ -4519,6 +4565,27 @@
                         "sortorder": "1",
                         "color": "1A7C11",
                         "item": {
+                            "host": "Unifi AP",
+                            "key": "wireless_reception_bandwidth"
+                        }
+                    },
+                    {
+                        "sortorder": "2",
+                        "color": "F63100",
+                        "item": {
+                            "host": "Unifi AP",
+                            "key": "wireless_transmission_bandwidth"
+                        }
+                    }
+                ]
+            },
+            {
+                "name": "Bandwidth",
+                "graph_items": [
+                    {
+                        "sortorder": "1",
+                        "color": "1A7C11",
+                        "item": {
                             "host": "Unifi USG",
                             "key": "download_bandwidth_smooth"
                         }
@@ -4561,6 +4628,48 @@
                         "sortorder": "1",
                         "color": "1A7C11",
                         "item": {
+                            "host": "Unifi USG",
+                            "key": "cpu_smooth"
+                        }
+                    },
+                    {
+                        "sortorder": "2",
+                        "color": "F63100",
+                        "item": {
+                            "host": "Unifi USG",
+                            "key": "memory"
+                        }
+                    }
+                ]
+            },
+            {
+                "name": "CPU and Memory",
+                "graph_items": [
+                    {
+                        "sortorder": "1",
+                        "color": "1A7C11",
+                        "item": {
+                            "host": "Unifi Switch",
+                            "key": "cpu_smooth"
+                        }
+                    },
+                    {
+                        "sortorder": "2",
+                        "color": "F63100",
+                        "item": {
+                            "host": "Unifi Switch",
+                            "key": "memory"
+                        }
+                    }
+                ]
+            },
+            {
+                "name": "CPU and Memory",
+                "graph_items": [
+                    {
+                        "sortorder": "1",
+                        "color": "1A7C11",
+                        "item": {
                             "host": "Unifi UDMP",
                             "key": "cpu"
                         }
@@ -4576,43 +4685,64 @@
                 ]
             },
             {
-                "name": "CPU and Memory",
+                "name": "Incoming Bandwidth",
                 "graph_items": [
                     {
                         "sortorder": "1",
                         "color": "1A7C11",
                         "item": {
-                            "host": "Unifi Switch",
-                            "key": "cpu_smooth"
-                        }
-                    },
-                    {
-                        "sortorder": "2",
-                        "color": "F63100",
-                        "item": {
-                            "host": "Unifi Switch",
-                            "key": "memory"
+                            "host": "Unifi Protect NVR4",
+                            "key": "IpExtInOctets"
                         }
                     }
                 ]
             },
             {
-                "name": "CPU and Memory",
+                "name": "Incoming Bandwidth",
                 "graph_items": [
                     {
                         "sortorder": "1",
                         "color": "1A7C11",
                         "item": {
-                            "host": "Unifi USG",
-                            "key": "cpu_smooth"
+                            "host": "Unifi Protect Cloud Key",
+                            "key": "IpExtInOctets"
+                        }
+                    }
+                ]
+            },
+            {
+                "name": "Interference and Channel Usage",
+                "graph_items": [
+                    {
+                        "sortorder": "1",
+                        "color": "1A7C11",
+                        "item": {
+                            "host": "Unifi AP",
+                            "key": "2g_interference_raw"
                         }
                     },
                     {
                         "sortorder": "2",
                         "color": "F63100",
                         "item": {
-                            "host": "Unifi USG",
-                            "key": "memory"
+                            "host": "Unifi AP",
+                            "key": "cu_total_2g"
+                        }
+                    },
+                    {
+                        "sortorder": "3",
+                        "color": "2774A4",
+                        "item": {
+                            "host": "Unifi AP",
+                            "key": "5g_interference"
+                        }
+                    },
+                    {
+                        "sortorder": "4",
+                        "color": "A54F10",
+                        "item": {
+                            "host": "Unifi AP",
+                            "key": "cu_total_5g"
                         }
                     }
                 ]
@@ -4728,6 +4858,27 @@
                         "item": {
                             "host": "Unifi Switch",
                             "key": "total_rx_bandwidth"
+                        }
+                    }
+                ]
+            },
+            {
+                "name": "Total WiFi Bandwidth",
+                "graph_items": [
+                    {
+                        "sortorder": "1",
+                        "color": "1A7C11",
+                        "item": {
+                            "host": "Unifi WiFi Site",
+                            "key": "grpsum[\"{$AP_GROUP}\", \"wireless_reception_bandwidth\",avg, {$UNIFI_SMOOTHING_PERIOD}]"
+                        }
+                    },
+                    {
+                        "sortorder": "2",
+                        "color": "F63100",
+                        "item": {
+                            "host": "Unifi WiFi Site",
+                            "key": "grpsum[\"{$AP_GROUP}\", \"wireless_transmission_bandwidth\",avg, {$UNIFI_SMOOTHING_PERIOD}]"
                         }
                     }
                 ]
