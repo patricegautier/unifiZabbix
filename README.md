@@ -50,11 +50,16 @@ You should now have the following templates available, and it should be pretty s
 	Unifi Protect Cloud Key
 	Unifi Protect NVR4
 	SunMax SolarPoint
+	Unifi SSH Host
 
 
-You will need to assign the templates with the matching type to hosts with the proper IP/fqdn that you have created in Zabbix.
+• You will need to assign the templates with the matching type to hosts with the proper IP/fqdn that you have created in Zabbix.
 
-Unifi Wifi Site is a bit special and meant to aggregate WiFi traffic across your wifi networks for a Unifi site.  Just assign it to one of the APs that can see all the networks in question and assign the {$UNIFI_AP_GROUP} macro for that host to the name of a zabbix host group that contains all the APs for that site.
+A couple of things on top of that:
+
+• Unifi SSH Host: assign that one to all your Unifi infrastructure devices, on top of the template for that specific type.  <i>(In a perfect world, I would have had the specific templates inherit from that one and all the right items appear that way but Zabbix does not support exporting and reimporting a template hierarchy as of 5.2.  Assinging both templates is the work-around)</i>
+
+• Unifi Wifi Site is meant to aggregate WiFi traffic across your wifi networks for a Unifi site.  Just assign it to one of the APs that can see all the networks in question and assign the {$UNIFI_AP_GROUP} macro for that host to the name of a zabbix host group that contains all the APs for that site.
 
 ## Setup SSH from your Zabbix server to your Unifi devices via public/private keypair
 

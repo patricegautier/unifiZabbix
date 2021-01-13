@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.2</version>
-    <date>2021-01-13T18:19:47Z</date>
+    <date>2021-01-13T22:25:50Z</date>
     <groups>
         <group>
             <name>Patrice</name>
@@ -416,6 +416,12 @@
                             <name>{HOST.NAME} Device did not report statistics</name>
                             <priority>WARNING</priority>
                             <manual_close>YES</manual_close>
+                            <dependencies>
+                                <dependency>
+                                    <name>{HOST.NAME} SSH is not available for  {$UNIFI_ALERT_PERIOD}</name>
+                                    <expression>{Unifi SSH Host:ssh.run[uname].nodata({$UNIFI_ALERT_PERIOD})}=1</expression>
+                                </dependency>
+                            </dependencies>
                         </trigger>
                     </triggers>
                 </item>
@@ -838,6 +844,9 @@ Assign this template to all APs in your site</description>
             </groups>
             <applications>
                 <application>
+                    <name>Availability</name>
+                </application>
+                <application>
                     <name>Host</name>
                 </application>
                 <application>
@@ -1119,6 +1128,12 @@ Assign this template to all APs in your site</description>
                             <name>{HOST.NAME} 2G Channel Usage &gt; 50%</name>
                             <priority>INFO</priority>
                             <manual_close>YES</manual_close>
+                            <dependencies>
+                                <dependency>
+                                    <name>{HOST.NAME} 2G Channel Usage &gt; 80%</name>
+                                    <expression>{Unifi AP:cu_total_2g.avg({$UNIFI_ALERT_PERIOD})}&gt;80</expression>
+                                </dependency>
+                            </dependencies>
                         </trigger>
                         <trigger>
                             <expression>{avg({$UNIFI_ALERT_PERIOD})}&gt;80</expression>
@@ -1156,6 +1171,12 @@ Assign this template to all APs in your site</description>
                             <name>{HOST.NAME} 5G Channel Usage &gt; 50%</name>
                             <priority>INFO</priority>
                             <manual_close>YES</manual_close>
+                            <dependencies>
+                                <dependency>
+                                    <name>{HOST.NAME} 5G Channel Usage &gt; 80%</name>
+                                    <expression>{Unifi AP:cu_total_5g.avg({$UNIFI_ALERT_PERIOD})}&gt;80</expression>
+                                </dependency>
+                            </dependencies>
                         </trigger>
                         <trigger>
                             <expression>{avg({$UNIFI_ALERT_PERIOD})}&gt;80</expression>
@@ -1494,6 +1515,16 @@ Assign this template to all APs in your site</description>
                             <name>{HOST.NAME} did not report statistics</name>
                             <priority>WARNING</priority>
                             <manual_close>YES</manual_close>
+                            <dependencies>
+                                <dependency>
+                                    <name>{HOST.NAME} did not report statistics for 6h</name>
+                                    <expression>{Unifi AP:uptime.nodata(6h)}=1</expression>
+                                </dependency>
+                                <dependency>
+                                    <name>{HOST.NAME} SSH is not available for  {$UNIFI_ALERT_PERIOD}</name>
+                                    <expression>{Unifi SSH Host:ssh.run[uname].nodata({$UNIFI_ALERT_PERIOD})}=1</expression>
+                                </dependency>
+                            </dependencies>
                         </trigger>
                         <trigger>
                             <expression>{nodata(6h)}=1</expression>
@@ -1964,6 +1995,12 @@ Assign this template to all APs in your site</description>
                             <name>{HOST.NAME} didn’t report statistics</name>
                             <priority>AVERAGE</priority>
                             <manual_close>YES</manual_close>
+                            <dependencies>
+                                <dependency>
+                                    <name>{HOST.NAME} SSH is not available for  {$UNIFI_ALERT_PERIOD}</name>
+                                    <expression>{Unifi SSH Host:ssh.run[uname].nodata({$UNIFI_ALERT_PERIOD})}=1</expression>
+                                </dependency>
+                            </dependencies>
                         </trigger>
                         <trigger>
                             <expression>{avg(3600s)} &lt; {avg(3600s, 1d)}*.7</expression>
@@ -2126,6 +2163,73 @@ Assign this template to all APs in your site</description>
             </items>
         </template>
         <template>
+            <template>Unifi SSH Host</template>
+            <name>Unifi SSH Host</name>
+            <description>Link this to Unifi AP, Switch, USG, UDMP, Airmax hosts to get availability and version tracking</description>
+            <groups>
+                <group>
+                    <name>Unifi Zabbix Export</name>
+                </group>
+            </groups>
+            <applications>
+                <application>
+                    <name>Availability</name>
+                </application>
+            </applications>
+            <items>
+                <item>
+                    <name>ping</name>
+                    <type>SIMPLE</type>
+                    <key>icmpping[]</key>
+                    <applications>
+                        <application>
+                            <name>Availability</name>
+                        </application>
+                    </applications>
+                    <triggers>
+                        <trigger>
+                            <expression>{max({$UNIFI_ALERT_PERIOD})}=0</expression>
+                            <name>{HOST.NAME} has not been pingable for {$UNIFI_ALERT_PERIOD}</name>
+                            <priority>WARNING</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>uname</name>
+                    <type>SSH</type>
+                    <key>ssh.run[uname]</key>
+                    <trends>0</trends>
+                    <value_type>CHAR</value_type>
+                    <params>uname -a</params>
+                    <authtype>PUBLIC_KEY</authtype>
+                    <username>{$UNIFI_USER}</username>
+                    <publickey>{$UNIFI_PUB_KEY}</publickey>
+                    <privatekey>{$UNIFI_PRIV_KEY}</privatekey>
+                    <inventory_link>OS_FULL</inventory_link>
+                    <applications>
+                        <application>
+                            <name>Availability</name>
+                        </application>
+                    </applications>
+                    <triggers>
+                        <trigger>
+                            <expression>{nodata({$UNIFI_ALERT_PERIOD})}=1</expression>
+                            <name>{HOST.NAME} SSH is not available for  {$UNIFI_ALERT_PERIOD}</name>
+                            <priority>WARNING</priority>
+                            <manual_close>YES</manual_close>
+                            <dependencies>
+                                <dependency>
+                                    <name>{HOST.NAME} has not been pingable for {$UNIFI_ALERT_PERIOD}</name>
+                                    <expression>{Unifi SSH Host:icmpping[].max({$UNIFI_ALERT_PERIOD})}=0</expression>
+                                </dependency>
+                            </dependencies>
+                        </trigger>
+                    </triggers>
+                </item>
+            </items>
+        </template>
+        <template>
             <template>Unifi Switch</template>
             <name>Unifi Switch</name>
             <description>Link this template to all Unifi switches</description>
@@ -2144,6 +2248,9 @@ Assign this template to all APs in your site</description>
                 </group>
             </groups>
             <applications>
+                <application>
+                    <name>Availability</name>
+                </application>
                 <application>
                     <name>Host</name>
                 </application>
@@ -2213,6 +2320,22 @@ Assign this template to all APs in your site</description>
                     <master_item>
                         <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;]</key>
                     </master_item>
+                </item>
+                <item>
+                    <name>ping</name>
+                    <type>SIMPLE</type>
+                    <key>icmppingp[]</key>
+                    <applications>
+                        <application>
+                            <name>Availability</name>
+                        </application>
+                    </applications>
+                    <triggers>
+                        <trigger>
+                            <expression>{max({$UNIFI_ALERT_PERIOD})}=0</expression>
+                            <name>{HOST.NAME} has not been pingable for {$UNIFI_ALERT_PERIOD}</name>
+                        </trigger>
+                    </triggers>
                 </item>
                 <item>
                     <name>Load Average 1mn</name>
@@ -2640,6 +2763,16 @@ Assign this template to all APs in your site</description>
                             <name>{HOST.NAME} did not report statistics</name>
                             <priority>WARNING</priority>
                             <manual_close>YES</manual_close>
+                            <dependencies>
+                                <dependency>
+                                    <name>{HOST.NAME} did not report statistics for 6h</name>
+                                    <expression>{Unifi Switch:uptime.nodata(6h)}=1</expression>
+                                </dependency>
+                                <dependency>
+                                    <name>{HOST.NAME} SSH is not available for  {$UNIFI_ALERT_PERIOD}</name>
+                                    <expression>{Unifi SSH Host:ssh.run[uname].nodata({$UNIFI_ALERT_PERIOD})}=1</expression>
+                                </dependency>
+                            </dependencies>
                         </trigger>
                         <trigger>
                             <expression>{nodata(6h)}=1</expression>
@@ -2925,6 +3058,9 @@ Assign this template to all APs in your site</description>
                 </group>
             </groups>
             <applications>
+                <application>
+                    <name>Availability</name>
+                </application>
                 <application>
                     <name>Host</name>
                 </application>
@@ -3465,6 +3601,16 @@ Assign this template to all APs in your site</description>
                             <name>{HOST.NAME} did not report statistics</name>
                             <priority>WARNING</priority>
                             <manual_close>YES</manual_close>
+                            <dependencies>
+                                <dependency>
+                                    <name>{HOST.NAME} did not report statistics for 6h</name>
+                                    <expression>{Unifi UDMP:uptime.nodata(6h)}=1</expression>
+                                </dependency>
+                                <dependency>
+                                    <name>{HOST.NAME} SSH is not available for  {$UNIFI_ALERT_PERIOD}</name>
+                                    <expression>{Unifi SSH Host:ssh.run[uname].nodata({$UNIFI_ALERT_PERIOD})}=1</expression>
+                                </dependency>
+                            </dependencies>
                         </trigger>
                         <trigger>
                             <expression>{nodata(6h)}=1</expression>
@@ -3656,6 +3802,9 @@ Assign this template to all APs in your site</description>
                 </group>
             </groups>
             <applications>
+                <application>
+                    <name>Availability</name>
+                </application>
                 <application>
                     <name>Host</name>
                 </application>
@@ -4208,6 +4357,16 @@ Assign this template to all APs in your site</description>
                             <name>{HOST.NAME} did not report statistics</name>
                             <priority>WARNING</priority>
                             <manual_close>YES</manual_close>
+                            <dependencies>
+                                <dependency>
+                                    <name>{HOST.NAME} did not report statistics for 6h</name>
+                                    <expression>{Unifi USG:uptime.nodata(6h)}=1</expression>
+                                </dependency>
+                                <dependency>
+                                    <name>{HOST.NAME} SSH is not available for  {$UNIFI_ALERT_PERIOD}</name>
+                                    <expression>{Unifi SSH Host:ssh.run[uname].nodata({$UNIFI_ALERT_PERIOD})}=1</expression>
+                                </dependency>
+                            </dependencies>
                         </trigger>
                         <trigger>
                             <expression>{nodata(6h)}=1</expression>

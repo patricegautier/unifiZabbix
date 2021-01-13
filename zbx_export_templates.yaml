@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2021-01-13T18:19:44Z'
+  date: '2021-01-13T22:25:47Z'
   groups:
     -
       name: Patrice
@@ -294,6 +294,10 @@ zabbix_export:
               name: '{HOST.NAME} Device did not report statistics'
               priority: WARNING
               manual_close: 'YES'
+              dependencies:
+                -
+                  name: '{HOST.NAME} SSH is not available for  {$UNIFI_ALERT_PERIOD}'
+                  expression: '{Unifi SSH Host:ssh.run[uname].nodata({$UNIFI_ALERT_PERIOD})}=1'
         -
           name: 'AirTime Smooth'
           type: CALCULATED
@@ -599,6 +603,8 @@ zabbix_export:
           name: 'Unifi Zabbix Export'
       applications:
         -
+          name: Availability
+        -
           name: Host
         -
           name: Radio
@@ -805,6 +811,10 @@ zabbix_export:
               name: '{HOST.NAME} 2G Channel Usage > 50%'
               priority: INFO
               manual_close: 'YES'
+              dependencies:
+                -
+                  name: '{HOST.NAME} 2G Channel Usage > 80%'
+                  expression: '{Unifi AP:cu_total_2g.avg({$UNIFI_ALERT_PERIOD})}>80'
             -
               expression: '{avg({$UNIFI_ALERT_PERIOD})}>80'
               name: '{HOST.NAME} 2G Channel Usage > 80%'
@@ -832,6 +842,10 @@ zabbix_export:
               name: '{HOST.NAME} 5G Channel Usage > 50%'
               priority: INFO
               manual_close: 'YES'
+              dependencies:
+                -
+                  name: '{HOST.NAME} 5G Channel Usage > 80%'
+                  expression: '{Unifi AP:cu_total_5g.avg({$UNIFI_ALERT_PERIOD})}>80'
             -
               expression: '{avg({$UNIFI_ALERT_PERIOD})}>80'
               name: '{HOST.NAME} 5G Channel Usage > 80%'
@@ -1074,6 +1088,13 @@ zabbix_export:
               name: '{HOST.NAME} did not report statistics'
               priority: WARNING
               manual_close: 'YES'
+              dependencies:
+                -
+                  name: '{HOST.NAME} did not report statistics for 6h'
+                  expression: '{Unifi AP:uptime.nodata(6h)}=1'
+                -
+                  name: '{HOST.NAME} SSH is not available for  {$UNIFI_ALERT_PERIOD}'
+                  expression: '{Unifi SSH Host:ssh.run[uname].nodata({$UNIFI_ALERT_PERIOD})}=1'
             -
               expression: '{nodata(6h)}=1'
               name: '{HOST.NAME} did not report statistics for 6h'
@@ -1410,6 +1431,10 @@ zabbix_export:
               name: '{HOST.NAME} didn’t report statistics'
               priority: AVERAGE
               manual_close: 'YES'
+              dependencies:
+                -
+                  name: '{HOST.NAME} SSH is not available for  {$UNIFI_ALERT_PERIOD}'
+                  expression: '{Unifi SSH Host:ssh.run[uname].nodata({$UNIFI_ALERT_PERIOD})}=1'
             -
               expression: '{avg(3600s)} < {avg(3600s, 1d)}*.7'
               name: '{HOST.NAME} Incoming Bandwidth Too Low'
@@ -1534,6 +1559,55 @@ zabbix_export:
           url: 'https://{HOST.NAME}:7443'
           retrieve_mode: HEADERS
     -
+      template: 'Unifi SSH Host'
+      name: 'Unifi SSH Host'
+      description: 'Link this to Unifi AP, Switch, USG, UDMP, Airmax hosts to get availability and version tracking'
+      groups:
+        -
+          name: 'Unifi Zabbix Export'
+      applications:
+        -
+          name: Availability
+      items:
+        -
+          name: ping
+          type: SIMPLE
+          key: 'icmpping[]'
+          applications:
+            -
+              name: Availability
+          triggers:
+            -
+              expression: '{max({$UNIFI_ALERT_PERIOD})}=0'
+              name: '{HOST.NAME} has not been pingable for {$UNIFI_ALERT_PERIOD}'
+              priority: WARNING
+              manual_close: 'YES'
+        -
+          name: uname
+          type: SSH
+          key: 'ssh.run[uname]'
+          trends: '0'
+          value_type: CHAR
+          params: 'uname -a'
+          authtype: PUBLIC_KEY
+          username: '{$UNIFI_USER}'
+          publickey: '{$UNIFI_PUB_KEY}'
+          privatekey: '{$UNIFI_PRIV_KEY}'
+          inventory_link: OS_FULL
+          applications:
+            -
+              name: Availability
+          triggers:
+            -
+              expression: '{nodata({$UNIFI_ALERT_PERIOD})}=1'
+              name: '{HOST.NAME} SSH is not available for  {$UNIFI_ALERT_PERIOD}'
+              priority: WARNING
+              manual_close: 'YES'
+              dependencies:
+                -
+                  name: '{HOST.NAME} has not been pingable for {$UNIFI_ALERT_PERIOD}'
+                  expression: '{Unifi SSH Host:icmpping[].max({$UNIFI_ALERT_PERIOD})}=0'
+    -
       template: 'Unifi Switch'
       name: 'Unifi Switch'
       description: 'Link this template to all Unifi switches'
@@ -1547,6 +1621,8 @@ zabbix_export:
         -
           name: 'Unifi Zabbix Export'
       applications:
+        -
+          name: Availability
         -
           name: Host
         -
@@ -1597,6 +1673,17 @@ zabbix_export:
                 - $.hostname
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "SWITCH"]'
+        -
+          name: ping
+          type: SIMPLE
+          key: 'icmppingp[]'
+          applications:
+            -
+              name: Availability
+          triggers:
+            -
+              expression: '{max({$UNIFI_ALERT_PERIOD})}=0'
+              name: '{HOST.NAME} has not been pingable for {$UNIFI_ALERT_PERIOD}'
         -
           name: 'Load Average 1mn'
           type: DEPENDENT
@@ -1902,6 +1989,13 @@ zabbix_export:
               name: '{HOST.NAME} did not report statistics'
               priority: WARNING
               manual_close: 'YES'
+              dependencies:
+                -
+                  name: '{HOST.NAME} did not report statistics for 6h'
+                  expression: '{Unifi Switch:uptime.nodata(6h)}=1'
+                -
+                  name: '{HOST.NAME} SSH is not available for  {$UNIFI_ALERT_PERIOD}'
+                  expression: '{Unifi SSH Host:ssh.run[uname].nodata({$UNIFI_ALERT_PERIOD})}=1'
             -
               expression: '{nodata(6h)}=1'
               name: '{HOST.NAME} did not report statistics for 6h'
@@ -2099,6 +2193,8 @@ zabbix_export:
         -
           name: 'Unifi Zabbix Export'
       applications:
+        -
+          name: Availability
         -
           name: Host
         -
@@ -2483,6 +2579,13 @@ zabbix_export:
               name: '{HOST.NAME} did not report statistics'
               priority: WARNING
               manual_close: 'YES'
+              dependencies:
+                -
+                  name: '{HOST.NAME} did not report statistics for 6h'
+                  expression: '{Unifi UDMP:uptime.nodata(6h)}=1'
+                -
+                  name: '{HOST.NAME} SSH is not available for  {$UNIFI_ALERT_PERIOD}'
+                  expression: '{Unifi SSH Host:ssh.run[uname].nodata({$UNIFI_ALERT_PERIOD})}=1'
             -
               expression: '{nodata(6h)}=1'
               name: '{HOST.NAME} did not report statistics for 6h'
@@ -2614,6 +2717,8 @@ zabbix_export:
         -
           name: 'Unifi Zabbix Export'
       applications:
+        -
+          name: Availability
         -
           name: Host
         -
@@ -3006,6 +3111,13 @@ zabbix_export:
               name: '{HOST.NAME} did not report statistics'
               priority: WARNING
               manual_close: 'YES'
+              dependencies:
+                -
+                  name: '{HOST.NAME} did not report statistics for 6h'
+                  expression: '{Unifi USG:uptime.nodata(6h)}=1'
+                -
+                  name: '{HOST.NAME} SSH is not available for  {$UNIFI_ALERT_PERIOD}'
+                  expression: '{Unifi SSH Host:ssh.run[uname].nodata({$UNIFI_ALERT_PERIOD})}=1'
             -
               expression: '{nodata(6h)}=1'
               name: '{HOST.NAME} did not report statistics for 6h'
