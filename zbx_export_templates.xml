@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.2</version>
-    <date>2021-01-13T22:25:50Z</date>
+    <date>2021-01-14T08:00:53Z</date>
     <groups>
         <group>
             <name>Patrice</name>
@@ -1781,6 +1781,214 @@ Assign this template to all APs in your site</description>
             </discovery_rules>
         </template>
         <template>
+            <template>Unifi Protect Camera</template>
+            <name>Unifi Protect Camera</name>
+            <groups>
+                <group>
+                    <name>Unifi</name>
+                </group>
+                <group>
+                    <name>unifiZabbix</name>
+                </group>
+                <group>
+                    <name>Unifi Zabbix Export</name>
+                </group>
+            </groups>
+            <applications>
+                <application>
+                    <name>Availability</name>
+                </application>
+                <application>
+                    <name>Network</name>
+                </application>
+                <application>
+                    <name>Ntwork</name>
+                </application>
+            </applications>
+            <items>
+                <item>
+                    <name>Camera Name</name>
+                    <type>DEPENDENT</type>
+                    <key>camera_name</key>
+                    <delay>0</delay>
+                    <trends>0</trends>
+                    <value_type>CHAR</value_type>
+                    <inventory_link>NAME</inventory_link>
+                    <preprocessing>
+                        <step>
+                            <type>REGEX</type>
+                            <parameters>
+                                <parameter>^Linux (\S*)</parameter>
+                                <parameter>\1</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>ssh.run[uname]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>ping</name>
+                    <type>SIMPLE</type>
+                    <key>icmpping[]</key>
+                    <applications>
+                        <application>
+                            <name>Availability</name>
+                        </application>
+                    </applications>
+                    <triggers>
+                        <trigger>
+                            <expression>{max({$UNIFI_ALERT_PERIOD})}=0</expression>
+                            <name>{HOST.NAME} has not been pingable for {$UNIFI_ALERT_PERIOD}</name>
+                            <priority>INFO</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>MAC Address</name>
+                    <type>DEPENDENT</type>
+                    <key>Mac</key>
+                    <delay>0</delay>
+                    <trends>0</trends>
+                    <value_type>CHAR</value_type>
+                    <inventory_link>MACADDRESS_A</inventory_link>
+                    <preprocessing>
+                        <step>
+                            <type>REGEX</type>
+                            <parameters>
+                                <parameter>.*HWaddr ([a-fA-F0-9:]{17}|[a-fA-F0-9]{12})</parameter>
+                                <parameter>\1</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>ssh.run[ifconfig]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Reception Bandwidth</name>
+                    <type>DEPENDENT</type>
+                    <key>rx_bandwidth</key>
+                    <delay>0</delay>
+                    <units>bps</units>
+                    <applications>
+                        <application>
+                            <name>Network</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>REGEX</type>
+                            <parameters>
+                                <parameter>.*RX bytes:(\d*)</parameter>
+                                <parameter>\1</parameter>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>CHANGE_PER_SECOND</type>
+                            <parameters>
+                                <parameter/>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>MULTIPLIER</type>
+                            <parameters>
+                                <parameter>8</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>ssh.run[ifconfig]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>ifconfig</name>
+                    <type>SSH</type>
+                    <key>ssh.run[ifconfig]</key>
+                    <history>0</history>
+                    <trends>0</trends>
+                    <value_type>CHAR</value_type>
+                    <params>if ifconfig eth0 &gt;/dev/null 2&gt;&amp;1 ; then ifconfig eth0; else ifconfig wlan0; fi</params>
+                    <authtype>PUBLIC_KEY</authtype>
+                    <username>ubnt</username>
+                    <publickey>{$UNIFI_PUB_KEY}</publickey>
+                    <privatekey>{$UNIFI_PRIV_KEY}</privatekey>
+                    <applications>
+                        <application>
+                            <name>Network</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>uname</name>
+                    <type>SSH</type>
+                    <key>ssh.run[uname]</key>
+                    <trends>0</trends>
+                    <value_type>CHAR</value_type>
+                    <params>uname -a</params>
+                    <authtype>PUBLIC_KEY</authtype>
+                    <username>ubnt</username>
+                    <publickey>{$UNIFI_PUB_KEY}</publickey>
+                    <privatekey>{$UNIFI_PRIV_KEY}</privatekey>
+                    <applications>
+                        <application>
+                            <name>Availability</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Transmission Bandwidth</name>
+                    <type>DEPENDENT</type>
+                    <key>tx_bandwidth</key>
+                    <delay>0</delay>
+                    <units>bps</units>
+                    <applications>
+                        <application>
+                            <name>Network</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>REGEX</type>
+                            <parameters>
+                                <parameter>.*TX bytes:(\d*)</parameter>
+                                <parameter>\1</parameter>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>CHANGE_PER_SECOND</type>
+                            <parameters>
+                                <parameter/>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>MULTIPLIER</type>
+                            <parameters>
+                                <parameter>8</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>ssh.run[ifconfig]</key>
+                    </master_item>
+                    <triggers>
+                        <trigger>
+                            <expression>{avg(1h)} &lt; {avg(1h,1d)}*.8 or {avg(10m)} &lt; 500000</expression>
+                            <name>{HOST.NAME} Outgoing Bandwidth Too Low</name>
+                            <priority>WARNING</priority>
+                            <dependencies>
+                                <dependency>
+                                    <name>{HOST.NAME} has not been pingable for {$UNIFI_ALERT_PERIOD}</name>
+                                    <expression>{Unifi Protect Camera:icmpping[].max({$UNIFI_ALERT_PERIOD})}=0</expression>
+                                </dependency>
+                            </dependencies>
+                        </trigger>
+                    </triggers>
+                </item>
+            </items>
+        </template>
+        <template>
             <template>Unifi Protect Cloud Key</template>
             <name>Unifi Protect Cloud Key</name>
             <description>Assign this template to your Cloud Keys running Protect</description>
@@ -2175,6 +2383,9 @@ Assign this template to all APs in your site</description>
                 <application>
                     <name>Availability</name>
                 </application>
+                <application>
+                    <name>Network</name>
+                </application>
             </applications>
             <items>
                 <item>
@@ -2194,6 +2405,45 @@ Assign this template to all APs in your site</description>
                             <manual_close>YES</manual_close>
                         </trigger>
                     </triggers>
+                </item>
+                <item>
+                    <name>MAC Address</name>
+                    <type>DEPENDENT</type>
+                    <key>mac</key>
+                    <delay>0</delay>
+                    <trends>0</trends>
+                    <value_type>CHAR</value_type>
+                    <inventory_link>MACADDRESS_A</inventory_link>
+                    <applications>
+                        <application>
+                            <name>Network</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>REGEX</type>
+                            <parameters>
+                                <parameter>.*HWaddr ([a-fA-F0-9:]{17}|[a-fA-F0-9]{12})</parameter>
+                                <parameter>\1</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>ssh.run[ifconfig]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>ifconfig</name>
+                    <type>SSH</type>
+                    <key>ssh.run[ifconfig]</key>
+                    <history>0</history>
+                    <trends>0</trends>
+                    <value_type>CHAR</value_type>
+                    <params>if ifconfig eth0 &gt;/dev/null 2&gt;&amp;1 ; then ifconfig eth0; else ifconfig wlan0; fi</params>
+                    <authtype>PUBLIC_KEY</authtype>
+                    <username>{$UNIFI_USER}</username>
+                    <publickey>{$UNIFI_PUB_KEY}</publickey>
+                    <privatekey>{$UNIFI_PRIV_KEY}</privatekey>
                 </item>
                 <item>
                     <name>uname</name>
@@ -2320,22 +2570,6 @@ Assign this template to all APs in your site</description>
                     <master_item>
                         <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;]</key>
                     </master_item>
-                </item>
-                <item>
-                    <name>ping</name>
-                    <type>SIMPLE</type>
-                    <key>icmppingp[]</key>
-                    <applications>
-                        <application>
-                            <name>Availability</name>
-                        </application>
-                    </applications>
-                    <triggers>
-                        <trigger>
-                            <expression>{max({$UNIFI_ALERT_PERIOD})}=0</expression>
-                            <name>{HOST.NAME} has not been pingable for {$UNIFI_ALERT_PERIOD}</name>
-                        </trigger>
-                    </triggers>
                 </item>
                 <item>
                     <name>Load Average 1mn</name>
@@ -4762,6 +4996,27 @@ Assign this template to all APs in your site</description>
             </graph_items>
         </graph>
         <graph>
+            <name>Bandwidth</name>
+            <graph_items>
+                <graph_item>
+                    <sortorder>1</sortorder>
+                    <color>1A7C11</color>
+                    <item>
+                        <host>Unifi Protect Camera</host>
+                        <key>rx_bandwidth</key>
+                    </item>
+                </graph_item>
+                <graph_item>
+                    <sortorder>2</sortorder>
+                    <color>F63100</color>
+                    <item>
+                        <host>Unifi Protect Camera</host>
+                        <key>tx_bandwidth</key>
+                    </item>
+                </graph_item>
+            </graph_items>
+        </graph>
+        <graph>
             <name>Bandwidth Used</name>
             <graph_items>
                 <graph_item>
@@ -4789,48 +5044,6 @@ Assign this template to all APs in your site</description>
                     <sortorder>1</sortorder>
                     <color>1A7C11</color>
                     <item>
-                        <host>Unifi USG</host>
-                        <key>cpu_smooth</key>
-                    </item>
-                </graph_item>
-                <graph_item>
-                    <sortorder>2</sortorder>
-                    <color>F63100</color>
-                    <item>
-                        <host>Unifi USG</host>
-                        <key>memory</key>
-                    </item>
-                </graph_item>
-            </graph_items>
-        </graph>
-        <graph>
-            <name>CPU and Memory</name>
-            <graph_items>
-                <graph_item>
-                    <sortorder>1</sortorder>
-                    <color>1A7C11</color>
-                    <item>
-                        <host>Unifi Switch</host>
-                        <key>cpu_smooth</key>
-                    </item>
-                </graph_item>
-                <graph_item>
-                    <sortorder>2</sortorder>
-                    <color>F63100</color>
-                    <item>
-                        <host>Unifi Switch</host>
-                        <key>memory</key>
-                    </item>
-                </graph_item>
-            </graph_items>
-        </graph>
-        <graph>
-            <name>CPU and Memory</name>
-            <graph_items>
-                <graph_item>
-                    <sortorder>1</sortorder>
-                    <color>1A7C11</color>
-                    <item>
                         <host>Unifi UDMP</host>
                         <key>cpu</key>
                     </item>
@@ -4840,6 +5053,48 @@ Assign this template to all APs in your site</description>
                     <color>F63100</color>
                     <item>
                         <host>Unifi UDMP</host>
+                        <key>memory</key>
+                    </item>
+                </graph_item>
+            </graph_items>
+        </graph>
+        <graph>
+            <name>CPU and Memory</name>
+            <graph_items>
+                <graph_item>
+                    <sortorder>1</sortorder>
+                    <color>1A7C11</color>
+                    <item>
+                        <host>Unifi Switch</host>
+                        <key>cpu_smooth</key>
+                    </item>
+                </graph_item>
+                <graph_item>
+                    <sortorder>2</sortorder>
+                    <color>F63100</color>
+                    <item>
+                        <host>Unifi Switch</host>
+                        <key>memory</key>
+                    </item>
+                </graph_item>
+            </graph_items>
+        </graph>
+        <graph>
+            <name>CPU and Memory</name>
+            <graph_items>
+                <graph_item>
+                    <sortorder>1</sortorder>
+                    <color>1A7C11</color>
+                    <item>
+                        <host>Unifi USG</host>
+                        <key>cpu_smooth</key>
+                    </item>
+                </graph_item>
+                <graph_item>
+                    <sortorder>2</sortorder>
+                    <color>F63100</color>
+                    <item>
+                        <host>Unifi USG</host>
                         <key>memory</key>
                     </item>
                 </graph_item>
@@ -4957,7 +5212,7 @@ Assign this template to all APs in your site</description>
                     <sortorder>1</sortorder>
                     <color>1A7C11</color>
                     <item>
-                        <host>Unifi Switch</host>
+                        <host>Unifi USG</host>
                         <key>loadavg_smooth</key>
                     </item>
                 </graph_item>
@@ -4970,7 +5225,7 @@ Assign this template to all APs in your site</description>
                     <sortorder>1</sortorder>
                     <color>1A7C11</color>
                     <item>
-                        <host>Unifi USG</host>
+                        <host>Unifi Switch</host>
                         <key>loadavg_smooth</key>
                     </item>
                 </graph_item>

@@ -1,7 +1,7 @@
 {
     "zabbix_export": {
         "version": "5.2",
-        "date": "2021-01-13T22:25:52Z",
+        "date": "2021-01-14T08:00:56Z",
         "groups": [
             {
                 "name": "Patrice"
@@ -1779,6 +1779,214 @@
                 ]
             },
             {
+                "template": "Unifi Protect Camera",
+                "name": "Unifi Protect Camera",
+                "groups": [
+                    {
+                        "name": "Unifi"
+                    },
+                    {
+                        "name": "unifiZabbix"
+                    },
+                    {
+                        "name": "Unifi Zabbix Export"
+                    }
+                ],
+                "applications": [
+                    {
+                        "name": "Availability"
+                    },
+                    {
+                        "name": "Network"
+                    },
+                    {
+                        "name": "Ntwork"
+                    }
+                ],
+                "items": [
+                    {
+                        "name": "Camera Name",
+                        "type": "DEPENDENT",
+                        "key": "camera_name",
+                        "delay": "0",
+                        "trends": "0",
+                        "value_type": "CHAR",
+                        "inventory_link": "NAME",
+                        "preprocessing": [
+                            {
+                                "type": "REGEX",
+                                "parameters": [
+                                    "^Linux (\\S*)",
+                                    "\\1"
+                                ]
+                            }
+                        ],
+                        "master_item": {
+                            "key": "ssh.run[uname]"
+                        }
+                    },
+                    {
+                        "name": "ping",
+                        "type": "SIMPLE",
+                        "key": "icmpping[]",
+                        "applications": [
+                            {
+                                "name": "Availability"
+                            }
+                        ],
+                        "triggers": [
+                            {
+                                "expression": "{max({$UNIFI_ALERT_PERIOD})}=0",
+                                "name": "{HOST.NAME} has not been pingable for {$UNIFI_ALERT_PERIOD}",
+                                "priority": "INFO",
+                                "manual_close": "YES"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "MAC Address",
+                        "type": "DEPENDENT",
+                        "key": "Mac",
+                        "delay": "0",
+                        "trends": "0",
+                        "value_type": "CHAR",
+                        "inventory_link": "MACADDRESS_A",
+                        "preprocessing": [
+                            {
+                                "type": "REGEX",
+                                "parameters": [
+                                    ".*HWaddr ([a-fA-F0-9:]{17}|[a-fA-F0-9]{12})",
+                                    "\\1"
+                                ]
+                            }
+                        ],
+                        "master_item": {
+                            "key": "ssh.run[ifconfig]"
+                        }
+                    },
+                    {
+                        "name": "Reception Bandwidth",
+                        "type": "DEPENDENT",
+                        "key": "rx_bandwidth",
+                        "delay": "0",
+                        "units": "bps",
+                        "applications": [
+                            {
+                                "name": "Network"
+                            }
+                        ],
+                        "preprocessing": [
+                            {
+                                "type": "REGEX",
+                                "parameters": [
+                                    ".*RX bytes:(\\d*)",
+                                    "\\1"
+                                ]
+                            },
+                            {
+                                "type": "CHANGE_PER_SECOND",
+                                "parameters": [
+                                    ""
+                                ]
+                            },
+                            {
+                                "type": "MULTIPLIER",
+                                "parameters": [
+                                    "8"
+                                ]
+                            }
+                        ],
+                        "master_item": {
+                            "key": "ssh.run[ifconfig]"
+                        }
+                    },
+                    {
+                        "name": "ifconfig",
+                        "type": "SSH",
+                        "key": "ssh.run[ifconfig]",
+                        "history": "0",
+                        "trends": "0",
+                        "value_type": "CHAR",
+                        "params": "if ifconfig eth0 >/dev/null 2>&1 ; then ifconfig eth0; else ifconfig wlan0; fi",
+                        "authtype": "PUBLIC_KEY",
+                        "username": "ubnt",
+                        "publickey": "{$UNIFI_PUB_KEY}",
+                        "privatekey": "{$UNIFI_PRIV_KEY}",
+                        "applications": [
+                            {
+                                "name": "Network"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "uname",
+                        "type": "SSH",
+                        "key": "ssh.run[uname]",
+                        "trends": "0",
+                        "value_type": "CHAR",
+                        "params": "uname -a",
+                        "authtype": "PUBLIC_KEY",
+                        "username": "ubnt",
+                        "publickey": "{$UNIFI_PUB_KEY}",
+                        "privatekey": "{$UNIFI_PRIV_KEY}",
+                        "applications": [
+                            {
+                                "name": "Availability"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Transmission Bandwidth",
+                        "type": "DEPENDENT",
+                        "key": "tx_bandwidth",
+                        "delay": "0",
+                        "units": "bps",
+                        "applications": [
+                            {
+                                "name": "Network"
+                            }
+                        ],
+                        "preprocessing": [
+                            {
+                                "type": "REGEX",
+                                "parameters": [
+                                    ".*TX bytes:(\\d*)",
+                                    "\\1"
+                                ]
+                            },
+                            {
+                                "type": "CHANGE_PER_SECOND",
+                                "parameters": [
+                                    ""
+                                ]
+                            },
+                            {
+                                "type": "MULTIPLIER",
+                                "parameters": [
+                                    "8"
+                                ]
+                            }
+                        ],
+                        "master_item": {
+                            "key": "ssh.run[ifconfig]"
+                        },
+                        "triggers": [
+                            {
+                                "expression": "{avg(1h)} < {avg(1h,1d)}*.8 or {avg(10m)} < 500000",
+                                "name": "{HOST.NAME} Outgoing Bandwidth Too Low",
+                                "priority": "WARNING",
+                                "dependencies": [
+                                    {
+                                        "name": "{HOST.NAME} has not been pingable for {$UNIFI_ALERT_PERIOD}",
+                                        "expression": "{Unifi Protect Camera:icmpping[].max({$UNIFI_ALERT_PERIOD})}=0"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
                 "template": "Unifi Protect Cloud Key",
                 "name": "Unifi Protect Cloud Key",
                 "description": "Assign this template to your Cloud Keys running Protect",
@@ -2172,6 +2380,9 @@
                 "applications": [
                     {
                         "name": "Availability"
+                    },
+                    {
+                        "name": "Network"
                     }
                 ],
                 "items": [
@@ -2192,6 +2403,45 @@
                                 "manual_close": "YES"
                             }
                         ]
+                    },
+                    {
+                        "name": "MAC Address",
+                        "type": "DEPENDENT",
+                        "key": "mac",
+                        "delay": "0",
+                        "trends": "0",
+                        "value_type": "CHAR",
+                        "inventory_link": "MACADDRESS_A",
+                        "applications": [
+                            {
+                                "name": "Network"
+                            }
+                        ],
+                        "preprocessing": [
+                            {
+                                "type": "REGEX",
+                                "parameters": [
+                                    ".*HWaddr ([a-fA-F0-9:]{17}|[a-fA-F0-9]{12})",
+                                    "\\1"
+                                ]
+                            }
+                        ],
+                        "master_item": {
+                            "key": "ssh.run[ifconfig]"
+                        }
+                    },
+                    {
+                        "name": "ifconfig",
+                        "type": "SSH",
+                        "key": "ssh.run[ifconfig]",
+                        "history": "0",
+                        "trends": "0",
+                        "value_type": "CHAR",
+                        "params": "if ifconfig eth0 >/dev/null 2>&1 ; then ifconfig eth0; else ifconfig wlan0; fi",
+                        "authtype": "PUBLIC_KEY",
+                        "username": "{$UNIFI_USER}",
+                        "publickey": "{$UNIFI_PUB_KEY}",
+                        "privatekey": "{$UNIFI_PRIV_KEY}"
                     },
                     {
                         "name": "uname",
@@ -2318,22 +2568,6 @@
                         "master_item": {
                             "key": "mca-dump-short.sh[\"-d\",\"{HOST.CONN}\", \"-u\", \"{$UNIFI_USER}\", \"-i\", \"{$UNIFI_SSH_PRIV_KEY_PATH}\", \"-t\", \"SWITCH\"]"
                         }
-                    },
-                    {
-                        "name": "ping",
-                        "type": "SIMPLE",
-                        "key": "icmppingp[]",
-                        "applications": [
-                            {
-                                "name": "Availability"
-                            }
-                        ],
-                        "triggers": [
-                            {
-                                "expression": "{max({$UNIFI_ALERT_PERIOD})}=0",
-                                "name": "{HOST.NAME} has not been pingable for {$UNIFI_ALERT_PERIOD}"
-                            }
-                        ]
                     },
                     {
                         "name": "Load Average 1mn",
@@ -4760,6 +4994,27 @@
                 ]
             },
             {
+                "name": "Bandwidth",
+                "graph_items": [
+                    {
+                        "sortorder": "1",
+                        "color": "1A7C11",
+                        "item": {
+                            "host": "Unifi Protect Camera",
+                            "key": "rx_bandwidth"
+                        }
+                    },
+                    {
+                        "sortorder": "2",
+                        "color": "F63100",
+                        "item": {
+                            "host": "Unifi Protect Camera",
+                            "key": "tx_bandwidth"
+                        }
+                    }
+                ]
+            },
+            {
                 "name": "Bandwidth Used",
                 "graph_items": [
                     {
@@ -4787,48 +5042,6 @@
                         "sortorder": "1",
                         "color": "1A7C11",
                         "item": {
-                            "host": "Unifi USG",
-                            "key": "cpu_smooth"
-                        }
-                    },
-                    {
-                        "sortorder": "2",
-                        "color": "F63100",
-                        "item": {
-                            "host": "Unifi USG",
-                            "key": "memory"
-                        }
-                    }
-                ]
-            },
-            {
-                "name": "CPU and Memory",
-                "graph_items": [
-                    {
-                        "sortorder": "1",
-                        "color": "1A7C11",
-                        "item": {
-                            "host": "Unifi Switch",
-                            "key": "cpu_smooth"
-                        }
-                    },
-                    {
-                        "sortorder": "2",
-                        "color": "F63100",
-                        "item": {
-                            "host": "Unifi Switch",
-                            "key": "memory"
-                        }
-                    }
-                ]
-            },
-            {
-                "name": "CPU and Memory",
-                "graph_items": [
-                    {
-                        "sortorder": "1",
-                        "color": "1A7C11",
-                        "item": {
                             "host": "Unifi UDMP",
                             "key": "cpu"
                         }
@@ -4838,6 +5051,48 @@
                         "color": "F63100",
                         "item": {
                             "host": "Unifi UDMP",
+                            "key": "memory"
+                        }
+                    }
+                ]
+            },
+            {
+                "name": "CPU and Memory",
+                "graph_items": [
+                    {
+                        "sortorder": "1",
+                        "color": "1A7C11",
+                        "item": {
+                            "host": "Unifi Switch",
+                            "key": "cpu_smooth"
+                        }
+                    },
+                    {
+                        "sortorder": "2",
+                        "color": "F63100",
+                        "item": {
+                            "host": "Unifi Switch",
+                            "key": "memory"
+                        }
+                    }
+                ]
+            },
+            {
+                "name": "CPU and Memory",
+                "graph_items": [
+                    {
+                        "sortorder": "1",
+                        "color": "1A7C11",
+                        "item": {
+                            "host": "Unifi USG",
+                            "key": "cpu_smooth"
+                        }
+                    },
+                    {
+                        "sortorder": "2",
+                        "color": "F63100",
+                        "item": {
+                            "host": "Unifi USG",
                             "key": "memory"
                         }
                     }
@@ -4955,7 +5210,7 @@
                         "sortorder": "1",
                         "color": "1A7C11",
                         "item": {
-                            "host": "Unifi Switch",
+                            "host": "Unifi USG",
                             "key": "loadavg_smooth"
                         }
                     }
@@ -4968,7 +5223,7 @@
                         "sortorder": "1",
                         "color": "1A7C11",
                         "item": {
-                            "host": "Unifi USG",
+                            "host": "Unifi Switch",
                             "key": "loadavg_smooth"
                         }
                     }

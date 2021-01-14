@@ -71,7 +71,7 @@ These templates use public key SSH to access APs, Switches, Routers, AirMax stat
 
 put that keypair somewhere on your zabbix server (I put it in ~/.ssh/zabbix/)
 
-You will need to specifically enable SSH access on the unifi devices.  There is one setting in the Unifi controller UI for devices at large in Settings > Site and one for the UDMP in the UDMP advanced settings which is separate.  The controller has handy UI to install your public key on all the devices, you will need to do it by hand on UDMPs and AirMax devices.  *ssh-copy-id* helps there, esp. on the UDMP since those will embarrasingly wipe all your keys at every firmware update and reboot (seriously UBNT).
+You will need to specifically enable SSH access on the unifi devices.  There is one setting in the Unifi controller UI for devices at large in Settings > Site and one for the UDMP in the UDMP advanced settings which is separate.  The controller has handy UI to install your public key on all the devices, you will need to do it by hand on UDMPs and AirMax devices.  *ssh-copy-id* helps there, esp. on the UDMP since those will embarrasingly wipe all your keys at every firmware update and reboot (seriously UBNT).  I have a more sophisticated script to do this at https://github.com/patricegautier/certRenewalScripts/blob/master/updatePublicKey.sh
 
 Permissions can get in the way so check that your zabbix server can actually get the SSH access with:
 
@@ -99,7 +99,13 @@ In Zabbix, in Administration > General > Macros, you will need to set a value fo
 The username that will let the zabbix server (or proxy) log in to your unifi devices via SSH
 
 ### {$UNIFI_SSH_PRIV_KEY_PATH}
-The full path private key filename to be able to SSH into your Unifi devices.  Please set this to the same value as SSHKeyLocation from your zabbix conf file.
+The full path where to find the public private key pair to be able to SSH into your Unifi devices.  Please set this to the same value as SSHKeyLocation from your zabbix conf file.
+
+### {$UNIFI_PRIV_KEY}
+The file name for your private key in the previous directory.  
+
+### {$UNIFI_PUB_KEY}
+The file name for your public key in the previous directory
 
 ### {$UNIFI_CHECK_FREQUENCY}
 I have this set to '1m'
@@ -117,6 +123,7 @@ I have this set to '#5'
 I have this set to '10m'
 
 Those last two are used to create moving averages that make graphs far easier to read.
+
 
 
 
@@ -189,6 +196,21 @@ That will give you access to power production and consumption, as well as set a 
 
 ## Battery Voltage
 ![Wan Download](/images/voltage.png)
+
+
+# Protect Cameras
+
+If you are going to be monitoring cameras you will need to first enable SSH on your protect controller.  The instructions are at:
+
+	https://help.ui.com/hc/en-us/articles/360015877853-UniFi-Protect-Enabling-Camera-SSH-Access
+	
+After SSH is on and similarly to the UDMP and AirMax devices, you will need to upload your SSH public key on each camera for passwordless access, see above.  I'd recommend you use https://github.com/patricegautier/certRenewalScripts/blob/master/updatePublicKey.sh because it deals with the idiosyncrasies of dropbear, the SSH server on the cameras which requires a bit of handling when setting up the public key.
+
+
+
+
+
+
 
 
 
