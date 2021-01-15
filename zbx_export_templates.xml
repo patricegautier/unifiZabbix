@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.2</version>
-    <date>2021-01-15T03:15:42Z</date>
+    <date>2021-01-15T07:09:32Z</date>
     <groups>
         <group>
             <name>Patrice</name>
@@ -83,6 +83,24 @@
                     <master_item>
                         <key>solarpointBattery.sh[&quot;-u&quot;, &quot;{$SOLARPOINT_USERNAME}&quot;, &quot;-p&quot;, &quot;{$SOLARPOINT_PASSWORD}&quot;, {HOST.CONN}]</key>
                     </master_item>
+                    <triggers>
+                        <trigger>
+                            <expression>{nodata({$UNIFI_ALERT_LONG_PERIOD})}=1</expression>
+                            <name>{HOST.NAME} has not reported data in {$UNIFI_ALERT_LONG_PERIOD}</name>
+                            <priority>AVERAGE</priority>
+                        </trigger>
+                        <trigger>
+                            <expression>{nodata({$UNIFI_ALERT_PERIOD})}=1</expression>
+                            <name>{HOST.NAME} has not reported data in {$UNIFI_ALERT_PERIOD}</name>
+                            <priority>WARNING</priority>
+                            <dependencies>
+                                <dependency>
+                                    <name>{HOST.NAME} has not reported data in {$UNIFI_ALERT_LONG_PERIOD}</name>
+                                    <expression>{SunMAX SolarPoint:batteryVoltage.nodata({$UNIFI_ALERT_LONG_PERIOD})}=1</expression>
+                                </dependency>
+                            </dependencies>
+                        </trigger>
+                    </triggers>
                 </item>
                 <item>
                     <name>Net Power Consumption</name>
@@ -412,8 +430,8 @@
                     </master_item>
                     <triggers>
                         <trigger>
-                            <expression>{nodata(6h)}=1</expression>
-                            <name>{HOST.NAME} Device has not reported statistics for 6h</name>
+                            <expression>{nodata({$UNIFI_ALERT_LONG_PERIOD})}=1</expression>
+                            <name>{HOST.NAME} Device has not reported statistics for {$UNIFI_ALERT_LONG_PERIOD}</name>
                             <priority>AVERAGE</priority>
                             <manual_close>YES</manual_close>
                             <dependencies>
@@ -430,8 +448,8 @@
                             <manual_close>YES</manual_close>
                             <dependencies>
                                 <dependency>
-                                    <name>{HOST.NAME} Device has not reported statistics for 6h</name>
-                                    <expression>{UBNT Airmax:airTime.nodata(6h)}=1</expression>
+                                    <name>{HOST.NAME} Device has not reported statistics for {$UNIFI_ALERT_LONG_PERIOD}</name>
+                                    <expression>{UBNT Airmax:airTime.nodata({$UNIFI_ALERT_LONG_PERIOD})}=1</expression>
                                 </dependency>
                                 <dependency>
                                     <name>{HOST.NAME} SSH has not been available for  {$UNIFI_ALERT_PERIOD}</name>
@@ -1527,8 +1545,8 @@ Assign this template to all APs in your site</description>
                     </master_item>
                     <triggers>
                         <trigger>
-                            <expression>{nodata(6h)}=1</expression>
-                            <name>{HOST.NAME} has not reported statistics for 6h</name>
+                            <expression>{nodata({$UNIFI_ALERT_LONG_PERIOD})}=1</expression>
+                            <name>{HOST.NAME} has not reported statistics for {$UNIFI_ALERT_LONG_PERIOD}</name>
                             <priority>AVERAGE</priority>
                             <manual_close>YES</manual_close>
                         </trigger>
@@ -1539,8 +1557,8 @@ Assign this template to all APs in your site</description>
                             <manual_close>YES</manual_close>
                             <dependencies>
                                 <dependency>
-                                    <name>{HOST.NAME} has not reported statistics for 6h</name>
-                                    <expression>{Unifi AP:uptime.nodata(6h)}=1</expression>
+                                    <name>{HOST.NAME} has not reported statistics for {$UNIFI_ALERT_LONG_PERIOD}</name>
+                                    <expression>{Unifi AP:uptime.nodata({$UNIFI_ALERT_LONG_PERIOD})}=1</expression>
                                 </dependency>
                                 <dependency>
                                     <name>{HOST.NAME} SSH has not been available for  {$UNIFI_ALERT_PERIOD}</name>
@@ -1939,10 +1957,8 @@ Assign this template to all APs in your site</description>
                     <trends>0</trends>
                     <value_type>CHAR</value_type>
                     <params>if ifconfig eth0 &gt;/dev/null 2&gt;&amp;1 ; then ifconfig eth0; else ifconfig wlan0; fi</params>
-                    <authtype>PUBLIC_KEY</authtype>
                     <username>ubnt</username>
-                    <publickey>{$UNIFI_PUB_KEY}</publickey>
-                    <privatekey>{$UNIFI_PRIV_KEY}</privatekey>
+                    <password>{$PROTECT_CAMERA_PASSWORD}</password>
                     <applications>
                         <application>
                             <name>Network</name>
@@ -1956,10 +1972,8 @@ Assign this template to all APs in your site</description>
                     <trends>0</trends>
                     <value_type>CHAR</value_type>
                     <params>uname -a</params>
-                    <authtype>PUBLIC_KEY</authtype>
                     <username>ubnt</username>
-                    <publickey>{$UNIFI_PUB_KEY}</publickey>
-                    <privatekey>{$UNIFI_PRIV_KEY}</privatekey>
+                    <password>{$PROTECT_CAMERA_PASSWORD}</password>
                     <applications>
                         <application>
                             <name>Availability</name>
@@ -1967,8 +1981,8 @@ Assign this template to all APs in your site</description>
                     </applications>
                     <triggers>
                         <trigger>
-                            <expression>{nodata(6h)}=1</expression>
-                            <name>Camera {HOST.NAME} SSH has not been available for 6h</name>
+                            <expression>{nodata({$UNIFI_ALERT_LONG_PERIOD})}=1</expression>
+                            <name>Camera {HOST.NAME} SSH has not been available for {$UNIFI_ALERT_LONG_PERIOD}</name>
                             <priority>AVERAGE</priority>
                             <manual_close>YES</manual_close>
                             <dependencies>
@@ -1993,8 +2007,8 @@ Assign this template to all APs in your site</description>
                                     <expression>{Unifi Protect Camera:icmpping[].max({$UNIFI_ALERT_PERIOD})}=0</expression>
                                 </dependency>
                                 <dependency>
-                                    <name>Camera {HOST.NAME} SSH has not been available for 6h</name>
-                                    <expression>{Unifi Protect Camera:ssh.run[uname].nodata(6h)}=1</expression>
+                                    <name>Camera {HOST.NAME} SSH has not been available for {$UNIFI_ALERT_LONG_PERIOD}</name>
+                                    <expression>{Unifi Protect Camera:ssh.run[uname].nodata({$UNIFI_ALERT_LONG_PERIOD})}=1</expression>
                                 </dependency>
                             </dependencies>
                         </trigger>
@@ -2037,11 +2051,23 @@ Assign this template to all APs in your site</description>
                     </master_item>
                     <triggers>
                         <trigger>
-                            <expression>( {avg(1h)} &lt; {avg(1h,1d)}*.8 ) or ( {avg(10m)} &lt; 500000 )</expression>
+                            <expression>( {avg(1h)} &lt; ({avg(1h,1d)}*.7 ) ) or ( {avg(10m)}&lt;500000 )</expression>
                             <name>Camera {HOST.NAME} Outgoing Bandwidth Too Low</name>
                             <priority>WARNING</priority>
                         </trigger>
                     </triggers>
+                </item>
+                <item>
+                    <name>Transmission Bandwidth Smooth</name>
+                    <type>CALCULATED</type>
+                    <key>tx_bandwidth_smooth</key>
+                    <units>bps</units>
+                    <params>avg(tx_bandwidth,1h)</params>
+                    <applications>
+                        <application>
+                            <name>Network</name>
+                        </application>
+                    </applications>
                 </item>
             </items>
         </template>
@@ -2102,8 +2128,8 @@ Assign this template to all APs in your site</description>
                     </master_item>
                     <triggers>
                         <trigger>
-                            <expression>{nodata(6h)}=1</expression>
-                            <name>{HOST.NAME} hasn't reported statistics in 6h</name>
+                            <expression>{nodata({$UNIFI_ALERT_LONG_PERIOD})}=1</expression>
+                            <name>{HOST.NAME} hasn't reported statistics in {$UNIFI_ALERT_LONG_PERIOD}</name>
                             <priority>AVERAGE</priority>
                             <manual_close>YES</manual_close>
                         </trigger>
@@ -2114,8 +2140,8 @@ Assign this template to all APs in your site</description>
                             <manual_close>YES</manual_close>
                             <dependencies>
                                 <dependency>
-                                    <name>{HOST.NAME} hasn't reported statistics in 6h</name>
-                                    <expression>{Unifi Protect Cloud Key:IpExtInOctets.nodata(6h)}=1</expression>
+                                    <name>{HOST.NAME} hasn't reported statistics in {$UNIFI_ALERT_LONG_PERIOD}</name>
+                                    <expression>{Unifi Protect Cloud Key:IpExtInOctets.nodata({$UNIFI_ALERT_LONG_PERIOD})}=1</expression>
                                 </dependency>
                             </dependencies>
                         </trigger>
@@ -2268,8 +2294,8 @@ Assign this template to all APs in your site</description>
                     </master_item>
                     <triggers>
                         <trigger>
-                            <expression>{nodata(6h)}=1</expression>
-                            <name>{HOST.NAME} hasn't reported statistics for 6h</name>
+                            <expression>{nodata({$UNIFI_ALERT_LONG_PERIOD})}=1</expression>
+                            <name>{HOST.NAME} hasn't reported statistics for {$UNIFI_ALERT_LONG_PERIOD}</name>
                             <priority>AVERAGE</priority>
                             <manual_close>YES</manual_close>
                             <dependencies>
@@ -2286,8 +2312,8 @@ Assign this template to all APs in your site</description>
                             <manual_close>YES</manual_close>
                             <dependencies>
                                 <dependency>
-                                    <name>{HOST.NAME} hasn't reported statistics for 6h</name>
-                                    <expression>{Unifi Protect NVR4:IpExtInOctets.nodata(6h)}=1</expression>
+                                    <name>{HOST.NAME} hasn't reported statistics for {$UNIFI_ALERT_LONG_PERIOD}</name>
+                                    <expression>{Unifi Protect NVR4:IpExtInOctets.nodata({$UNIFI_ALERT_LONG_PERIOD})}=1</expression>
                                 </dependency>
                                 <dependency>
                                     <name>{HOST.NAME} SSH has not been available for  {$UNIFI_ALERT_PERIOD}</name>
@@ -2488,8 +2514,8 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                     </applications>
                     <triggers>
                         <trigger>
-                            <expression>{max(6h)}=0</expression>
-                            <name>{HOST.NAME} has not been pingable for 6h</name>
+                            <expression>{max({$UNIFI_ALERT_LONG_PERIOD})}=0</expression>
+                            <name>{HOST.NAME} has not been pingable for {$UNIFI_ALERT_LONG_PERIOD}</name>
                             <priority>AVERAGE</priority>
                             <manual_close>YES</manual_close>
                         </trigger>
@@ -2500,8 +2526,8 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                             <manual_close>YES</manual_close>
                             <dependencies>
                                 <dependency>
-                                    <name>{HOST.NAME} has not been pingable for 6h</name>
-                                    <expression>{Unifi SSH Host:icmpping[].max(6h)}=0</expression>
+                                    <name>{HOST.NAME} has not been pingable for {$UNIFI_ALERT_LONG_PERIOD}</name>
+                                    <expression>{Unifi SSH Host:icmpping[].max({$UNIFI_ALERT_LONG_PERIOD})}=0</expression>
                                 </dependency>
                             </dependencies>
                         </trigger>
@@ -2597,8 +2623,8 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                     </applications>
                     <triggers>
                         <trigger>
-                            <expression>{nodata(6h)}=1</expression>
-                            <name>{HOST.NAME} SSH has not been available for 6h</name>
+                            <expression>{nodata({$UNIFI_ALERT_LONG_PERIOD})}=1</expression>
+                            <name>{HOST.NAME} SSH has not been available for {$UNIFI_ALERT_LONG_PERIOD}</name>
                             <priority>AVERAGE</priority>
                             <manual_close>YES</manual_close>
                             <dependencies>
@@ -2619,8 +2645,8 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                                     <expression>{Unifi SSH Host:icmpping[].max({$UNIFI_ALERT_PERIOD})}=0</expression>
                                 </dependency>
                                 <dependency>
-                                    <name>{HOST.NAME} SSH has not been available for 6h</name>
-                                    <expression>{Unifi SSH Host:ssh.run[uname].nodata(6h)}=1</expression>
+                                    <name>{HOST.NAME} SSH has not been available for {$UNIFI_ALERT_LONG_PERIOD}</name>
+                                    <expression>{Unifi SSH Host:ssh.run[uname].nodata({$UNIFI_ALERT_LONG_PERIOD})}=1</expression>
                                 </dependency>
                             </dependencies>
                         </trigger>
@@ -3142,8 +3168,8 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                     </master_item>
                     <triggers>
                         <trigger>
-                            <expression>{nodata(6h)}=1</expression>
-                            <name>{HOST.NAME} has not reported statistics for 6h</name>
+                            <expression>{nodata({$UNIFI_ALERT_LONG_PERIOD})}=1</expression>
+                            <name>{HOST.NAME} has not reported statistics for {$UNIFI_ALERT_LONG_PERIOD}</name>
                             <priority>WARNING</priority>
                             <manual_close>YES</manual_close>
                         </trigger>
@@ -3154,8 +3180,8 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                             <manual_close>YES</manual_close>
                             <dependencies>
                                 <dependency>
-                                    <name>{HOST.NAME} has not reported statistics for 6h</name>
-                                    <expression>{Unifi Switch:uptime.nodata(6h)}=1</expression>
+                                    <name>{HOST.NAME} has not reported statistics for {$UNIFI_ALERT_LONG_PERIOD}</name>
+                                    <expression>{Unifi Switch:uptime.nodata({$UNIFI_ALERT_LONG_PERIOD})}=1</expression>
                                 </dependency>
                                 <dependency>
                                     <name>{HOST.NAME} SSH has not been available for  {$UNIFI_ALERT_PERIOD}</name>
@@ -3980,8 +4006,8 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                     </master_item>
                     <triggers>
                         <trigger>
-                            <expression>{nodata(6h)}=1</expression>
-                            <name>{HOST.NAME} has not reported statistics for 6h</name>
+                            <expression>{nodata({$UNIFI_ALERT_LONG_PERIOD})}=1</expression>
+                            <name>{HOST.NAME} has not reported statistics for {$UNIFI_ALERT_LONG_PERIOD}</name>
                             <priority>AVERAGE</priority>
                             <manual_close>YES</manual_close>
                         </trigger>
@@ -3992,8 +4018,8 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                             <manual_close>YES</manual_close>
                             <dependencies>
                                 <dependency>
-                                    <name>{HOST.NAME} has not reported statistics for 6h</name>
-                                    <expression>{Unifi UDMP:uptime.nodata(6h)}=1</expression>
+                                    <name>{HOST.NAME} has not reported statistics for {$UNIFI_ALERT_LONG_PERIOD}</name>
+                                    <expression>{Unifi UDMP:uptime.nodata({$UNIFI_ALERT_LONG_PERIOD})}=1</expression>
                                 </dependency>
                                 <dependency>
                                     <name>{HOST.NAME} SSH has not been available for  {$UNIFI_ALERT_PERIOD}</name>
@@ -4736,8 +4762,8 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                     </master_item>
                     <triggers>
                         <trigger>
-                            <expression>{nodata(6h)}=1</expression>
-                            <name>{HOST.NAME} has not reported statistics for 6h</name>
+                            <expression>{nodata({$UNIFI_ALERT_LONG_PERIOD})}=1</expression>
+                            <name>{HOST.NAME} has not reported statistics for {$UNIFI_ALERT_LONG_PERIOD}</name>
                             <priority>WARNING</priority>
                             <manual_close>YES</manual_close>
                         </trigger>
@@ -4748,8 +4774,8 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                             <manual_close>YES</manual_close>
                             <dependencies>
                                 <dependency>
-                                    <name>{HOST.NAME} has not reported statistics for 6h</name>
-                                    <expression>{Unifi USG:uptime.nodata(6h)}=1</expression>
+                                    <name>{HOST.NAME} has not reported statistics for {$UNIFI_ALERT_LONG_PERIOD}</name>
+                                    <expression>{Unifi USG:uptime.nodata({$UNIFI_ALERT_LONG_PERIOD})}=1</expression>
                                 </dependency>
                                 <dependency>
                                     <name>{HOST.NAME} SSH has not been available for  {$UNIFI_ALERT_PERIOD}</name>

@@ -114,7 +114,18 @@ I have this set to '1m'
 The temperature in Celsius above which to alert.  I have set this to '90'.
 
 ### {$UNIFI_ALERT_PERIOD}
-The period after which to alert for most checks. I have this set to '10m'.
+The period after which to alert for most checks. I have this set to '10m'.  The triggers on this period are level 'Warning'
+
+### {$UNIFI_ALERT_LONG_PERIOD}
+The period after which to alert for checks that failed for an extended period pf time. I have this set to '6h'.  The triggers on this period are level 'Average'
+
+### {$PROTECT_CAMERA_PASSWORD}
+Set this to your cameras' password.  There's UI in the protect controller to set this on all cameras at once.  
+
+You will also need to enable SSH for cameras, the instructions are at:
+
+	(https://help.ui.com/hc/en-us/articles/360015877853-UniFi-Protect-Enabling-Camera-SSH-Access)
+
 
 ### {$UNIFI_SMOOTHING_COUNT}
 I have this set to '#5'
@@ -122,7 +133,8 @@ I have this set to '#5'
 ### {$UNIFI_SMOOTHING_PERIOD}
 I have this set to '10m'
 
-Those last two are used to create moving averages that make graphs far easier to read.
+
+Those last two are used to create moving averages that make graphs  easier to read.
 
 
 
@@ -196,17 +208,6 @@ That will give you access to power production and consumption, as well as set a 
 
 ## Battery Voltage
 ![Wan Download](/images/voltage.png)
-
-
-# Protect Cameras
-
-If you are going to be monitoring cameras you will need to first enable SSH on your protect controller.  The instructions are at:
-
-	https://help.ui.com/hc/en-us/articles/360015877853-UniFi-Protect-Enabling-Camera-SSH-Access
-	
-After SSH is on and similarly to the UDMP and AirMax devices, you will need to upload your SSH public key on each camera for passwordless access, see above.  I'd recommend you use https://github.com/patricegautier/certRenewalScripts/blob/master/updatePublicKey.sh because it deals with the idiosyncrasies of dropbear, the SSH server on the cameras which requires a bit of handling when setting up the public key.
-
-
 
 
 
