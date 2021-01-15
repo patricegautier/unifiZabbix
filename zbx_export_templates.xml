@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.2</version>
-    <date>2021-01-15T01:57:03Z</date>
+    <date>2021-01-15T03:15:42Z</date>
     <groups>
         <group>
             <name>Patrice</name>
@@ -1987,6 +1987,10 @@ Assign this template to all APs in your site</description>
                                 <dependency>
                                     <name>Camera {HOST.NAME} has not been pingable for 6h</name>
                                     <expression>{Unifi Protect Camera:icmpping[].max(6h)}=0</expression>
+                                </dependency>
+                                <dependency>
+                                    <name>Camera {HOST.NAME} has not been pingable for {$UNIFI_ALERT_PERIOD}</name>
+                                    <expression>{Unifi Protect Camera:icmpping[].max({$UNIFI_ALERT_PERIOD})}=0</expression>
                                 </dependency>
                                 <dependency>
                                     <name>Camera {HOST.NAME} SSH has not been available for 6h</name>

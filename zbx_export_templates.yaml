@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2021-01-15T01:57:01Z'
+  date: '2021-01-15T03:15:40Z'
   groups:
     -
       name: Patrice
@@ -1430,6 +1430,9 @@ zabbix_export:
                 -
                   name: 'Camera {HOST.NAME} has not been pingable for 6h'
                   expression: '{Unifi Protect Camera:icmpping[].max(6h)}=0'
+                -
+                  name: 'Camera {HOST.NAME} has not been pingable for {$UNIFI_ALERT_PERIOD}'
+                  expression: '{Unifi Protect Camera:icmpping[].max({$UNIFI_ALERT_PERIOD})}=0'
                 -
                   name: 'Camera {HOST.NAME} SSH has not been available for 6h'
                   expression: '{Unifi Protect Camera:ssh.run[uname].nodata(6h)}=1'
