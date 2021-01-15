@@ -1,7 +1,7 @@
 {
     "zabbix_export": {
         "version": "5.2",
-        "date": "2021-01-15T07:09:34Z",
+        "date": "2021-01-15T23:13:17Z",
         "groups": [
             {
                 "name": "Patrice"
@@ -5182,6 +5182,14 @@
                         "item": {
                             "host": "Unifi Protect Camera",
                             "key": "tx_bandwidth"
+                        }
+                    },
+                    {
+                        "sortorder": "3",
+                        "color": "2774A4",
+                        "item": {
+                            "host": "Unifi Protect Camera",
+                            "key": "tx_bandwidth_smooth"
                         }
                     }
                 ]

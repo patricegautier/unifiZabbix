@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2021-01-15T07:09:28Z'
+  date: '2021-01-15T23:13:13Z'
   groups:
     -
       name: Patrice
@@ -3711,6 +3711,12 @@ zabbix_export:
           item:
             host: 'Unifi Protect Camera'
             key: tx_bandwidth
+        -
+          sortorder: '3'
+          color: 2774A4
+          item:
+            host: 'Unifi Protect Camera'
+            key: tx_bandwidth_smooth
     -
       name: 'Bandwidth Used'
       graph_items:

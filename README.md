@@ -124,18 +124,11 @@ Set this to your cameras' password.  There's UI in the protect controller to set
 
 You will also need to enable SSH for cameras, the instructions are at:
 
-	(https://help.ui.com/hc/en-us/articles/360015877853-UniFi-Protect-Enabling-Camera-SSH-Access)
+	[Protect Camera SSH Instructions](https://help.ui.com/hc/en-us/articles/360015877853-UniFi-Protect-Enabling-Camera-SSH-Access)
 
-
-### {$UNIFI_SMOOTHING_COUNT}
-I have this set to '#5'
 
 ### {$UNIFI_SMOOTHING_PERIOD}
-I have this set to '10m'
-
-
-Those last two are used to create moving averages that make graphs  easier to read.
-
+I have defined some moving average items with the suffix _smooth to help make graphs easier to read.  This is set to '10m' for me.
 
 
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.2</version>
-    <date>2021-01-15T07:09:32Z</date>
+    <date>2021-01-15T23:13:15Z</date>
     <groups>
         <group>
             <name>Patrice</name>
@@ -5188,6 +5188,14 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                     <item>
                         <host>Unifi Protect Camera</host>
                         <key>tx_bandwidth</key>
+                    </item>
+                </graph_item>
+                <graph_item>
+                    <sortorder>3</sortorder>
+                    <color>2774A4</color>
+                    <item>
+                        <host>Unifi Protect Camera</host>
+                        <key>tx_bandwidth_smooth</key>
                     </item>
                 </graph_item>
             </graph_items>
