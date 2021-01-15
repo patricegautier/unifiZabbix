@@ -57,7 +57,7 @@ You should now have the following templates available, and it should be pretty s
 
 A couple of things on top of that:
 
-• Unifi SSH Host: assign that one to all your Unifi infrastructure devices, on top of the template for that specific type.  <i>(In a perfect world, I would have had the specific templates inherit from that one and all the right items appear that way but Zabbix does not support exporting and reimporting a template hierarchy as of 5.2.  Assinging both templates is the work-around)</i>
+• Unifi SSH Host: assign that one to all your Unifi infrastructure devices, on top of the template for that specific type.  <i>(In a perfect world, I would have had the specific templates inherit from that one and all the right items appear that way but Zabbix does not support exporting and reimporting a template hierarchy as of 5.2.  Assigning both templates is the work-around)</i>
 
 • Unifi Wifi Site is meant to aggregate WiFi traffic across your wifi networks for a Unifi site.  Just assign it to one of the APs that can see all the networks in question and assign the {$UNIFI_AP_GROUP} macro for that host to the name of a zabbix host group that contains all the APs for that site.
 
