@@ -93,7 +93,7 @@ for UDMPs and AirMax devices, you will need to do it by hand.  *ssh-copy-id* hel
 
 	sudo -u zabbix ssh -i <fullPathToYourPrivateKey> yourUserName@oneOfYouUnifiDevicesIP
   
-If you are set up correctly that should get you in without asking for a password
+If you are set up correctly that should get you in *without asking for a password*
 
 You can also check that the script used to retrieve data is working correctly for a given device with:
 
@@ -238,7 +238,10 @@ That will give you access to power production and consumption, as well as set a 
 
 # Troubleshooting - Notes
 
-
+• Your zabbix server log file (/var/log/zabbix/zabbix\_server.log usually) can be a good source of debugging info, esp if you set DebugLevel=4 in  /etc/zabbix/zabbix_server.conf. Restart the Zabbix server with
+	
+		 sudo service zabbix-server restart
+		 
 
 • if some of your items randomly fail with 'Cannot read data from SSH server' (in the UI or in  /var/log/zabbix/zabbix_server.log), the likely culprit is an outdated version of libssh, which sometimes returns an error code even on success.  You have to compile the last version from sources from libssh.org and recompile I'm afraid..  This was a problem on Raspbian buster for libssh 0.8.x and is confirmed fixed with libssh 0.9.5 at least.  
 
