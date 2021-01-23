@@ -1,7 +1,7 @@
 {
     "zabbix_export": {
         "version": "5.2",
-        "date": "2021-01-15T23:13:17Z",
+        "date": "2021-01-23T02:25:13Z",
         "groups": [
             {
                 "name": "Patrice"
@@ -1871,8 +1871,8 @@
                         ],
                         "triggers": [
                             {
-                                "expression": "{max(6h)}=0",
-                                "name": "Camera {HOST.NAME} has not been pingable for 6h",
+                                "expression": "{max({$UNIFI_ALERT_LONG_PERIOD})}=0",
+                                "name": "Camera {HOST.NAME} has not been pingable for {$UNIFI_ALERT_LONG_PERIOD}",
                                 "priority": "AVERAGE",
                                 "manual_close": "YES"
                             },
@@ -1883,8 +1883,8 @@
                                 "manual_close": "YES",
                                 "dependencies": [
                                     {
-                                        "name": "Camera {HOST.NAME} has not been pingable for 6h",
-                                        "expression": "{Unifi Protect Camera:icmpping[].max(6h)}=0"
+                                        "name": "Camera {HOST.NAME} has not been pingable for {$UNIFI_ALERT_LONG_PERIOD}",
+                                        "expression": "{Unifi Protect Camera:icmpping[].max({$UNIFI_ALERT_LONG_PERIOD})}=0"
                                     }
                                 ]
                             }
@@ -1985,20 +1985,20 @@
                                 "manual_close": "YES",
                                 "dependencies": [
                                     {
-                                        "name": "Camera {HOST.NAME} has not been pingable for 6h",
-                                        "expression": "{Unifi Protect Camera:icmpping[].max(6h)}=0"
+                                        "name": "Camera {HOST.NAME} has not been pingable for {$UNIFI_ALERT_LONG_PERIOD}",
+                                        "expression": "{Unifi Protect Camera:icmpping[].max({$UNIFI_ALERT_LONG_PERIOD})}=0"
                                     }
                                 ]
                             },
                             {
                                 "expression": "{nodata({$UNIFI_ALERT_PERIOD})}=1",
-                                "name": "Camera {HOST.NAME} SSH has not been available for  {$UNIFI_ALERT_PERIOD}",
+                                "name": "Camera {HOST.NAME} SSH has not been available for  {EVENT.AGE} since {EVENT.TIME}",
                                 "priority": "WARNING",
                                 "manual_close": "YES",
                                 "dependencies": [
                                     {
-                                        "name": "Camera {HOST.NAME} has not been pingable for 6h",
-                                        "expression": "{Unifi Protect Camera:icmpping[].max(6h)}=0"
+                                        "name": "Camera {HOST.NAME} has not been pingable for {$UNIFI_ALERT_LONG_PERIOD}",
+                                        "expression": "{Unifi Protect Camera:icmpping[].max({$UNIFI_ALERT_LONG_PERIOD})}=0"
                                     },
                                     {
                                         "name": "Camera {HOST.NAME} has not been pingable for {$UNIFI_ALERT_PERIOD}",
@@ -2049,9 +2049,34 @@
                         },
                         "triggers": [
                             {
-                                "expression": "( {avg(1h)} < ({avg(1h,1d)}*.7 ) ) or ( {avg(10m)}<500000 )",
-                                "name": "Camera {HOST.NAME} Outgoing Bandwidth Too Low",
-                                "priority": "WARNING"
+                                "expression": "{avg(10m)}<{$PROTECT_LOW_BANDWIDTH}",
+                                "name": "Camera {HOST.NAME} Outgoing Bandwidth Low",
+                                "priority": "WARNING",
+                                "dependencies": [
+                                    {
+                                        "name": "Camera {HOST.NAME} has not been pingable for {$UNIFI_ALERT_PERIOD}",
+                                        "expression": "{Unifi Protect Camera:icmpping[].max({$UNIFI_ALERT_PERIOD})}=0"
+                                    },
+                                    {
+                                        "name": "Camera {HOST.NAME} SSH has not been available for  {EVENT.AGE} since {EVENT.TIME}",
+                                        "expression": "{Unifi Protect Camera:ssh.run[uname].nodata({$UNIFI_ALERT_PERIOD})}=1"
+                                    }
+                                ]
+                            },
+                            {
+                                "expression": "{avg(1h)} < ({avg(1h,1d)}*.6 )",
+                                "name": "Camera {HOST.NAME} Outgoing Bandwidth Lower than yesterday",
+                                "priority": "INFO",
+                                "dependencies": [
+                                    {
+                                        "name": "Camera {HOST.NAME} has not been pingable for {$UNIFI_ALERT_PERIOD}",
+                                        "expression": "{Unifi Protect Camera:icmpping[].max({$UNIFI_ALERT_PERIOD})}=0"
+                                    },
+                                    {
+                                        "name": "Camera {HOST.NAME} SSH has not been available for  {EVENT.AGE} since {EVENT.TIME}",
+                                        "expression": "{Unifi Protect Camera:ssh.run[uname].nodata({$UNIFI_ALERT_PERIOD})}=1"
+                                    }
+                                ]
                             }
                         ]
                     },

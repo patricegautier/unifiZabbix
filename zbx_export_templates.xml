@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.2</version>
-    <date>2021-01-15T23:13:15Z</date>
+    <date>2021-01-23T02:25:10Z</date>
     <groups>
         <group>
             <name>Patrice</name>
@@ -1873,8 +1873,8 @@ Assign this template to all APs in your site</description>
                     </applications>
                     <triggers>
                         <trigger>
-                            <expression>{max(6h)}=0</expression>
-                            <name>Camera {HOST.NAME} has not been pingable for 6h</name>
+                            <expression>{max({$UNIFI_ALERT_LONG_PERIOD})}=0</expression>
+                            <name>Camera {HOST.NAME} has not been pingable for {$UNIFI_ALERT_LONG_PERIOD}</name>
                             <priority>AVERAGE</priority>
                             <manual_close>YES</manual_close>
                         </trigger>
@@ -1885,8 +1885,8 @@ Assign this template to all APs in your site</description>
                             <manual_close>YES</manual_close>
                             <dependencies>
                                 <dependency>
-                                    <name>Camera {HOST.NAME} has not been pingable for 6h</name>
-                                    <expression>{Unifi Protect Camera:icmpping[].max(6h)}=0</expression>
+                                    <name>Camera {HOST.NAME} has not been pingable for {$UNIFI_ALERT_LONG_PERIOD}</name>
+                                    <expression>{Unifi Protect Camera:icmpping[].max({$UNIFI_ALERT_LONG_PERIOD})}=0</expression>
                                 </dependency>
                             </dependencies>
                         </trigger>
@@ -1987,20 +1987,20 @@ Assign this template to all APs in your site</description>
                             <manual_close>YES</manual_close>
                             <dependencies>
                                 <dependency>
-                                    <name>Camera {HOST.NAME} has not been pingable for 6h</name>
-                                    <expression>{Unifi Protect Camera:icmpping[].max(6h)}=0</expression>
+                                    <name>Camera {HOST.NAME} has not been pingable for {$UNIFI_ALERT_LONG_PERIOD}</name>
+                                    <expression>{Unifi Protect Camera:icmpping[].max({$UNIFI_ALERT_LONG_PERIOD})}=0</expression>
                                 </dependency>
                             </dependencies>
                         </trigger>
                         <trigger>
                             <expression>{nodata({$UNIFI_ALERT_PERIOD})}=1</expression>
-                            <name>Camera {HOST.NAME} SSH has not been available for  {$UNIFI_ALERT_PERIOD}</name>
+                            <name>Camera {HOST.NAME} SSH has not been available for  {EVENT.AGE} since {EVENT.TIME}</name>
                             <priority>WARNING</priority>
                             <manual_close>YES</manual_close>
                             <dependencies>
                                 <dependency>
-                                    <name>Camera {HOST.NAME} has not been pingable for 6h</name>
-                                    <expression>{Unifi Protect Camera:icmpping[].max(6h)}=0</expression>
+                                    <name>Camera {HOST.NAME} has not been pingable for {$UNIFI_ALERT_LONG_PERIOD}</name>
+                                    <expression>{Unifi Protect Camera:icmpping[].max({$UNIFI_ALERT_LONG_PERIOD})}=0</expression>
                                 </dependency>
                                 <dependency>
                                     <name>Camera {HOST.NAME} has not been pingable for {$UNIFI_ALERT_PERIOD}</name>
@@ -2051,9 +2051,34 @@ Assign this template to all APs in your site</description>
                     </master_item>
                     <triggers>
                         <trigger>
-                            <expression>( {avg(1h)} &lt; ({avg(1h,1d)}*.7 ) ) or ( {avg(10m)}&lt;500000 )</expression>
-                            <name>Camera {HOST.NAME} Outgoing Bandwidth Too Low</name>
+                            <expression>{avg(10m)}&lt;{$PROTECT_LOW_BANDWIDTH}</expression>
+                            <name>Camera {HOST.NAME} Outgoing Bandwidth Low</name>
                             <priority>WARNING</priority>
+                            <dependencies>
+                                <dependency>
+                                    <name>Camera {HOST.NAME} has not been pingable for {$UNIFI_ALERT_PERIOD}</name>
+                                    <expression>{Unifi Protect Camera:icmpping[].max({$UNIFI_ALERT_PERIOD})}=0</expression>
+                                </dependency>
+                                <dependency>
+                                    <name>Camera {HOST.NAME} SSH has not been available for  {EVENT.AGE} since {EVENT.TIME}</name>
+                                    <expression>{Unifi Protect Camera:ssh.run[uname].nodata({$UNIFI_ALERT_PERIOD})}=1</expression>
+                                </dependency>
+                            </dependencies>
+                        </trigger>
+                        <trigger>
+                            <expression>{avg(1h)} &lt; ({avg(1h,1d)}*.6 )</expression>
+                            <name>Camera {HOST.NAME} Outgoing Bandwidth Lower than yesterday</name>
+                            <priority>INFO</priority>
+                            <dependencies>
+                                <dependency>
+                                    <name>Camera {HOST.NAME} has not been pingable for {$UNIFI_ALERT_PERIOD}</name>
+                                    <expression>{Unifi Protect Camera:icmpping[].max({$UNIFI_ALERT_PERIOD})}=0</expression>
+                                </dependency>
+                                <dependency>
+                                    <name>Camera {HOST.NAME} SSH has not been available for  {EVENT.AGE} since {EVENT.TIME}</name>
+                                    <expression>{Unifi Protect Camera:ssh.run[uname].nodata({$UNIFI_ALERT_PERIOD})}=1</expression>
+                                </dependency>
+                            </dependencies>
                         </trigger>
                     </triggers>
                 </item>

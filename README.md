@@ -146,17 +146,14 @@ Set this to your cameras' password.  There's UI in the protect controller to set
 
 You will also need to enable SSH for cameras, the instructions are at:
 
-	[Protect Camera SSH Instructions](https://help.ui.com/hc/en-us/articles/360015877853-UniFi-Protect-Enabling-Camera-SSH-Access)
+	https://help.ui.com/hc/en-us/articles/360015877853-UniFi-Protect-Enabling-Camera-SSH-Access
 
+
+### {$PROTECT_LOW_BANDWIDTH}
+The threshold of camera outoing bandwidth below which to alert.  I have this set to 500000 i.e 500kbps.
 
 ### {$UNIFI_SMOOTHING_PERIOD}
 I have defined some moving average items with the suffix _smooth to help make graphs easier to read.  This is set to '10m' for me.
-
-
-To recap:
-
-![Macros](/images/macros.png)
-
 
 
 
@@ -241,7 +238,12 @@ That will give you access to power production and consumption, as well as set a 
 • Your zabbix server log file (/var/log/zabbix/zabbix\_server.log usually) can be a good source of debugging info, esp if you set DebugLevel=4 in  /etc/zabbix/zabbix_server.conf. Restart the Zabbix server with
 	
 		 sudo service zabbix-server restart
-		 
+
+• Macros Cheat Sheet
+
+This is my set of values
+
+![Macros](/images/macros.png)		 
 
 • if some of your items randomly fail with 'Cannot read data from SSH server' (in the UI or in  /var/log/zabbix/zabbix_server.log), the likely culprit is an outdated version of libssh, which sometimes returns an error code even on success.  You have to compile the last version from sources from libssh.org and recompile I'm afraid..  This was a problem on Raspbian buster for libssh 0.8.x and is confirmed fixed with libssh 0.9.5 at least.  
 
@@ -261,9 +263,6 @@ i.e automatically create all the proper hosts connected to the proper templates 
 ## Better SSH debugging
 
 Most of the pain in setting those templates up is debugging the SSH connections..  Add pre-processing to check for valid json on mca-dump-short to all templates
-
-## Auto Switch Port discovery, alert on traffic > % of capacity
-in progress - need to add macros to set alert levels and durations
 
 ## SolarPoint support
 
