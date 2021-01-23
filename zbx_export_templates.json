@@ -1,7 +1,7 @@
 {
     "zabbix_export": {
         "version": "5.2",
-        "date": "2021-01-15T03:15:45Z",
+        "date": "2021-01-15T23:13:17Z",
         "groups": [
             {
                 "name": "Patrice"
@@ -82,7 +82,25 @@
                         ],
                         "master_item": {
                             "key": "solarpointBattery.sh[\"-u\", \"{$SOLARPOINT_USERNAME}\", \"-p\", \"{$SOLARPOINT_PASSWORD}\", {HOST.CONN}]"
-                        }
+                        },
+                        "triggers": [
+                            {
+                                "expression": "{nodata({$UNIFI_ALERT_LONG_PERIOD})}=1",
+                                "name": "{HOST.NAME} has not reported data in {$UNIFI_ALERT_LONG_PERIOD}",
+                                "priority": "AVERAGE"
+                            },
+                            {
+                                "expression": "{nodata({$UNIFI_ALERT_PERIOD})}=1",
+                                "name": "{HOST.NAME} has not reported data in {$UNIFI_ALERT_PERIOD}",
+                                "priority": "WARNING",
+                                "dependencies": [
+                                    {
+                                        "name": "{HOST.NAME} has not reported data in {$UNIFI_ALERT_LONG_PERIOD}",
+                                        "expression": "{SunMAX SolarPoint:batteryVoltage.nodata({$UNIFI_ALERT_LONG_PERIOD})}=1"
+                                    }
+                                ]
+                            }
+                        ]
                     },
                     {
                         "name": "Net Power Consumption",
@@ -412,8 +430,8 @@
                         },
                         "triggers": [
                             {
-                                "expression": "{nodata(6h)}=1",
-                                "name": "{HOST.NAME} Device has not reported statistics for 6h",
+                                "expression": "{nodata({$UNIFI_ALERT_LONG_PERIOD})}=1",
+                                "name": "{HOST.NAME} Device has not reported statistics for {$UNIFI_ALERT_LONG_PERIOD}",
                                 "priority": "AVERAGE",
                                 "manual_close": "YES",
                                 "dependencies": [
@@ -430,8 +448,8 @@
                                 "manual_close": "YES",
                                 "dependencies": [
                                     {
-                                        "name": "{HOST.NAME} Device has not reported statistics for 6h",
-                                        "expression": "{UBNT Airmax:airTime.nodata(6h)}=1"
+                                        "name": "{HOST.NAME} Device has not reported statistics for {$UNIFI_ALERT_LONG_PERIOD}",
+                                        "expression": "{UBNT Airmax:airTime.nodata({$UNIFI_ALERT_LONG_PERIOD})}=1"
                                     },
                                     {
                                         "name": "{HOST.NAME} SSH has not been available for  {$UNIFI_ALERT_PERIOD}",
@@ -1525,8 +1543,8 @@
                         },
                         "triggers": [
                             {
-                                "expression": "{nodata(6h)}=1",
-                                "name": "{HOST.NAME} has not reported statistics for 6h",
+                                "expression": "{nodata({$UNIFI_ALERT_LONG_PERIOD})}=1",
+                                "name": "{HOST.NAME} has not reported statistics for {$UNIFI_ALERT_LONG_PERIOD}",
                                 "priority": "AVERAGE",
                                 "manual_close": "YES"
                             },
@@ -1537,8 +1555,8 @@
                                 "manual_close": "YES",
                                 "dependencies": [
                                     {
-                                        "name": "{HOST.NAME} has not reported statistics for 6h",
-                                        "expression": "{Unifi AP:uptime.nodata(6h)}=1"
+                                        "name": "{HOST.NAME} has not reported statistics for {$UNIFI_ALERT_LONG_PERIOD}",
+                                        "expression": "{Unifi AP:uptime.nodata({$UNIFI_ALERT_LONG_PERIOD})}=1"
                                     },
                                     {
                                         "name": "{HOST.NAME} SSH has not been available for  {$UNIFI_ALERT_PERIOD}",
@@ -1937,10 +1955,8 @@
                         "trends": "0",
                         "value_type": "CHAR",
                         "params": "if ifconfig eth0 >/dev/null 2>&1 ; then ifconfig eth0; else ifconfig wlan0; fi",
-                        "authtype": "PUBLIC_KEY",
                         "username": "ubnt",
-                        "publickey": "{$UNIFI_PUB_KEY}",
-                        "privatekey": "{$UNIFI_PRIV_KEY}",
+                        "password": "{$PROTECT_CAMERA_PASSWORD}",
                         "applications": [
                             {
                                 "name": "Network"
@@ -1954,10 +1970,8 @@
                         "trends": "0",
                         "value_type": "CHAR",
                         "params": "uname -a",
-                        "authtype": "PUBLIC_KEY",
                         "username": "ubnt",
-                        "publickey": "{$UNIFI_PUB_KEY}",
-                        "privatekey": "{$UNIFI_PRIV_KEY}",
+                        "password": "{$PROTECT_CAMERA_PASSWORD}",
                         "applications": [
                             {
                                 "name": "Availability"
@@ -1965,8 +1979,8 @@
                         ],
                         "triggers": [
                             {
-                                "expression": "{nodata(6h)}=1",
-                                "name": "Camera {HOST.NAME} SSH has not been available for 6h",
+                                "expression": "{nodata({$UNIFI_ALERT_LONG_PERIOD})}=1",
+                                "name": "Camera {HOST.NAME} SSH has not been available for {$UNIFI_ALERT_LONG_PERIOD}",
                                 "priority": "AVERAGE",
                                 "manual_close": "YES",
                                 "dependencies": [
@@ -1991,8 +2005,8 @@
                                         "expression": "{Unifi Protect Camera:icmpping[].max({$UNIFI_ALERT_PERIOD})}=0"
                                     },
                                     {
-                                        "name": "Camera {HOST.NAME} SSH has not been available for 6h",
-                                        "expression": "{Unifi Protect Camera:ssh.run[uname].nodata(6h)}=1"
+                                        "name": "Camera {HOST.NAME} SSH has not been available for {$UNIFI_ALERT_LONG_PERIOD}",
+                                        "expression": "{Unifi Protect Camera:ssh.run[uname].nodata({$UNIFI_ALERT_LONG_PERIOD})}=1"
                                     }
                                 ]
                             }
@@ -2035,9 +2049,21 @@
                         },
                         "triggers": [
                             {
-                                "expression": "( {avg(1h)} < {avg(1h,1d)}*.8 ) or ( {avg(10m)} < 500000 )",
+                                "expression": "( {avg(1h)} < ({avg(1h,1d)}*.7 ) ) or ( {avg(10m)}<500000 )",
                                 "name": "Camera {HOST.NAME} Outgoing Bandwidth Too Low",
                                 "priority": "WARNING"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Transmission Bandwidth Smooth",
+                        "type": "CALCULATED",
+                        "key": "tx_bandwidth_smooth",
+                        "units": "bps",
+                        "params": "avg(tx_bandwidth,1h)",
+                        "applications": [
+                            {
+                                "name": "Network"
                             }
                         ]
                     }
@@ -2100,8 +2126,8 @@
                         },
                         "triggers": [
                             {
-                                "expression": "{nodata(6h)}=1",
-                                "name": "{HOST.NAME} hasn't reported statistics in 6h",
+                                "expression": "{nodata({$UNIFI_ALERT_LONG_PERIOD})}=1",
+                                "name": "{HOST.NAME} hasn't reported statistics in {$UNIFI_ALERT_LONG_PERIOD}",
                                 "priority": "AVERAGE",
                                 "manual_close": "YES"
                             },
@@ -2112,8 +2138,8 @@
                                 "manual_close": "YES",
                                 "dependencies": [
                                     {
-                                        "name": "{HOST.NAME} hasn't reported statistics in 6h",
-                                        "expression": "{Unifi Protect Cloud Key:IpExtInOctets.nodata(6h)}=1"
+                                        "name": "{HOST.NAME} hasn't reported statistics in {$UNIFI_ALERT_LONG_PERIOD}",
+                                        "expression": "{Unifi Protect Cloud Key:IpExtInOctets.nodata({$UNIFI_ALERT_LONG_PERIOD})}=1"
                                     }
                                 ]
                             },
@@ -2266,8 +2292,8 @@
                         },
                         "triggers": [
                             {
-                                "expression": "{nodata(6h)}=1",
-                                "name": "{HOST.NAME} hasn't reported statistics for 6h",
+                                "expression": "{nodata({$UNIFI_ALERT_LONG_PERIOD})}=1",
+                                "name": "{HOST.NAME} hasn't reported statistics for {$UNIFI_ALERT_LONG_PERIOD}",
                                 "priority": "AVERAGE",
                                 "manual_close": "YES",
                                 "dependencies": [
@@ -2284,8 +2310,8 @@
                                 "manual_close": "YES",
                                 "dependencies": [
                                     {
-                                        "name": "{HOST.NAME} hasn't reported statistics for 6h",
-                                        "expression": "{Unifi Protect NVR4:IpExtInOctets.nodata(6h)}=1"
+                                        "name": "{HOST.NAME} hasn't reported statistics for {$UNIFI_ALERT_LONG_PERIOD}",
+                                        "expression": "{Unifi Protect NVR4:IpExtInOctets.nodata({$UNIFI_ALERT_LONG_PERIOD})}=1"
                                     },
                                     {
                                         "name": "{HOST.NAME} SSH has not been available for  {$UNIFI_ALERT_PERIOD}",
@@ -2482,8 +2508,8 @@
                         ],
                         "triggers": [
                             {
-                                "expression": "{max(6h)}=0",
-                                "name": "{HOST.NAME} has not been pingable for 6h",
+                                "expression": "{max({$UNIFI_ALERT_LONG_PERIOD})}=0",
+                                "name": "{HOST.NAME} has not been pingable for {$UNIFI_ALERT_LONG_PERIOD}",
                                 "priority": "AVERAGE",
                                 "manual_close": "YES"
                             },
@@ -2494,8 +2520,8 @@
                                 "manual_close": "YES",
                                 "dependencies": [
                                     {
-                                        "name": "{HOST.NAME} has not been pingable for 6h",
-                                        "expression": "{Unifi SSH Host:icmpping[].max(6h)}=0"
+                                        "name": "{HOST.NAME} has not been pingable for {$UNIFI_ALERT_LONG_PERIOD}",
+                                        "expression": "{Unifi SSH Host:icmpping[].max({$UNIFI_ALERT_LONG_PERIOD})}=0"
                                     }
                                 ]
                             }
@@ -2591,8 +2617,8 @@
                         ],
                         "triggers": [
                             {
-                                "expression": "{nodata(6h)}=1",
-                                "name": "{HOST.NAME} SSH has not been available for 6h",
+                                "expression": "{nodata({$UNIFI_ALERT_LONG_PERIOD})}=1",
+                                "name": "{HOST.NAME} SSH has not been available for {$UNIFI_ALERT_LONG_PERIOD}",
                                 "priority": "AVERAGE",
                                 "manual_close": "YES",
                                 "dependencies": [
@@ -2613,8 +2639,8 @@
                                         "expression": "{Unifi SSH Host:icmpping[].max({$UNIFI_ALERT_PERIOD})}=0"
                                     },
                                     {
-                                        "name": "{HOST.NAME} SSH has not been available for 6h",
-                                        "expression": "{Unifi SSH Host:ssh.run[uname].nodata(6h)}=1"
+                                        "name": "{HOST.NAME} SSH has not been available for {$UNIFI_ALERT_LONG_PERIOD}",
+                                        "expression": "{Unifi SSH Host:ssh.run[uname].nodata({$UNIFI_ALERT_LONG_PERIOD})}=1"
                                     }
                                 ]
                             }
@@ -3136,8 +3162,8 @@
                         },
                         "triggers": [
                             {
-                                "expression": "{nodata(6h)}=1",
-                                "name": "{HOST.NAME} has not reported statistics for 6h",
+                                "expression": "{nodata({$UNIFI_ALERT_LONG_PERIOD})}=1",
+                                "name": "{HOST.NAME} has not reported statistics for {$UNIFI_ALERT_LONG_PERIOD}",
                                 "priority": "WARNING",
                                 "manual_close": "YES"
                             },
@@ -3148,8 +3174,8 @@
                                 "manual_close": "YES",
                                 "dependencies": [
                                     {
-                                        "name": "{HOST.NAME} has not reported statistics for 6h",
-                                        "expression": "{Unifi Switch:uptime.nodata(6h)}=1"
+                                        "name": "{HOST.NAME} has not reported statistics for {$UNIFI_ALERT_LONG_PERIOD}",
+                                        "expression": "{Unifi Switch:uptime.nodata({$UNIFI_ALERT_LONG_PERIOD})}=1"
                                     },
                                     {
                                         "name": "{HOST.NAME} SSH has not been available for  {$UNIFI_ALERT_PERIOD}",
@@ -3974,8 +4000,8 @@
                         },
                         "triggers": [
                             {
-                                "expression": "{nodata(6h)}=1",
-                                "name": "{HOST.NAME} has not reported statistics for 6h",
+                                "expression": "{nodata({$UNIFI_ALERT_LONG_PERIOD})}=1",
+                                "name": "{HOST.NAME} has not reported statistics for {$UNIFI_ALERT_LONG_PERIOD}",
                                 "priority": "AVERAGE",
                                 "manual_close": "YES"
                             },
@@ -3986,8 +4012,8 @@
                                 "manual_close": "YES",
                                 "dependencies": [
                                     {
-                                        "name": "{HOST.NAME} has not reported statistics for 6h",
-                                        "expression": "{Unifi UDMP:uptime.nodata(6h)}=1"
+                                        "name": "{HOST.NAME} has not reported statistics for {$UNIFI_ALERT_LONG_PERIOD}",
+                                        "expression": "{Unifi UDMP:uptime.nodata({$UNIFI_ALERT_LONG_PERIOD})}=1"
                                     },
                                     {
                                         "name": "{HOST.NAME} SSH has not been available for  {$UNIFI_ALERT_PERIOD}",
@@ -4730,8 +4756,8 @@
                         },
                         "triggers": [
                             {
-                                "expression": "{nodata(6h)}=1",
-                                "name": "{HOST.NAME} has not reported statistics for 6h",
+                                "expression": "{nodata({$UNIFI_ALERT_LONG_PERIOD})}=1",
+                                "name": "{HOST.NAME} has not reported statistics for {$UNIFI_ALERT_LONG_PERIOD}",
                                 "priority": "WARNING",
                                 "manual_close": "YES"
                             },
@@ -4742,8 +4768,8 @@
                                 "manual_close": "YES",
                                 "dependencies": [
                                     {
-                                        "name": "{HOST.NAME} has not reported statistics for 6h",
-                                        "expression": "{Unifi USG:uptime.nodata(6h)}=1"
+                                        "name": "{HOST.NAME} has not reported statistics for {$UNIFI_ALERT_LONG_PERIOD}",
+                                        "expression": "{Unifi USG:uptime.nodata({$UNIFI_ALERT_LONG_PERIOD})}=1"
                                     },
                                     {
                                         "name": "{HOST.NAME} SSH has not been available for  {$UNIFI_ALERT_PERIOD}",
@@ -5156,6 +5182,14 @@
                         "item": {
                             "host": "Unifi Protect Camera",
                             "key": "tx_bandwidth"
+                        }
+                    },
+                    {
+                        "sortorder": "3",
+                        "color": "2774A4",
+                        "item": {
+                            "host": "Unifi Protect Camera",
+                            "key": "tx_bandwidth_smooth"
                         }
                     }
                 ]

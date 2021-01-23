@@ -65,19 +65,35 @@ A couple of things on top of that:
 
 These templates use public key SSH to access APs, Switches, Routers, AirMax stations and retrieve data directly, using the mca-dump or mca-status command line utility.  Your zabbix server (or your proxies if you use those) will need public key SSH access to all the unifi devices they are monitoring:
 
-1/ You should generate a new key pair for this.  Zabbix is finicky and this is the specific way I needed to run the generation get a workable keypair (no passphrase, pem format). From your Zabbix server, run:
+1/ You should generate a new key pair for this.  
 
-	ssh-keygen -P "" -t rsa  -m pem -f zb_id_rsa
+Zabbix is finicky and this is the specific way I needed to run the generation get a workable keypair (no passphrase, pem format). From your Zabbix server, run:
 
-put that keypair somewhere on your zabbix server (I put it in ~/.ssh/zabbix/)
+	sudo -u zabbix ssh-keygen -P "" -t rsa  -m pem -f zb_id_rsa
 
-You will need to specifically enable SSH access on the unifi devices.  There is one setting in the Unifi controller UI for devices at large in Settings > Site and one for the UDMP in the UDMP advanced settings which is separate.  The controller has handy UI to install your public key on all the devices, you will need to do it by hand on UDMPs and AirMax devices.  *ssh-copy-id* helps there, esp. on the UDMP since those will embarrasingly wipe all your keys at every firmware update and reboot (seriously UBNT).  I have a more sophisticated script to do this at https://github.com/patricegautier/certRenewalScripts/blob/master/updatePublicKey.sh
+put that keypair somewhere on your zabbix server (I put it in ~/.ssh/zabbix/).  Check the permissions on those keys and directory.  This is what I have end up with for ex:
 
-Permissions can get in the way so check that your zabbix server can actually get the SSH access with:
+	pi@pi:~/.ssh/zabbix $ ls -l
+	total 20
+	-rw------- 1 zabbix zabbix 1675 Jul 23 18:57 zb_id_rsa
+	-rw-r--r-- 1 zabbix zabbix 391 Jul 23 18:57 zb_id_rsa.pub
 
-	sudo -u zabbix ssh -i my-key-pair yourUserName@oneOfYouUnifiDevicesIP
+
+2/ You will need to specifically enable SSH access on the unifi devices.  
+
+There is one setting in the Unifi controller UI for devices at large in Settings > Site and one for the UDMP in the UDMP advanced settings which is separate.  The controller has handy UI to install your public key on all the devices.
+
+for UDMPs and AirMax devices, you will need to do it by hand.  *ssh-copy-id* helps there, esp. on the UDMP since those will embarrasingly wipe all your keys at every firmware update and reboot (seriously UBNT):  
+
+	sudo -u zabbix ssh-copy-id -i <path_to_your_privateKey> yourUserName@oneOfYouUnifiDevicesIP
+
+(I have a slightly more sophisticated script to do this at https://github.com/patricegautier/certRenewalScripts/blob/master/updatePublicKey.sh)
+
+3/ So now check that your zabbix server can actually get in with SSH with:
+
+	sudo -u zabbix ssh -i <fullPathToYourPrivateKey> yourUserName@oneOfYouUnifiDevicesIP
   
-If you are set up correctly that should get you in without asking for a password
+If you are set up correctly that should get you in *without asking for a password*
 
 You can also check that the script used to retrieve data is working correctly for a given device with:
 
@@ -86,9 +102,15 @@ You can also check that the script used to retrieve data is working correctly fo
 You should get a JSON document in return.
 
 
-2/ You then need to point Zabbix to those keys.  In your Zabbix conf file (/etc/zabbix/zabbix_server.conf typically) add:
+4/ You then need to point Zabbix to those keys.  
+
+In your Zabbix conf file (/etc/zabbix/zabbix_server.conf typically) add:
 
 	SSHKeyLocation=/the/path/to/your/keys
+
+in my case I have:
+	
+	SSHKeyLocation=/home/pi/.ssh/zabbix
 
 
 ## Macros
@@ -99,13 +121,13 @@ In Zabbix, in Administration > General > Macros, you will need to set a value fo
 The username that will let the zabbix server (or proxy) log in to your unifi devices via SSH
 
 ### {$UNIFI_SSH_PRIV_KEY_PATH}
-The full path where to find the public private key pair to be able to SSH into your Unifi devices.  Please set this to the same value as SSHKeyLocation from your zabbix conf file.
+The full path where to find the public private key pair to be able to SSH into your Unifi devices.  The private key should be in the SSHKeyLocation directory from your zabbix conf file.  For my system for ex, this is set to /home/pi/.ssh/zabbix/zb_id_rsa
 
 ### {$UNIFI_PRIV_KEY}
-The file name for your private key in the previous directory.  
+The file name for your private key in SSHKeyLocation.  For me this is set to zb_id_rsa
 
 ### {$UNIFI_PUB_KEY}
-The file name for your public key in the previous directory
+The file name for your public key in SSHKeyLocation.  For me this is set to zb_id_rsa.pub
 
 ### {$UNIFI_CHECK_FREQUENCY}
 I have this set to '1m'
@@ -114,15 +136,26 @@ I have this set to '1m'
 The temperature in Celsius above which to alert.  I have set this to '90'.
 
 ### {$UNIFI_ALERT_PERIOD}
-The period after which to alert for most checks. I have this set to '10m'.
+The period after which to alert for most checks. I have this set to '10m'.  The triggers on this period are level 'Warning'
 
-### {$UNIFI_SMOOTHING_COUNT}
-I have this set to '#5'
+### {$UNIFI_ALERT_LONG_PERIOD}
+The period after which to alert for checks that failed for an extended period pf time. I have this set to '6h'.  The triggers on this period are level 'Average'
+
+### {$PROTECT_CAMERA_PASSWORD}
+Set this to your cameras' password.  There's UI in the protect controller to set this on all cameras at once.  
+
+You will also need to enable SSH for cameras, the instructions are at:
+
+	[Protect Camera SSH Instructions](https://help.ui.com/hc/en-us/articles/360015877853-UniFi-Protect-Enabling-Camera-SSH-Access)
+
 
 ### {$UNIFI_SMOOTHING_PERIOD}
-I have this set to '10m'
+I have defined some moving average items with the suffix _smooth to help make graphs easier to read.  This is set to '10m' for me.
 
-Those last two are used to create moving averages that make graphs far easier to read.
+
+To recap:
+
+![Macros](/images/macros.png)
 
 
 
@@ -198,17 +231,6 @@ That will give you access to power production and consumption, as well as set a 
 ![Wan Download](/images/voltage.png)
 
 
-# Protect Cameras
-
-If you are going to be monitoring cameras you will need to first enable SSH on your protect controller.  The instructions are at:
-
-	https://help.ui.com/hc/en-us/articles/360015877853-UniFi-Protect-Enabling-Camera-SSH-Access
-	
-After SSH is on and similarly to the UDMP and AirMax devices, you will need to upload your SSH public key on each camera for passwordless access, see above.  I'd recommend you use https://github.com/patricegautier/certRenewalScripts/blob/master/updatePublicKey.sh because it deals with the idiosyncrasies of dropbear, the SSH server on the cameras which requires a bit of handling when setting up the public key.
-
-
-
-
 
 
 
@@ -216,7 +238,10 @@ After SSH is on and similarly to the UDMP and AirMax devices, you will need to u
 
 # Troubleshooting - Notes
 
-
+• Your zabbix server log file (/var/log/zabbix/zabbix\_server.log usually) can be a good source of debugging info, esp if you set DebugLevel=4 in  /etc/zabbix/zabbix_server.conf. Restart the Zabbix server with
+	
+		 sudo service zabbix-server restart
+		 
 
 • if some of your items randomly fail with 'Cannot read data from SSH server' (in the UI or in  /var/log/zabbix/zabbix_server.log), the likely culprit is an outdated version of libssh, which sometimes returns an error code even on success.  You have to compile the last version from sources from libssh.org and recompile I'm afraid..  This was a problem on Raspbian buster for libssh 0.8.x and is confirmed fixed with libssh 0.9.5 at least.  
 
