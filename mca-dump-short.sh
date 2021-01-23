@@ -7,7 +7,7 @@ usage()
 	echo "-i specify private public key pair"
 	echo "-u SSH user name for Unifi device"
 	echo "-d IP or FQDN for Unifi device"
-	echo "-d Unifi device type"
+	echo "-t Unifi device type"
 	exit 2
 }
 
@@ -42,12 +42,12 @@ fi
 
 
 if ! [[ -z ${VERBOSE} ]]; then
-    echo 'ssh -o LogLevel=Error -o StrictHostKeyChecking=accept-new -i ${PRIVKEY_PATH} ${USER}@${TARGET_DEVICE} mca-dump | jq --indent 0 "${JQ_OPTIONS}"'
+    echo 'ssh -o LogLevel=Error -o StrictHostKeyChecking=accept-new -i ${PRIVKEY_PATH} ${USER}@${TARGET_DEVICE} "mca-dump | gzip" | gunzip | jq --indent 0 "${JQ_OPTIONS}"'
 fi
 
 
 
-ssh -o LogLevel=Error -o StrictHostKeyChecking=accept-new -i ${PRIVKEY_PATH} ${USER}@${TARGET_DEVICE} mca-dump | jq --indent 0 "${JQ_OPTIONS}"
+ssh -o LogLevel=Error -o StrictHostKeyChecking=accept-new -i ${PRIVKEY_PATH} ${USER}@${TARGET_DEVICE} "mca-dump | gzip" | gunzip | jq --indent 0 "${JQ_OPTIONS}"
 
 
 
