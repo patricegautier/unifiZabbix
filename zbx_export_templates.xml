@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.2</version>
-    <date>2021-01-23T02:25:10Z</date>
+    <date>2021-01-27T00:02:46Z</date>
     <groups>
         <group>
             <name>Patrice</name>
@@ -299,8 +299,8 @@
                             <trigger_prototypes>
                                 <trigger_prototype>
                                     <expression>{last(#1)}=&quot;true&quot;</expression>
-                                    <name>{#PORT_NAME} Port is Low Voltage</name>
-                                    <priority>INFO</priority>
+                                    <name>{#PORT_NAME} Port is in low voltage outage</name>
+                                    <priority>WARNING</priority>
                                     <manual_close>YES</manual_close>
                                 </trigger_prototype>
                             </trigger_prototypes>
@@ -1549,6 +1549,16 @@ Assign this template to all APs in your site</description>
                             <name>{HOST.NAME} has not reported statistics for {$UNIFI_ALERT_LONG_PERIOD}</name>
                             <priority>AVERAGE</priority>
                             <manual_close>YES</manual_close>
+                            <dependencies>
+                                <dependency>
+                                    <name>{HOST.NAME} has not been pingable for {$UNIFI_ALERT_LONG_PERIOD}</name>
+                                    <expression>{Unifi SSH Host:icmpping[].max({$UNIFI_ALERT_LONG_PERIOD})}=0</expression>
+                                </dependency>
+                                <dependency>
+                                    <name>{HOST.NAME} SSH has not been available for {$UNIFI_ALERT_LONG_PERIOD}</name>
+                                    <expression>{Unifi SSH Host:ssh.run[uname].nodata({$UNIFI_ALERT_LONG_PERIOD})}=1</expression>
+                                </dependency>
+                            </dependencies>
                         </trigger>
                         <trigger>
                             <expression>{nodata({$UNIFI_ALERT_PERIOD})}=1</expression>
@@ -1556,6 +1566,10 @@ Assign this template to all APs in your site</description>
                             <priority>WARNING</priority>
                             <manual_close>YES</manual_close>
                             <dependencies>
+                                <dependency>
+                                    <name>{HOST.NAME} has not been pingable for {$UNIFI_ALERT_PERIOD}</name>
+                                    <expression>{Unifi SSH Host:icmpping[].max({$UNIFI_ALERT_PERIOD})}=0</expression>
+                                </dependency>
                                 <dependency>
                                     <name>{HOST.NAME} has not reported statistics for {$UNIFI_ALERT_LONG_PERIOD}</name>
                                     <expression>{Unifi AP:uptime.nodata({$UNIFI_ALERT_LONG_PERIOD})}=1</expression>
@@ -1834,6 +1848,9 @@ Assign this template to all APs in your site</description>
                     <name>Availability</name>
                 </application>
                 <application>
+                    <name>Bandwidth</name>
+                </application>
+                <application>
                     <name>Network</name>
                 </application>
                 <application>
@@ -1914,6 +1931,27 @@ Assign this template to all APs in your site</description>
                     </master_item>
                 </item>
                 <item>
+                    <name>Outoing Bandwidth Moving Average Threshold</name>
+                    <type>CALCULATED</type>
+                    <key>outgoing_bandwidth_moving_average_threshold</key>
+                    <units>Bps</units>
+                    <params>( 
+avg( tx_bandwidth_smooth, 1h,1d) +
+avg( tx_bandwidth_smooth, 1h,2d) +
+avg( tx_bandwidth_smooth, 1h,3d) +
+avg( tx_bandwidth_smooth, 1h,4d) +
+avg( tx_bandwidth_smooth, 1h,5d) +
+avg( tx_bandwidth_smooth, 1h,6d) +
+avg( tx_bandwidth_smooth, 1h,7d) 
+
+) /7 * 0.6</params>
+                    <applications>
+                        <application>
+                            <name>Bandwidth</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
                     <name>Reception Bandwidth</name>
                     <type>DEPENDENT</type>
                     <key>rx_bandwidth</key>
@@ -1981,20 +2019,8 @@ Assign this template to all APs in your site</description>
                     </applications>
                     <triggers>
                         <trigger>
-                            <expression>{nodata({$UNIFI_ALERT_LONG_PERIOD})}=1</expression>
-                            <name>Camera {HOST.NAME} SSH has not been available for {$UNIFI_ALERT_LONG_PERIOD}</name>
-                            <priority>AVERAGE</priority>
-                            <manual_close>YES</manual_close>
-                            <dependencies>
-                                <dependency>
-                                    <name>Camera {HOST.NAME} has not been pingable for {$UNIFI_ALERT_LONG_PERIOD}</name>
-                                    <expression>{Unifi Protect Camera:icmpping[].max({$UNIFI_ALERT_LONG_PERIOD})}=0</expression>
-                                </dependency>
-                            </dependencies>
-                        </trigger>
-                        <trigger>
                             <expression>{nodata({$UNIFI_ALERT_PERIOD})}=1</expression>
-                            <name>Camera {HOST.NAME} SSH has not been available for  {EVENT.AGE} since {EVENT.TIME}</name>
+                            <name>Camera {HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_PERIOD}</name>
                             <priority>WARNING</priority>
                             <manual_close>YES</manual_close>
                             <dependencies>
@@ -2009,6 +2035,18 @@ Assign this template to all APs in your site</description>
                                 <dependency>
                                     <name>Camera {HOST.NAME} SSH has not been available for {$UNIFI_ALERT_LONG_PERIOD}</name>
                                     <expression>{Unifi Protect Camera:ssh.run[uname].nodata({$UNIFI_ALERT_LONG_PERIOD})}=1</expression>
+                                </dependency>
+                            </dependencies>
+                        </trigger>
+                        <trigger>
+                            <expression>{nodata({$UNIFI_ALERT_LONG_PERIOD})}=1</expression>
+                            <name>Camera {HOST.NAME} SSH has not been available for {$UNIFI_ALERT_LONG_PERIOD}</name>
+                            <priority>AVERAGE</priority>
+                            <manual_close>YES</manual_close>
+                            <dependencies>
+                                <dependency>
+                                    <name>Camera {HOST.NAME} has not been pingable for {$UNIFI_ALERT_LONG_PERIOD}</name>
+                                    <expression>{Unifi Protect Camera:icmpping[].max({$UNIFI_ALERT_LONG_PERIOD})}=0</expression>
                                 </dependency>
                             </dependencies>
                         </trigger>
@@ -2060,22 +2098,7 @@ Assign this template to all APs in your site</description>
                                     <expression>{Unifi Protect Camera:icmpping[].max({$UNIFI_ALERT_PERIOD})}=0</expression>
                                 </dependency>
                                 <dependency>
-                                    <name>Camera {HOST.NAME} SSH has not been available for  {EVENT.AGE} since {EVENT.TIME}</name>
-                                    <expression>{Unifi Protect Camera:ssh.run[uname].nodata({$UNIFI_ALERT_PERIOD})}=1</expression>
-                                </dependency>
-                            </dependencies>
-                        </trigger>
-                        <trigger>
-                            <expression>{avg(1h)} &lt; ({avg(1h,1d)}*.6 )</expression>
-                            <name>Camera {HOST.NAME} Outgoing Bandwidth Lower than yesterday</name>
-                            <priority>INFO</priority>
-                            <dependencies>
-                                <dependency>
-                                    <name>Camera {HOST.NAME} has not been pingable for {$UNIFI_ALERT_PERIOD}</name>
-                                    <expression>{Unifi Protect Camera:icmpping[].max({$UNIFI_ALERT_PERIOD})}=0</expression>
-                                </dependency>
-                                <dependency>
-                                    <name>Camera {HOST.NAME} SSH has not been available for  {EVENT.AGE} since {EVENT.TIME}</name>
+                                    <name>Camera {HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_PERIOD}</name>
                                     <expression>{Unifi Protect Camera:ssh.run[uname].nodata({$UNIFI_ALERT_PERIOD})}=1</expression>
                                 </dependency>
                             </dependencies>
@@ -2113,10 +2136,33 @@ Assign this template to all APs in your site</description>
             </groups>
             <applications>
                 <application>
+                    <name>Bandwidth</name>
+                </application>
+                <application>
                     <name>Network</name>
                 </application>
             </applications>
             <items>
+                <item>
+                    <name>Incoming Bandwidth Moving Average Threshold</name>
+                    <type>CALCULATED</type>
+                    <key>incoming_bandwidth_moving_average_threshold</key>
+                    <units>bps</units>
+                    <params>(
+avg(IpExtInOctets,1h,1d)+
+avg(IpExtInOctets,1h,2d)+
+avg(IpExtInOctets,1h,3d)+
+avg(IpExtInOctets,1h,4d)+
+avg(IpExtInOctets,1h,5d)+
+avg(IpExtInOctets,1h,6d)+
+avg(IpExtInOctets,1h,7d)
+) /7*.7</params>
+                    <applications>
+                        <application>
+                            <name>Bandwidth</name>
+                        </application>
+                    </applications>
+                </item>
                 <item>
                     <name>Incoming Bandwidth</name>
                     <type>DEPENDENT</type>
@@ -2170,12 +2216,6 @@ Assign this template to all APs in your site</description>
                                 </dependency>
                             </dependencies>
                         </trigger>
-                        <trigger>
-                            <expression>{avg(3600s)} &lt; {avg(3600s, 1d)}*.7</expression>
-                            <name>{HOST.NAME} Incoming Bandwidth Too Low</name>
-                            <priority>WARNING</priority>
-                            <manual_close>YES</manual_close>
-                        </trigger>
                     </triggers>
                 </item>
                 <item>
@@ -2225,6 +2265,9 @@ Assign this template to all APs in your site</description>
                 </group>
             </groups>
             <applications>
+                <application>
+                    <name>Bandwidth</name>
+                </application>
                 <application>
                     <name>Host</name>
                 </application>
@@ -2280,6 +2323,27 @@ Assign this template to all APs in your site</description>
                     <applications>
                         <application>
                             <name>Host</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Incoming Bandwidth Moving Average Threshold</name>
+                    <type>CALCULATED</type>
+                    <key>incoming_bandwidth_moving_average_threshold</key>
+                    <value_type>FLOAT</value_type>
+                    <units>bps</units>
+                    <params>(
+avg(IpExtInOctets,1h,1d)+
+avg(IpExtInOctets,1h,2d)+
+avg(IpExtInOctets,1h,3d)+
+avg(IpExtInOctets,1h,4d)+
+avg(IpExtInOctets,1h,5d)+
+avg(IpExtInOctets,1h,6d)+
+avg(IpExtInOctets,1h,7d)
+) /7*.7</params>
+                    <applications>
+                        <application>
+                            <name>Bandwidth</name>
                         </application>
                     </applications>
                 </item>
@@ -2345,12 +2409,6 @@ Assign this template to all APs in your site</description>
                                     <expression>{Unifi SSH Host:ssh.run[uname].nodata({$UNIFI_ALERT_PERIOD})}=1</expression>
                                 </dependency>
                             </dependencies>
-                        </trigger>
-                        <trigger>
-                            <expression>{avg(3600s)} &lt; {avg(3600s, 1d)}*.7</expression>
-                            <name>{HOST.NAME} Incoming Bandwidth Too Low</name>
-                            <priority>WARNING</priority>
-                            <manual_close>YES</manual_close>
                         </trigger>
                     </triggers>
                 </item>
@@ -3195,18 +3253,28 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         <trigger>
                             <expression>{nodata({$UNIFI_ALERT_LONG_PERIOD})}=1</expression>
                             <name>{HOST.NAME} has not reported statistics for {$UNIFI_ALERT_LONG_PERIOD}</name>
-                            <priority>WARNING</priority>
-                            <manual_close>YES</manual_close>
-                        </trigger>
-                        <trigger>
-                            <expression>{nodata({$UNIFI_ALERT_PERIOD})}=1</expression>
-                            <name>{HOST.NAME} has not reported statistics for {$UNIFI_ALERT_PERIOD}</name>
                             <priority>AVERAGE</priority>
                             <manual_close>YES</manual_close>
                             <dependencies>
                                 <dependency>
-                                    <name>{HOST.NAME} has not reported statistics for {$UNIFI_ALERT_LONG_PERIOD}</name>
-                                    <expression>{Unifi Switch:uptime.nodata({$UNIFI_ALERT_LONG_PERIOD})}=1</expression>
+                                    <name>{HOST.NAME} has not been pingable for {$UNIFI_ALERT_LONG_PERIOD}</name>
+                                    <expression>{Unifi SSH Host:icmpping[].max({$UNIFI_ALERT_LONG_PERIOD})}=0</expression>
+                                </dependency>
+                                <dependency>
+                                    <name>{HOST.NAME} SSH has not been available for {$UNIFI_ALERT_LONG_PERIOD}</name>
+                                    <expression>{Unifi SSH Host:ssh.run[uname].nodata({$UNIFI_ALERT_LONG_PERIOD})}=1</expression>
+                                </dependency>
+                            </dependencies>
+                        </trigger>
+                        <trigger>
+                            <expression>{nodata({$UNIFI_ALERT_PERIOD})}=1</expression>
+                            <name>{HOST.NAME} has not reported statistics for {$UNIFI_ALERT_PERIOD}</name>
+                            <priority>WARNING</priority>
+                            <manual_close>YES</manual_close>
+                            <dependencies>
+                                <dependency>
+                                    <name>{HOST.NAME} has not been pingable for {$UNIFI_ALERT_PERIOD}</name>
+                                    <expression>{Unifi SSH Host:icmpping[].max({$UNIFI_ALERT_PERIOD})}=0</expression>
                                 </dependency>
                                 <dependency>
                                     <name>{HOST.NAME} SSH has not been available for  {$UNIFI_ALERT_PERIOD}</name>
@@ -5114,6 +5182,33 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
     </templates>
     <triggers>
         <trigger>
+            <expression>{Unifi Protect Camera:tx_bandwidth_smooth.last(#1)} &lt; {Unifi Protect Camera:outgoing_bandwidth_moving_average_threshold.last(#1)}</expression>
+            <name>Camera {HOST.NAME} Outgoing Bandwidth Low</name>
+            <priority>INFO</priority>
+            <dependencies>
+                <dependency>
+                    <name>Camera {HOST.NAME} has not been pingable for {$UNIFI_ALERT_PERIOD}</name>
+                    <expression>{Unifi Protect Camera:icmpping[].max({$UNIFI_ALERT_PERIOD})}=0</expression>
+                </dependency>
+                <dependency>
+                    <name>Camera {HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_PERIOD}</name>
+                    <expression>{Unifi Protect Camera:ssh.run[uname].nodata({$UNIFI_ALERT_PERIOD})}=1</expression>
+                </dependency>
+            </dependencies>
+        </trigger>
+        <trigger>
+            <expression>{Unifi Protect Cloud Key:IpExtInOctets.avg(3600s)} &lt; {Unifi Protect Cloud Key:incoming_bandwidth_moving_average_threshold.last(#1)}</expression>
+            <name>{HOST.NAME} Incoming Bandwidth Too Low</name>
+            <priority>WARNING</priority>
+            <manual_close>YES</manual_close>
+        </trigger>
+        <trigger>
+            <expression>{Unifi Protect NVR4:IpExtInOctets.avg(1h)} &lt; {Unifi Protect NVR4:incoming_bandwidth_moving_average_threshold.last(#1)}</expression>
+            <name>{HOST.NAME} Incoming Bandwidth Too Low</name>
+            <priority>WARNING</priority>
+            <manual_close>YES</manual_close>
+        </trigger>
+        <trigger>
             <expression>{Unifi Protect NVR4:ssh.run[temp1].last(#1)}&gt;{$UNIFI_ALERT_TEMP} or {Unifi Protect NVR4:ssh.run[temp2].last(#1)}&gt;{$UNIFI_ALERT_TEMP} or {Unifi Protect NVR4:ssh.run[temp3].last(#1)}&gt;{$UNIFI_ALERT_TEMP}</expression>
             <name>{HOST.NAME} is hot</name>
             <priority>WARNING</priority>
@@ -5223,6 +5318,35 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         <key>tx_bandwidth_smooth</key>
                     </item>
                 </graph_item>
+                <graph_item>
+                    <sortorder>4</sortorder>
+                    <color>A54F10</color>
+                    <item>
+                        <host>Unifi Protect Camera</host>
+                        <key>outgoing_bandwidth_moving_average_threshold</key>
+                    </item>
+                </graph_item>
+            </graph_items>
+        </graph>
+        <graph>
+            <name>Bandwidth</name>
+            <graph_items>
+                <graph_item>
+                    <sortorder>1</sortorder>
+                    <color>1A7C11</color>
+                    <item>
+                        <host>Unifi Protect NVR4</host>
+                        <key>IpExtInOctets</key>
+                    </item>
+                </graph_item>
+                <graph_item>
+                    <sortorder>2</sortorder>
+                    <color>F63100</color>
+                    <item>
+                        <host>Unifi Protect NVR4</host>
+                        <key>incoming_bandwidth_moving_average_threshold</key>
+                    </item>
+                </graph_item>
             </graph_items>
         </graph>
         <graph>
@@ -5316,21 +5440,16 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                     <sortorder>1</sortorder>
                     <color>1A7C11</color>
                     <item>
-                        <host>Unifi Protect NVR4</host>
+                        <host>Unifi Protect Cloud Key</host>
                         <key>IpExtInOctets</key>
                     </item>
                 </graph_item>
-            </graph_items>
-        </graph>
-        <graph>
-            <name>Incoming Bandwidth</name>
-            <graph_items>
                 <graph_item>
-                    <sortorder>1</sortorder>
-                    <color>1A7C11</color>
+                    <sortorder>2</sortorder>
+                    <color>F63100</color>
                     <item>
                         <host>Unifi Protect Cloud Key</host>
-                        <key>IpExtInOctets</key>
+                        <key>incoming_bandwidth_moving_average_threshold</key>
                     </item>
                 </graph_item>
             </graph_items>

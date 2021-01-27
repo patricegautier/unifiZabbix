@@ -1,7 +1,7 @@
 {
     "zabbix_export": {
         "version": "5.2",
-        "date": "2021-01-23T02:25:13Z",
+        "date": "2021-01-27T00:02:49Z",
         "groups": [
             {
                 "name": "Patrice"
@@ -299,8 +299,8 @@
                                 "trigger_prototypes": [
                                     {
                                         "expression": "{last(#1)}=\"true\"",
-                                        "name": "{#PORT_NAME} Port is Low Voltage",
-                                        "priority": "INFO",
+                                        "name": "{#PORT_NAME} Port is in low voltage outage",
+                                        "priority": "WARNING",
                                         "manual_close": "YES"
                                     }
                                 ]
@@ -1546,7 +1546,17 @@
                                 "expression": "{nodata({$UNIFI_ALERT_LONG_PERIOD})}=1",
                                 "name": "{HOST.NAME} has not reported statistics for {$UNIFI_ALERT_LONG_PERIOD}",
                                 "priority": "AVERAGE",
-                                "manual_close": "YES"
+                                "manual_close": "YES",
+                                "dependencies": [
+                                    {
+                                        "name": "{HOST.NAME} has not been pingable for {$UNIFI_ALERT_LONG_PERIOD}",
+                                        "expression": "{Unifi SSH Host:icmpping[].max({$UNIFI_ALERT_LONG_PERIOD})}=0"
+                                    },
+                                    {
+                                        "name": "{HOST.NAME} SSH has not been available for {$UNIFI_ALERT_LONG_PERIOD}",
+                                        "expression": "{Unifi SSH Host:ssh.run[uname].nodata({$UNIFI_ALERT_LONG_PERIOD})}=1"
+                                    }
+                                ]
                             },
                             {
                                 "expression": "{nodata({$UNIFI_ALERT_PERIOD})}=1",
@@ -1554,6 +1564,10 @@
                                 "priority": "WARNING",
                                 "manual_close": "YES",
                                 "dependencies": [
+                                    {
+                                        "name": "{HOST.NAME} has not been pingable for {$UNIFI_ALERT_PERIOD}",
+                                        "expression": "{Unifi SSH Host:icmpping[].max({$UNIFI_ALERT_PERIOD})}=0"
+                                    },
                                     {
                                         "name": "{HOST.NAME} has not reported statistics for {$UNIFI_ALERT_LONG_PERIOD}",
                                         "expression": "{Unifi AP:uptime.nodata({$UNIFI_ALERT_LONG_PERIOD})}=1"
@@ -1832,6 +1846,9 @@
                         "name": "Availability"
                     },
                     {
+                        "name": "Bandwidth"
+                    },
+                    {
                         "name": "Network"
                     },
                     {
@@ -1912,6 +1929,18 @@
                         }
                     },
                     {
+                        "name": "Outoing Bandwidth Moving Average Threshold",
+                        "type": "CALCULATED",
+                        "key": "outgoing_bandwidth_moving_average_threshold",
+                        "units": "Bps",
+                        "params": "( \navg( tx_bandwidth_smooth, 1h,1d) +\navg( tx_bandwidth_smooth, 1h,2d) +\navg( tx_bandwidth_smooth, 1h,3d) +\navg( tx_bandwidth_smooth, 1h,4d) +\navg( tx_bandwidth_smooth, 1h,5d) +\navg( tx_bandwidth_smooth, 1h,6d) +\navg( tx_bandwidth_smooth, 1h,7d) \n\n) /7 * 0.6",
+                        "applications": [
+                            {
+                                "name": "Bandwidth"
+                            }
+                        ]
+                    },
+                    {
                         "name": "Reception Bandwidth",
                         "type": "DEPENDENT",
                         "key": "rx_bandwidth",
@@ -1979,20 +2008,8 @@
                         ],
                         "triggers": [
                             {
-                                "expression": "{nodata({$UNIFI_ALERT_LONG_PERIOD})}=1",
-                                "name": "Camera {HOST.NAME} SSH has not been available for {$UNIFI_ALERT_LONG_PERIOD}",
-                                "priority": "AVERAGE",
-                                "manual_close": "YES",
-                                "dependencies": [
-                                    {
-                                        "name": "Camera {HOST.NAME} has not been pingable for {$UNIFI_ALERT_LONG_PERIOD}",
-                                        "expression": "{Unifi Protect Camera:icmpping[].max({$UNIFI_ALERT_LONG_PERIOD})}=0"
-                                    }
-                                ]
-                            },
-                            {
                                 "expression": "{nodata({$UNIFI_ALERT_PERIOD})}=1",
-                                "name": "Camera {HOST.NAME} SSH has not been available for  {EVENT.AGE} since {EVENT.TIME}",
+                                "name": "Camera {HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_PERIOD}",
                                 "priority": "WARNING",
                                 "manual_close": "YES",
                                 "dependencies": [
@@ -2007,6 +2024,18 @@
                                     {
                                         "name": "Camera {HOST.NAME} SSH has not been available for {$UNIFI_ALERT_LONG_PERIOD}",
                                         "expression": "{Unifi Protect Camera:ssh.run[uname].nodata({$UNIFI_ALERT_LONG_PERIOD})}=1"
+                                    }
+                                ]
+                            },
+                            {
+                                "expression": "{nodata({$UNIFI_ALERT_LONG_PERIOD})}=1",
+                                "name": "Camera {HOST.NAME} SSH has not been available for {$UNIFI_ALERT_LONG_PERIOD}",
+                                "priority": "AVERAGE",
+                                "manual_close": "YES",
+                                "dependencies": [
+                                    {
+                                        "name": "Camera {HOST.NAME} has not been pingable for {$UNIFI_ALERT_LONG_PERIOD}",
+                                        "expression": "{Unifi Protect Camera:icmpping[].max({$UNIFI_ALERT_LONG_PERIOD})}=0"
                                     }
                                 ]
                             }
@@ -2058,22 +2087,7 @@
                                         "expression": "{Unifi Protect Camera:icmpping[].max({$UNIFI_ALERT_PERIOD})}=0"
                                     },
                                     {
-                                        "name": "Camera {HOST.NAME} SSH has not been available for  {EVENT.AGE} since {EVENT.TIME}",
-                                        "expression": "{Unifi Protect Camera:ssh.run[uname].nodata({$UNIFI_ALERT_PERIOD})}=1"
-                                    }
-                                ]
-                            },
-                            {
-                                "expression": "{avg(1h)} < ({avg(1h,1d)}*.6 )",
-                                "name": "Camera {HOST.NAME} Outgoing Bandwidth Lower than yesterday",
-                                "priority": "INFO",
-                                "dependencies": [
-                                    {
-                                        "name": "Camera {HOST.NAME} has not been pingable for {$UNIFI_ALERT_PERIOD}",
-                                        "expression": "{Unifi Protect Camera:icmpping[].max({$UNIFI_ALERT_PERIOD})}=0"
-                                    },
-                                    {
-                                        "name": "Camera {HOST.NAME} SSH has not been available for  {EVENT.AGE} since {EVENT.TIME}",
+                                        "name": "Camera {HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_PERIOD}",
                                         "expression": "{Unifi Protect Camera:ssh.run[uname].nodata({$UNIFI_ALERT_PERIOD})}=1"
                                     }
                                 ]
@@ -2111,10 +2125,25 @@
                 ],
                 "applications": [
                     {
+                        "name": "Bandwidth"
+                    },
+                    {
                         "name": "Network"
                     }
                 ],
                 "items": [
+                    {
+                        "name": "Incoming Bandwidth Moving Average Threshold",
+                        "type": "CALCULATED",
+                        "key": "incoming_bandwidth_moving_average_threshold",
+                        "units": "bps",
+                        "params": "(\navg(IpExtInOctets,1h,1d)+\navg(IpExtInOctets,1h,2d)+\navg(IpExtInOctets,1h,3d)+\navg(IpExtInOctets,1h,4d)+\navg(IpExtInOctets,1h,5d)+\navg(IpExtInOctets,1h,6d)+\navg(IpExtInOctets,1h,7d)\n) /7*.7",
+                        "applications": [
+                            {
+                                "name": "Bandwidth"
+                            }
+                        ]
+                    },
                     {
                         "name": "Incoming Bandwidth",
                         "type": "DEPENDENT",
@@ -2167,12 +2196,6 @@
                                         "expression": "{Unifi Protect Cloud Key:IpExtInOctets.nodata({$UNIFI_ALERT_LONG_PERIOD})}=1"
                                     }
                                 ]
-                            },
-                            {
-                                "expression": "{avg(3600s)} < {avg(3600s, 1d)}*.7",
-                                "name": "{HOST.NAME} Incoming Bandwidth Too Low",
-                                "priority": "WARNING",
-                                "manual_close": "YES"
                             }
                         ]
                     },
@@ -2223,6 +2246,9 @@
                     }
                 ],
                 "applications": [
+                    {
+                        "name": "Bandwidth"
+                    },
                     {
                         "name": "Host"
                     },
@@ -2278,6 +2304,19 @@
                         "applications": [
                             {
                                 "name": "Host"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Incoming Bandwidth Moving Average Threshold",
+                        "type": "CALCULATED",
+                        "key": "incoming_bandwidth_moving_average_threshold",
+                        "value_type": "FLOAT",
+                        "units": "bps",
+                        "params": "(\navg(IpExtInOctets,1h,1d)+\navg(IpExtInOctets,1h,2d)+\navg(IpExtInOctets,1h,3d)+\navg(IpExtInOctets,1h,4d)+\navg(IpExtInOctets,1h,5d)+\navg(IpExtInOctets,1h,6d)+\navg(IpExtInOctets,1h,7d)\n) /7*.7",
+                        "applications": [
+                            {
+                                "name": "Bandwidth"
                             }
                         ]
                     },
@@ -2343,12 +2382,6 @@
                                         "expression": "{Unifi SSH Host:ssh.run[uname].nodata({$UNIFI_ALERT_PERIOD})}=1"
                                     }
                                 ]
-                            },
-                            {
-                                "expression": "{avg(3600s)} < {avg(3600s, 1d)}*.7",
-                                "name": "{HOST.NAME} Incoming Bandwidth Too Low",
-                                "priority": "WARNING",
-                                "manual_close": "YES"
                             }
                         ]
                     },
@@ -3189,18 +3222,28 @@
                             {
                                 "expression": "{nodata({$UNIFI_ALERT_LONG_PERIOD})}=1",
                                 "name": "{HOST.NAME} has not reported statistics for {$UNIFI_ALERT_LONG_PERIOD}",
-                                "priority": "WARNING",
-                                "manual_close": "YES"
-                            },
-                            {
-                                "expression": "{nodata({$UNIFI_ALERT_PERIOD})}=1",
-                                "name": "{HOST.NAME} has not reported statistics for {$UNIFI_ALERT_PERIOD}",
                                 "priority": "AVERAGE",
                                 "manual_close": "YES",
                                 "dependencies": [
                                     {
-                                        "name": "{HOST.NAME} has not reported statistics for {$UNIFI_ALERT_LONG_PERIOD}",
-                                        "expression": "{Unifi Switch:uptime.nodata({$UNIFI_ALERT_LONG_PERIOD})}=1"
+                                        "name": "{HOST.NAME} has not been pingable for {$UNIFI_ALERT_LONG_PERIOD}",
+                                        "expression": "{Unifi SSH Host:icmpping[].max({$UNIFI_ALERT_LONG_PERIOD})}=0"
+                                    },
+                                    {
+                                        "name": "{HOST.NAME} SSH has not been available for {$UNIFI_ALERT_LONG_PERIOD}",
+                                        "expression": "{Unifi SSH Host:ssh.run[uname].nodata({$UNIFI_ALERT_LONG_PERIOD})}=1"
+                                    }
+                                ]
+                            },
+                            {
+                                "expression": "{nodata({$UNIFI_ALERT_PERIOD})}=1",
+                                "name": "{HOST.NAME} has not reported statistics for {$UNIFI_ALERT_PERIOD}",
+                                "priority": "WARNING",
+                                "manual_close": "YES",
+                                "dependencies": [
+                                    {
+                                        "name": "{HOST.NAME} has not been pingable for {$UNIFI_ALERT_PERIOD}",
+                                        "expression": "{Unifi SSH Host:icmpping[].max({$UNIFI_ALERT_PERIOD})}=0"
                                     },
                                     {
                                         "name": "{HOST.NAME} SSH has not been available for  {$UNIFI_ALERT_PERIOD}",
@@ -5108,6 +5151,33 @@
         ],
         "triggers": [
             {
+                "expression": "{Unifi Protect Camera:tx_bandwidth_smooth.last(#1)} < {Unifi Protect Camera:outgoing_bandwidth_moving_average_threshold.last(#1)}",
+                "name": "Camera {HOST.NAME} Outgoing Bandwidth Low",
+                "priority": "INFO",
+                "dependencies": [
+                    {
+                        "name": "Camera {HOST.NAME} has not been pingable for {$UNIFI_ALERT_PERIOD}",
+                        "expression": "{Unifi Protect Camera:icmpping[].max({$UNIFI_ALERT_PERIOD})}=0"
+                    },
+                    {
+                        "name": "Camera {HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_PERIOD}",
+                        "expression": "{Unifi Protect Camera:ssh.run[uname].nodata({$UNIFI_ALERT_PERIOD})}=1"
+                    }
+                ]
+            },
+            {
+                "expression": "{Unifi Protect Cloud Key:IpExtInOctets.avg(3600s)} < {Unifi Protect Cloud Key:incoming_bandwidth_moving_average_threshold.last(#1)}",
+                "name": "{HOST.NAME} Incoming Bandwidth Too Low",
+                "priority": "WARNING",
+                "manual_close": "YES"
+            },
+            {
+                "expression": "{Unifi Protect NVR4:IpExtInOctets.avg(1h)} < {Unifi Protect NVR4:incoming_bandwidth_moving_average_threshold.last(#1)}",
+                "name": "{HOST.NAME} Incoming Bandwidth Too Low",
+                "priority": "WARNING",
+                "manual_close": "YES"
+            },
+            {
                 "expression": "{Unifi Protect NVR4:ssh.run[temp1].last(#1)}>{$UNIFI_ALERT_TEMP} or {Unifi Protect NVR4:ssh.run[temp2].last(#1)}>{$UNIFI_ALERT_TEMP} or {Unifi Protect NVR4:ssh.run[temp3].last(#1)}>{$UNIFI_ALERT_TEMP}",
                 "name": "{HOST.NAME} is hot",
                 "priority": "WARNING"
@@ -5216,6 +5286,35 @@
                             "host": "Unifi Protect Camera",
                             "key": "tx_bandwidth_smooth"
                         }
+                    },
+                    {
+                        "sortorder": "4",
+                        "color": "A54F10",
+                        "item": {
+                            "host": "Unifi Protect Camera",
+                            "key": "outgoing_bandwidth_moving_average_threshold"
+                        }
+                    }
+                ]
+            },
+            {
+                "name": "Bandwidth",
+                "graph_items": [
+                    {
+                        "sortorder": "1",
+                        "color": "1A7C11",
+                        "item": {
+                            "host": "Unifi Protect NVR4",
+                            "key": "IpExtInOctets"
+                        }
+                    },
+                    {
+                        "sortorder": "2",
+                        "color": "F63100",
+                        "item": {
+                            "host": "Unifi Protect NVR4",
+                            "key": "incoming_bandwidth_moving_average_threshold"
+                        }
                     }
                 ]
             },
@@ -5310,21 +5409,16 @@
                         "sortorder": "1",
                         "color": "1A7C11",
                         "item": {
-                            "host": "Unifi Protect NVR4",
-                            "key": "IpExtInOctets"
-                        }
-                    }
-                ]
-            },
-            {
-                "name": "Incoming Bandwidth",
-                "graph_items": [
-                    {
-                        "sortorder": "1",
-                        "color": "1A7C11",
-                        "item": {
                             "host": "Unifi Protect Cloud Key",
                             "key": "IpExtInOctets"
+                        }
+                    },
+                    {
+                        "sortorder": "2",
+                        "color": "F63100",
+                        "item": {
+                            "host": "Unifi Protect Cloud Key",
+                            "key": "incoming_bandwidth_moving_average_threshold"
                         }
                     }
                 ]
