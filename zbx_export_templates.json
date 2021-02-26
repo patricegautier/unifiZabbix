@@ -1,7 +1,7 @@
 {
     "zabbix_export": {
         "version": "5.2",
-        "date": "2021-01-27T00:02:49Z",
+        "date": "2021-02-26T01:26:25Z",
         "groups": [
             {
                 "name": "Patrice"
@@ -86,16 +86,16 @@
                         "triggers": [
                             {
                                 "expression": "{nodata({$UNIFI_ALERT_LONG_PERIOD})}=1",
-                                "name": "{HOST.NAME} has not reported data in {$UNIFI_ALERT_LONG_PERIOD}",
+                                "name": "{HOST.NAME} has not reported data in more than {$UNIFI_ALERT_LONG_PERIOD}",
                                 "priority": "AVERAGE"
                             },
                             {
                                 "expression": "{nodata({$UNIFI_ALERT_PERIOD})}=1",
-                                "name": "{HOST.NAME} has not reported data in {$UNIFI_ALERT_PERIOD}",
+                                "name": "{HOST.NAME} has not reported data in more than {$UNIFI_ALERT_PERIOD}",
                                 "priority": "WARNING",
                                 "dependencies": [
                                     {
-                                        "name": "{HOST.NAME} has not reported data in {$UNIFI_ALERT_LONG_PERIOD}",
+                                        "name": "{HOST.NAME} has not reported data in more than {$UNIFI_ALERT_LONG_PERIOD}",
                                         "expression": "{SunMAX SolarPoint:batteryVoltage.nodata({$UNIFI_ALERT_LONG_PERIOD})}=1"
                                     }
                                 ]
@@ -431,29 +431,29 @@
                         "triggers": [
                             {
                                 "expression": "{nodata({$UNIFI_ALERT_LONG_PERIOD})}=1",
-                                "name": "{HOST.NAME} Device has not reported statistics for {$UNIFI_ALERT_LONG_PERIOD}",
+                                "name": "{HOST.NAME} Device has not reported statistics in more than {$UNIFI_ALERT_LONG_PERIOD}",
                                 "priority": "AVERAGE",
                                 "manual_close": "YES",
                                 "dependencies": [
                                     {
-                                        "name": "{HOST.NAME} SSH has not been available for  {$UNIFI_ALERT_PERIOD}",
-                                        "expression": "{Unifi SSH Host:ssh.run[uname].nodata({$UNIFI_ALERT_PERIOD})}=1"
+                                        "name": "{HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_PERIOD}",
+                                        "expression": "{Unifi SSH Host:load_avg_1mn.nodata({$UNIFI_ALERT_PERIOD})}=1"
                                     }
                                 ]
                             },
                             {
                                 "expression": "{nodata({$UNIFI_ALERT_PERIOD})}=1",
-                                "name": "{HOST.NAME} Device has not reported statistics for {$UNIFI_ALERT_PERIOD}",
+                                "name": "{HOST.NAME} Device has not reported statistics in more than {$UNIFI_ALERT_PERIOD}",
                                 "priority": "WARNING",
                                 "manual_close": "YES",
                                 "dependencies": [
                                     {
-                                        "name": "{HOST.NAME} Device has not reported statistics for {$UNIFI_ALERT_LONG_PERIOD}",
+                                        "name": "{HOST.NAME} Device has not reported statistics in more than {$UNIFI_ALERT_LONG_PERIOD}",
                                         "expression": "{UBNT Airmax:airTime.nodata({$UNIFI_ALERT_LONG_PERIOD})}=1"
                                     },
                                     {
-                                        "name": "{HOST.NAME} SSH has not been available for  {$UNIFI_ALERT_PERIOD}",
-                                        "expression": "{Unifi SSH Host:ssh.run[uname].nodata({$UNIFI_ALERT_PERIOD})}=1"
+                                        "name": "{HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_PERIOD}",
+                                        "expression": "{Unifi SSH Host:load_avg_1mn.nodata({$UNIFI_ALERT_PERIOD})}=1"
                                     }
                                 ]
                             }
@@ -1007,7 +1007,7 @@
                         "key": "cpu_smooth",
                         "value_type": "FLOAT",
                         "units": "%",
-                        "params": "avg(cpu,{$UNIFI_SMOOTHING_COUNT})",
+                        "params": "avg(cpu,{$UNIFI_SMOOTHING_PERIOD})",
                         "applications": [
                             {
                                 "name": "Host"
@@ -1244,87 +1244,6 @@
                         }
                     },
                     {
-                        "name": "Load Average 1mn",
-                        "type": "DEPENDENT",
-                        "key": "loadavg_1",
-                        "delay": "0",
-                        "value_type": "FLOAT",
-                        "applications": [
-                            {
-                                "name": "Host"
-                            }
-                        ],
-                        "preprocessing": [
-                            {
-                                "type": "JSONPATH",
-                                "parameters": [
-                                    "$.sys_stats.loadavg_1"
-                                ]
-                            }
-                        ],
-                        "master_item": {
-                            "key": "mca-dump-short.sh[\"-d\",\"{HOST.CONN}\", \"-u\", \"{$UNIFI_USER}\", \"-i\", \"{$UNIFI_SSH_PRIV_KEY_PATH}\", \"-t\", \"AP\"]"
-                        }
-                    },
-                    {
-                        "name": "Load Average 5mn",
-                        "type": "DEPENDENT",
-                        "key": "loadavg_5",
-                        "delay": "0",
-                        "value_type": "FLOAT",
-                        "applications": [
-                            {
-                                "name": "Host"
-                            }
-                        ],
-                        "preprocessing": [
-                            {
-                                "type": "JSONPATH",
-                                "parameters": [
-                                    "$.sys_stats.loadavg_5"
-                                ]
-                            }
-                        ],
-                        "master_item": {
-                            "key": "mca-dump-short.sh[\"-d\",\"{HOST.CONN}\", \"-u\", \"{$UNIFI_USER}\", \"-i\", \"{$UNIFI_SSH_PRIV_KEY_PATH}\", \"-t\", \"AP\"]"
-                        }
-                    },
-                    {
-                        "name": "Load Average 15mn",
-                        "type": "DEPENDENT",
-                        "key": "loadavg_15",
-                        "delay": "0",
-                        "value_type": "FLOAT",
-                        "applications": [
-                            {
-                                "name": "Host"
-                            }
-                        ],
-                        "preprocessing": [
-                            {
-                                "type": "JSONPATH",
-                                "parameters": [
-                                    "$.sys_stats.loadavg_15"
-                                ]
-                            }
-                        ],
-                        "master_item": {
-                            "key": "mca-dump-short.sh[\"-d\",\"{HOST.CONN}\", \"-u\", \"{$UNIFI_USER}\", \"-i\", \"{$UNIFI_SSH_PRIV_KEY_PATH}\", \"-t\", \"AP\"]"
-                        }
-                    },
-                    {
-                        "name": "Load Average Smooth",
-                        "type": "CALCULATED",
-                        "key": "loadavg_smooth",
-                        "value_type": "FLOAT",
-                        "params": "avg(loadavg_1,{$UNIFI_SMOOTHING_COUNT})",
-                        "applications": [
-                            {
-                                "name": "Host"
-                            }
-                        ]
-                    },
-                    {
                         "name": "mca-dump",
                         "type": "EXTERNAL",
                         "key": "mca-dump-short.sh[\"-d\",\"{HOST.CONN}\", \"-u\", \"{$UNIFI_USER}\", \"-i\", \"{$UNIFI_SSH_PRIV_KEY_PATH}\", \"-t\", \"AP\"]",
@@ -1544,37 +1463,37 @@
                         "triggers": [
                             {
                                 "expression": "{nodata({$UNIFI_ALERT_LONG_PERIOD})}=1",
-                                "name": "{HOST.NAME} has not reported statistics for {$UNIFI_ALERT_LONG_PERIOD}",
+                                "name": "{HOST.NAME} has not reported statistics in more than {$UNIFI_ALERT_LONG_PERIOD}",
                                 "priority": "AVERAGE",
                                 "manual_close": "YES",
                                 "dependencies": [
                                     {
-                                        "name": "{HOST.NAME} has not been pingable for {$UNIFI_ALERT_LONG_PERIOD}",
+                                        "name": "{HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_LONG_PERIOD}",
                                         "expression": "{Unifi SSH Host:icmpping[].max({$UNIFI_ALERT_LONG_PERIOD})}=0"
                                     },
                                     {
-                                        "name": "{HOST.NAME} SSH has not been available for {$UNIFI_ALERT_LONG_PERIOD}",
-                                        "expression": "{Unifi SSH Host:ssh.run[uname].nodata({$UNIFI_ALERT_LONG_PERIOD})}=1"
+                                        "name": "{HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_LONG_PERIOD}",
+                                        "expression": "{Unifi SSH Host:load_avg_1mn.nodata({$UNIFI_ALERT_LONG_PERIOD})}=1"
                                     }
                                 ]
                             },
                             {
                                 "expression": "{nodata({$UNIFI_ALERT_PERIOD})}=1",
-                                "name": "{HOST.NAME} has not reported statistics for {$UNIFI_ALERT_PERIOD}",
+                                "name": "{HOST.NAME} has not reported statistics in more than {$UNIFI_ALERT_PERIOD}",
                                 "priority": "WARNING",
                                 "manual_close": "YES",
                                 "dependencies": [
                                     {
-                                        "name": "{HOST.NAME} has not been pingable for {$UNIFI_ALERT_PERIOD}",
+                                        "name": "{HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_PERIOD}",
                                         "expression": "{Unifi SSH Host:icmpping[].max({$UNIFI_ALERT_PERIOD})}=0"
                                     },
                                     {
-                                        "name": "{HOST.NAME} has not reported statistics for {$UNIFI_ALERT_LONG_PERIOD}",
+                                        "name": "{HOST.NAME} has not reported statistics in more than {$UNIFI_ALERT_LONG_PERIOD}",
                                         "expression": "{Unifi AP:uptime.nodata({$UNIFI_ALERT_LONG_PERIOD})}=1"
                                     },
                                     {
-                                        "name": "{HOST.NAME} SSH has not been available for  {$UNIFI_ALERT_PERIOD}",
-                                        "expression": "{Unifi SSH Host:ssh.run[uname].nodata({$UNIFI_ALERT_PERIOD})}=1"
+                                        "name": "{HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_PERIOD}",
+                                        "expression": "{Unifi SSH Host:load_avg_1mn.nodata({$UNIFI_ALERT_PERIOD})}=1"
                                     }
                                 ]
                             }
@@ -1889,18 +1808,18 @@
                         "triggers": [
                             {
                                 "expression": "{max({$UNIFI_ALERT_LONG_PERIOD})}=0",
-                                "name": "Camera {HOST.NAME} has not been pingable for {$UNIFI_ALERT_LONG_PERIOD}",
+                                "name": "Camera {HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_LONG_PERIOD}",
                                 "priority": "AVERAGE",
                                 "manual_close": "YES"
                             },
                             {
                                 "expression": "{max({$UNIFI_ALERT_PERIOD})}=0",
-                                "name": "Camera {HOST.NAME} has not been pingable for {$UNIFI_ALERT_PERIOD}",
+                                "name": "Camera {HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_PERIOD}",
                                 "priority": "WARNING",
                                 "manual_close": "YES",
                                 "dependencies": [
                                     {
-                                        "name": "Camera {HOST.NAME} has not been pingable for {$UNIFI_ALERT_LONG_PERIOD}",
+                                        "name": "Camera {HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_LONG_PERIOD}",
                                         "expression": "{Unifi Protect Camera:icmpping[].max({$UNIFI_ALERT_LONG_PERIOD})}=0"
                                     }
                                 ]
@@ -1933,7 +1852,7 @@
                         "type": "CALCULATED",
                         "key": "outgoing_bandwidth_moving_average_threshold",
                         "units": "Bps",
-                        "params": "( \navg( tx_bandwidth_smooth, 1h,1d) +\navg( tx_bandwidth_smooth, 1h,2d) +\navg( tx_bandwidth_smooth, 1h,3d) +\navg( tx_bandwidth_smooth, 1h,4d) +\navg( tx_bandwidth_smooth, 1h,5d) +\navg( tx_bandwidth_smooth, 1h,6d) +\navg( tx_bandwidth_smooth, 1h,7d) \n\n) /7 * 0.6",
+                        "params": "( \nlast( tx_bandwidth_smooth, #1,1d) +\nlast( tx_bandwidth_smooth, #1,2d) +\nlast( tx_bandwidth_smooth, #1,3d) +\nlast( tx_bandwidth_smooth, #1,4d) +\nlast( tx_bandwidth_smooth, #1,5d) +\nlast( tx_bandwidth_smooth, #1,6d) +\nlast( tx_bandwidth_smooth, #1,7d) \n\n) /7 * 0.5",
                         "applications": [
                             {
                                 "name": "Bandwidth"
@@ -2008,34 +1927,34 @@
                         ],
                         "triggers": [
                             {
+                                "expression": "{nodata({$UNIFI_ALERT_LONG_PERIOD})}=1",
+                                "name": "Camera {HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_LONG_PERIOD}",
+                                "priority": "AVERAGE",
+                                "manual_close": "YES",
+                                "dependencies": [
+                                    {
+                                        "name": "Camera {HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_LONG_PERIOD}",
+                                        "expression": "{Unifi Protect Camera:icmpping[].max({$UNIFI_ALERT_LONG_PERIOD})}=0"
+                                    }
+                                ]
+                            },
+                            {
                                 "expression": "{nodata({$UNIFI_ALERT_PERIOD})}=1",
                                 "name": "Camera {HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_PERIOD}",
                                 "priority": "WARNING",
                                 "manual_close": "YES",
                                 "dependencies": [
                                     {
-                                        "name": "Camera {HOST.NAME} has not been pingable for {$UNIFI_ALERT_LONG_PERIOD}",
+                                        "name": "Camera {HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_LONG_PERIOD}",
                                         "expression": "{Unifi Protect Camera:icmpping[].max({$UNIFI_ALERT_LONG_PERIOD})}=0"
                                     },
                                     {
-                                        "name": "Camera {HOST.NAME} has not been pingable for {$UNIFI_ALERT_PERIOD}",
+                                        "name": "Camera {HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_PERIOD}",
                                         "expression": "{Unifi Protect Camera:icmpping[].max({$UNIFI_ALERT_PERIOD})}=0"
                                     },
                                     {
-                                        "name": "Camera {HOST.NAME} SSH has not been available for {$UNIFI_ALERT_LONG_PERIOD}",
+                                        "name": "Camera {HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_LONG_PERIOD}",
                                         "expression": "{Unifi Protect Camera:ssh.run[uname].nodata({$UNIFI_ALERT_LONG_PERIOD})}=1"
-                                    }
-                                ]
-                            },
-                            {
-                                "expression": "{nodata({$UNIFI_ALERT_LONG_PERIOD})}=1",
-                                "name": "Camera {HOST.NAME} SSH has not been available for {$UNIFI_ALERT_LONG_PERIOD}",
-                                "priority": "AVERAGE",
-                                "manual_close": "YES",
-                                "dependencies": [
-                                    {
-                                        "name": "Camera {HOST.NAME} has not been pingable for {$UNIFI_ALERT_LONG_PERIOD}",
-                                        "expression": "{Unifi Protect Camera:icmpping[].max({$UNIFI_ALERT_LONG_PERIOD})}=0"
                                     }
                                 ]
                             }
@@ -2083,7 +2002,7 @@
                                 "priority": "WARNING",
                                 "dependencies": [
                                     {
-                                        "name": "Camera {HOST.NAME} has not been pingable for {$UNIFI_ALERT_PERIOD}",
+                                        "name": "Camera {HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_PERIOD}",
                                         "expression": "{Unifi Protect Camera:icmpping[].max({$UNIFI_ALERT_PERIOD})}=0"
                                     },
                                     {
@@ -2181,18 +2100,18 @@
                         "triggers": [
                             {
                                 "expression": "{nodata({$UNIFI_ALERT_LONG_PERIOD})}=1",
-                                "name": "{HOST.NAME} hasn't reported statistics in {$UNIFI_ALERT_LONG_PERIOD}",
+                                "name": "{HOST.NAME} hasn't reported statistics in more than {$UNIFI_ALERT_LONG_PERIOD}",
                                 "priority": "AVERAGE",
                                 "manual_close": "YES"
                             },
                             {
                                 "expression": "{nodata({$UNIFI_ALERT_PERIOD})}=1",
-                                "name": "{HOST.NAME} hasn't reported statistics in {$UNIFI_ALERT_PERIOD}",
+                                "name": "{HOST.NAME} hasn't reported statistics in more than {$UNIFI_ALERT_PERIOD}",
                                 "priority": "WARNING",
                                 "manual_close": "YES",
                                 "dependencies": [
                                     {
-                                        "name": "{HOST.NAME} hasn't reported statistics in {$UNIFI_ALERT_LONG_PERIOD}",
+                                        "name": "{HOST.NAME} hasn't reported statistics in more than {$UNIFI_ALERT_LONG_PERIOD}",
                                         "expression": "{Unifi Protect Cloud Key:IpExtInOctets.nodata({$UNIFI_ALERT_LONG_PERIOD})}=1"
                                     }
                                 ]
@@ -2278,7 +2197,7 @@
                             }
                         ],
                         "master_item": {
-                            "key": "ssh.run[mpstat]"
+                            "key": "ssh.run[mpstat_nvr]"
                         }
                     },
                     {
@@ -2357,29 +2276,29 @@
                         "triggers": [
                             {
                                 "expression": "{nodata({$UNIFI_ALERT_LONG_PERIOD})}=1",
-                                "name": "{HOST.NAME} hasn't reported statistics for {$UNIFI_ALERT_LONG_PERIOD}",
+                                "name": "{HOST.NAME} hasn't reported statistics for more than {$UNIFI_ALERT_LONG_PERIOD}",
                                 "priority": "AVERAGE",
                                 "manual_close": "YES",
                                 "dependencies": [
                                     {
-                                        "name": "{HOST.NAME} SSH has not been available for  {$UNIFI_ALERT_PERIOD}",
-                                        "expression": "{Unifi SSH Host:ssh.run[uname].nodata({$UNIFI_ALERT_PERIOD})}=1"
+                                        "name": "{HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_PERIOD}",
+                                        "expression": "{Unifi SSH Host:load_avg_1mn.nodata({$UNIFI_ALERT_PERIOD})}=1"
                                     }
                                 ]
                             },
                             {
                                 "expression": "{nodata({$UNIFI_ALERT_PERIOD})}=1",
-                                "name": "{HOST.NAME} hasn't reported statistics for {$UNIFI_ALERT_PERIOD}",
+                                "name": "{HOST.NAME} hasn't reported statistics for more than {$UNIFI_ALERT_PERIOD}",
                                 "priority": "WARNING",
                                 "manual_close": "YES",
                                 "dependencies": [
                                     {
-                                        "name": "{HOST.NAME} hasn't reported statistics for {$UNIFI_ALERT_LONG_PERIOD}",
+                                        "name": "{HOST.NAME} hasn't reported statistics for more than {$UNIFI_ALERT_LONG_PERIOD}",
                                         "expression": "{Unifi Protect NVR4:IpExtInOctets.nodata({$UNIFI_ALERT_LONG_PERIOD})}=1"
                                     },
                                     {
-                                        "name": "{HOST.NAME} SSH has not been available for  {$UNIFI_ALERT_PERIOD}",
-                                        "expression": "{Unifi SSH Host:ssh.run[uname].nodata({$UNIFI_ALERT_PERIOD})}=1"
+                                        "name": "{HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_PERIOD}",
+                                        "expression": "{Unifi SSH Host:load_avg_1mn.nodata({$UNIFI_ALERT_PERIOD})}=1"
                                     }
                                 ]
                             }
@@ -2406,13 +2325,13 @@
                             }
                         ],
                         "master_item": {
-                            "key": "ssh.run[mpstat]"
+                            "key": "ssh.run[mpstat_nvr]"
                         }
                     },
                     {
                         "name": "mpstat",
                         "type": "SSH",
-                        "key": "ssh.run[mpstat]",
+                        "key": "ssh.run[mpstat_nvr]",
                         "delay": "{$UNIFI_CHECK_FREQUENCY}",
                         "history": "0",
                         "trends": "0",
@@ -2551,7 +2470,16 @@
                         "name": "Availability"
                     },
                     {
+                        "name": "Hardware"
+                    },
+                    {
+                        "name": "Host"
+                    },
+                    {
                         "name": "Network"
+                    },
+                    {
+                        "name": "Performance"
                     }
                 ],
                 "items": [
@@ -2567,23 +2495,110 @@
                         "triggers": [
                             {
                                 "expression": "{max({$UNIFI_ALERT_LONG_PERIOD})}=0",
-                                "name": "{HOST.NAME} has not been pingable for {$UNIFI_ALERT_LONG_PERIOD}",
+                                "name": "{HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_LONG_PERIOD}",
                                 "priority": "AVERAGE",
                                 "manual_close": "YES"
                             },
                             {
                                 "expression": "{max({$UNIFI_ALERT_PERIOD})}=0",
-                                "name": "{HOST.NAME} has not been pingable for {$UNIFI_ALERT_PERIOD}",
+                                "name": "{HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_PERIOD}",
                                 "priority": "WARNING",
                                 "manual_close": "YES",
                                 "dependencies": [
                                     {
-                                        "name": "{HOST.NAME} has not been pingable for {$UNIFI_ALERT_LONG_PERIOD}",
+                                        "name": "{HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_LONG_PERIOD}",
                                         "expression": "{Unifi SSH Host:icmpping[].max({$UNIFI_ALERT_LONG_PERIOD})}=0"
                                     }
                                 ]
                             }
                         ]
+                    },
+                    {
+                        "name": "Load Average (1mn)",
+                        "type": "DEPENDENT",
+                        "key": "load_avg_1mn",
+                        "delay": "0",
+                        "value_type": "FLOAT",
+                        "preprocessing": [
+                            {
+                                "type": "REGEX",
+                                "parameters": [
+                                    ".*load average: ([0-9]([.][0-9]+))",
+                                    "\\1"
+                                ]
+                            }
+                        ],
+                        "master_item": {
+                            "key": "ssh.run[uptime]"
+                        },
+                        "triggers": [
+                            {
+                                "expression": "{nodata({$UNIFI_ALERT_LONG_PERIOD})}=1",
+                                "name": "{HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_LONG_PERIOD}",
+                                "priority": "AVERAGE",
+                                "manual_close": "YES",
+                                "dependencies": [
+                                    {
+                                        "name": "{HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_PERIOD}",
+                                        "expression": "{Unifi SSH Host:icmpping[].max({$UNIFI_ALERT_PERIOD})}=0"
+                                    }
+                                ]
+                            },
+                            {
+                                "expression": "{nodata({$UNIFI_ALERT_PERIOD})}=1",
+                                "name": "{HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_PERIOD}",
+                                "priority": "WARNING",
+                                "manual_close": "YES",
+                                "dependencies": [
+                                    {
+                                        "name": "{HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_PERIOD}",
+                                        "expression": "{Unifi SSH Host:icmpping[].max({$UNIFI_ALERT_PERIOD})}=0"
+                                    },
+                                    {
+                                        "name": "{HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_LONG_PERIOD}",
+                                        "expression": "{Unifi SSH Host:load_avg_1mn.nodata({$UNIFI_ALERT_LONG_PERIOD})}=1"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Load Average (5mn)",
+                        "type": "DEPENDENT",
+                        "key": "load_avg_5mn",
+                        "delay": "0",
+                        "value_type": "FLOAT",
+                        "preprocessing": [
+                            {
+                                "type": "REGEX",
+                                "parameters": [
+                                    ".*load average: .*, ([0-9]([.][0-9]+))",
+                                    "\\1"
+                                ]
+                            }
+                        ],
+                        "master_item": {
+                            "key": "ssh.run[uptime]"
+                        }
+                    },
+                    {
+                        "name": "Load Average (15mn)",
+                        "type": "DEPENDENT",
+                        "key": "load_avg_15mn",
+                        "delay": "0",
+                        "value_type": "FLOAT",
+                        "preprocessing": [
+                            {
+                                "type": "REGEX",
+                                "parameters": [
+                                    ".*load average: .*,.*, ([0-9]([.][0-9]+))",
+                                    "\\1"
+                                ]
+                            }
+                        ],
+                        "master_item": {
+                            "key": "ssh.run[uptime]"
+                        }
                     },
                     {
                         "name": "MAC Address A",
@@ -2657,9 +2672,53 @@
                         ]
                     },
                     {
+                        "name": "mpstat",
+                        "type": "SSH",
+                        "key": "ssh.run[mpstat]",
+                        "delay": "1d",
+                        "trends": "0",
+                        "status": "DISABLED",
+                        "value_type": "TEXT",
+                        "params": "mpstat -o JSON 1 1 | sed 's/\"cpu-load\"/\"cpuload\"/'",
+                        "authtype": "PUBLIC_KEY",
+                        "username": "{$UNIFI_USER}",
+                        "publickey": "{$UNIFI_PUB_KEY}",
+                        "privatekey": "{$UNIFI_PRIV_KEY}",
+                        "applications": [
+                            {
+                                "name": "Host"
+                            },
+                            {
+                                "name": "Performance"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Number of processors",
+                        "type": "SSH",
+                        "key": "ssh.run[nproc]",
+                        "delay": "1d",
+                        "units": "Processors",
+                        "params": "nproc",
+                        "authtype": "PUBLIC_KEY",
+                        "username": "{$UNIFI_USER}",
+                        "publickey": "{$UNIFI_PUB_KEY}",
+                        "privatekey": "{$UNIFI_PRIV_KEY}",
+                        "description": "Number of processors",
+                        "applications": [
+                            {
+                                "name": "Hardware"
+                            },
+                            {
+                                "name": "Host"
+                            }
+                        ]
+                    },
+                    {
                         "name": "uname",
                         "type": "SSH",
                         "key": "ssh.run[uname]",
+                        "delay": "1d",
                         "trends": "0",
                         "value_type": "CHAR",
                         "params": "uname -a",
@@ -2675,32 +2734,31 @@
                         ],
                         "triggers": [
                             {
-                                "expression": "{nodata({$UNIFI_ALERT_LONG_PERIOD})}=1",
-                                "name": "{HOST.NAME} SSH has not been available for {$UNIFI_ALERT_LONG_PERIOD}",
-                                "priority": "AVERAGE",
-                                "manual_close": "YES",
-                                "dependencies": [
-                                    {
-                                        "name": "{HOST.NAME} has not been pingable for {$UNIFI_ALERT_PERIOD}",
-                                        "expression": "{Unifi SSH Host:icmpping[].max({$UNIFI_ALERT_PERIOD})}=0"
-                                    }
-                                ]
+                                "expression": "{change()}=1",
+                                "name": "{HOST.NAME} Version Change",
+                                "priority": "INFO",
+                                "manual_close": "YES"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "uptime",
+                        "type": "SSH",
+                        "key": "ssh.run[uptime]",
+                        "history": "0",
+                        "trends": "0",
+                        "value_type": "CHAR",
+                        "params": "uptime",
+                        "authtype": "PUBLIC_KEY",
+                        "username": "{$UNIFI_USER}",
+                        "publickey": "{$UNIFI_PUB_KEY}",
+                        "privatekey": "{$UNIFI_PRIV_KEY}",
+                        "applications": [
+                            {
+                                "name": "Availability"
                             },
                             {
-                                "expression": "{nodata({$UNIFI_ALERT_PERIOD})}=1",
-                                "name": "{HOST.NAME} SSH has not been available for  {$UNIFI_ALERT_PERIOD}",
-                                "priority": "WARNING",
-                                "manual_close": "YES",
-                                "dependencies": [
-                                    {
-                                        "name": "{HOST.NAME} has not been pingable for {$UNIFI_ALERT_PERIOD}",
-                                        "expression": "{Unifi SSH Host:icmpping[].max({$UNIFI_ALERT_PERIOD})}=0"
-                                    },
-                                    {
-                                        "name": "{HOST.NAME} SSH has not been available for {$UNIFI_ALERT_LONG_PERIOD}",
-                                        "expression": "{Unifi SSH Host:ssh.run[uname].nodata({$UNIFI_ALERT_LONG_PERIOD})}=1"
-                                    }
-                                ]
+                                "name": "Performance"
                             }
                         ]
                     }
@@ -2766,7 +2824,7 @@
                         "key": "cpu_smooth",
                         "value_type": "FLOAT",
                         "units": "%",
-                        "params": "avg(cpu,{$UNIFI_SMOOTHING_COUNT})",
+                        "params": "avg(cpu,{$UNIFI_SMOOTHING_PERIOD})",
                         "applications": [
                             {
                                 "name": "Host"
@@ -2791,75 +2849,6 @@
                                 "type": "JSONPATH",
                                 "parameters": [
                                     "$.hostname"
-                                ]
-                            }
-                        ],
-                        "master_item": {
-                            "key": "mca-dump-short.sh[\"-d\",\"{HOST.CONN}\", \"-u\", \"{$UNIFI_USER}\", \"-i\", \"{$UNIFI_SSH_PRIV_KEY_PATH}\", \"-t\", \"SWITCH\"]"
-                        }
-                    },
-                    {
-                        "name": "Load Average 1mn",
-                        "type": "DEPENDENT",
-                        "key": "loadavg_1",
-                        "delay": "0",
-                        "value_type": "FLOAT",
-                        "applications": [
-                            {
-                                "name": "Host"
-                            }
-                        ],
-                        "preprocessing": [
-                            {
-                                "type": "JSONPATH",
-                                "parameters": [
-                                    "$.sys_stats.loadavg_1"
-                                ]
-                            }
-                        ],
-                        "master_item": {
-                            "key": "mca-dump-short.sh[\"-d\",\"{HOST.CONN}\", \"-u\", \"{$UNIFI_USER}\", \"-i\", \"{$UNIFI_SSH_PRIV_KEY_PATH}\", \"-t\", \"SWITCH\"]"
-                        }
-                    },
-                    {
-                        "name": "Load Average 5mn",
-                        "type": "DEPENDENT",
-                        "key": "loadavg_5",
-                        "delay": "0",
-                        "value_type": "FLOAT",
-                        "applications": [
-                            {
-                                "name": "Host"
-                            }
-                        ],
-                        "preprocessing": [
-                            {
-                                "type": "JSONPATH",
-                                "parameters": [
-                                    "$.sys_stats.loadavg_5"
-                                ]
-                            }
-                        ],
-                        "master_item": {
-                            "key": "mca-dump-short.sh[\"-d\",\"{HOST.CONN}\", \"-u\", \"{$UNIFI_USER}\", \"-i\", \"{$UNIFI_SSH_PRIV_KEY_PATH}\", \"-t\", \"SWITCH\"]"
-                        }
-                    },
-                    {
-                        "name": "Load Average 15mn",
-                        "type": "DEPENDENT",
-                        "key": "loadavg_15",
-                        "delay": "0",
-                        "value_type": "FLOAT",
-                        "applications": [
-                            {
-                                "name": "Host"
-                            }
-                        ],
-                        "preprocessing": [
-                            {
-                                "type": "JSONPATH",
-                                "parameters": [
-                                    "$.sys_stats.loadavg_15"
                                 ]
                             }
                         ],
@@ -3221,33 +3210,33 @@
                         "triggers": [
                             {
                                 "expression": "{nodata({$UNIFI_ALERT_LONG_PERIOD})}=1",
-                                "name": "{HOST.NAME} has not reported statistics for {$UNIFI_ALERT_LONG_PERIOD}",
+                                "name": "{HOST.NAME} has not reported statistics for more than {$UNIFI_ALERT_LONG_PERIOD}",
                                 "priority": "AVERAGE",
                                 "manual_close": "YES",
                                 "dependencies": [
                                     {
-                                        "name": "{HOST.NAME} has not been pingable for {$UNIFI_ALERT_LONG_PERIOD}",
+                                        "name": "{HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_LONG_PERIOD}",
                                         "expression": "{Unifi SSH Host:icmpping[].max({$UNIFI_ALERT_LONG_PERIOD})}=0"
                                     },
                                     {
-                                        "name": "{HOST.NAME} SSH has not been available for {$UNIFI_ALERT_LONG_PERIOD}",
-                                        "expression": "{Unifi SSH Host:ssh.run[uname].nodata({$UNIFI_ALERT_LONG_PERIOD})}=1"
+                                        "name": "{HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_LONG_PERIOD}",
+                                        "expression": "{Unifi SSH Host:load_avg_1mn.nodata({$UNIFI_ALERT_LONG_PERIOD})}=1"
                                     }
                                 ]
                             },
                             {
                                 "expression": "{nodata({$UNIFI_ALERT_PERIOD})}=1",
-                                "name": "{HOST.NAME} has not reported statistics for {$UNIFI_ALERT_PERIOD}",
+                                "name": "{HOST.NAME} has not reported statistics for more than {$UNIFI_ALERT_PERIOD}",
                                 "priority": "WARNING",
                                 "manual_close": "YES",
                                 "dependencies": [
                                     {
-                                        "name": "{HOST.NAME} has not been pingable for {$UNIFI_ALERT_PERIOD}",
+                                        "name": "{HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_PERIOD}",
                                         "expression": "{Unifi SSH Host:icmpping[].max({$UNIFI_ALERT_PERIOD})}=0"
                                     },
                                     {
-                                        "name": "{HOST.NAME} SSH has not been available for  {$UNIFI_ALERT_PERIOD}",
-                                        "expression": "{Unifi SSH Host:ssh.run[uname].nodata({$UNIFI_ALERT_PERIOD})}=1"
+                                        "name": "{HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_PERIOD}",
+                                        "expression": "{Unifi SSH Host:load_avg_1mn.nodata({$UNIFI_ALERT_PERIOD})}=1"
                                     }
                                 ]
                             }
@@ -3533,6 +3522,9 @@
                         "name": "Availability"
                     },
                     {
+                        "name": "DNS"
+                    },
+                    {
                         "name": "Host"
                     },
                     {
@@ -3573,7 +3565,7 @@
                         "key": "cpu_smooth",
                         "value_type": "FLOAT",
                         "units": "%",
-                        "params": "avg(cpu,{$UNIFI_SMOOTHING_COUNT})",
+                        "params": "avg(cpu,{$UNIFI_SMOOTHING_PERIOD})",
                         "applications": [
                             {
                                 "name": "Host"
@@ -3751,7 +3743,6 @@
                         "delay": "0",
                         "trends": "0",
                         "value_type": "TEXT",
-                        "inventory_link": "NAME",
                         "applications": [
                             {
                                 "name": "Host"
@@ -3768,6 +3759,18 @@
                         "master_item": {
                             "key": "mca-dump-short.sh[\"-d\",\"{HOST.CONN}\", \"-u\", \"root\", \"-i\", \"{$UNIFI_SSH_PRIV_KEY_PATH}\", \"-t\", \"UDMP\"]"
                         }
+                    },
+                    {
+                        "name": "Hourly Direct Port 53 Requests",
+                        "type": "CALCULATED",
+                        "key": "hourly_port_53_requests",
+                        "history": "1d",
+                        "params": "count(\"port_53_abuser_request\",3600)",
+                        "applications": [
+                            {
+                                "name": "DNS"
+                            }
+                        ]
                     },
                     {
                         "name": "Load Average 1mn",
@@ -3836,17 +3839,38 @@
                         ],
                         "master_item": {
                             "key": "mca-dump-short.sh[\"-d\",\"{HOST.CONN}\", \"-u\", \"root\", \"-i\", \"{$UNIFI_SSH_PRIV_KEY_PATH}\", \"-t\", \"UDMP\"]"
-                        }
+                        },
+                        "triggers": [
+                            {
+                                "expression": "{avg(1)}>4",
+                                "name": "{HOST.NAME} high load average",
+                                "priority": "WARNING",
+                                "manual_close": "YES"
+                            }
+                        ]
                     },
                     {
                         "name": "Load Average Smooth",
                         "type": "CALCULATED",
                         "key": "loadavg_smooth",
                         "value_type": "FLOAT",
-                        "params": "avg(loadavg_1,{$UNIFI_SMOOTHING_COUNT})",
+                        "params": "avg(loadavg_1,{$UNIFI_SMOOTHING_PERIOD})",
                         "applications": [
                             {
                                 "name": "Host"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Port 53 Abuser Request Raw",
+                        "type": "ZABBIX_ACTIVE",
+                        "key": "logrt[\"/mnt/data/log/messages(\\.[0-9])?\",\"user.warn kernel.*SRC=(([0-9]{1,3}\\.){3}[0-9]{1,3}) DST=(([0-9]{1,3}\\.){3}[0-9]{1,3}).*DPT=8?53 .*\",,,,\"[ { \\\"ip\\\": \\\"\\1\\\", \\\"dns_server\\\":\\\"\\3\\\" } ]\"]",
+                        "history": "0",
+                        "trends": "0",
+                        "value_type": "TEXT",
+                        "applications": [
+                            {
+                                "name": "DNS"
                             }
                         ]
                     },
@@ -3946,6 +3970,22 @@
                         ],
                         "master_item": {
                             "key": "mca-dump-short.sh[\"-d\",\"{HOST.CONN}\", \"-u\", \"root\", \"-i\", \"{$UNIFI_SSH_PRIV_KEY_PATH}\", \"-t\", \"UDMP\"]"
+                        }
+                    },
+                    {
+                        "name": "Port 53 Abuser Request",
+                        "type": "DEPENDENT",
+                        "key": "port_53_abuser_request",
+                        "delay": "0",
+                        "trends": "0",
+                        "value_type": "CHAR",
+                        "applications": [
+                            {
+                                "name": "DNS"
+                            }
+                        ],
+                        "master_item": {
+                            "key": "logrt[\"/mnt/data/log/messages(\\.[0-9])?\",\"user.warn kernel.*SRC=(([0-9]{1,3}\\.){3}[0-9]{1,3}) DST=(([0-9]{1,3}\\.){3}[0-9]{1,3}).*DPT=8?53 .*\",,,,\"[ { \\\"ip\\\": \\\"\\1\\\", \\\"dns_server\\\":\\\"\\3\\\" } ]\"]"
                         }
                     },
                     {
@@ -4069,23 +4109,23 @@
                         "triggers": [
                             {
                                 "expression": "{nodata({$UNIFI_ALERT_LONG_PERIOD})}=1",
-                                "name": "{HOST.NAME} has not reported statistics for {$UNIFI_ALERT_LONG_PERIOD}",
+                                "name": "{HOST.NAME} has not reported statistics for more than {$UNIFI_ALERT_LONG_PERIOD}",
                                 "priority": "AVERAGE",
                                 "manual_close": "YES"
                             },
                             {
                                 "expression": "{nodata({$UNIFI_ALERT_PERIOD})}=1",
-                                "name": "{HOST.NAME} has not report statistics for {$UNIFI_ALERT_PERIOD}",
+                                "name": "{HOST.NAME} has not report statistics for more than {$UNIFI_ALERT_PERIOD}",
                                 "priority": "WARNING",
                                 "manual_close": "YES",
                                 "dependencies": [
                                     {
-                                        "name": "{HOST.NAME} has not reported statistics for {$UNIFI_ALERT_LONG_PERIOD}",
+                                        "name": "{HOST.NAME} has not reported statistics for more than {$UNIFI_ALERT_LONG_PERIOD}",
                                         "expression": "{Unifi UDMP:uptime.nodata({$UNIFI_ALERT_LONG_PERIOD})}=1"
                                     },
                                     {
-                                        "name": "{HOST.NAME} SSH has not been available for  {$UNIFI_ALERT_PERIOD}",
-                                        "expression": "{Unifi SSH Host:ssh.run[uname].nodata({$UNIFI_ALERT_PERIOD})}=1"
+                                        "name": "{HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_PERIOD}",
+                                        "expression": "{Unifi SSH Host:load_avg_1mn.nodata({$UNIFI_ALERT_PERIOD})}=1"
                                     }
                                 ]
                             }
@@ -4247,6 +4287,72 @@
                                 ]
                             }
                         ]
+                    },
+                    {
+                        "name": "Port 53 discovery abuser",
+                        "type": "DEPENDENT",
+                        "key": "port_53_abuser_discovery",
+                        "delay": "0",
+                        "item_prototypes": [
+                            {
+                                "name": "Hourly Port 53 Requests from {#ABUSER}",
+                                "type": "CALCULATED",
+                                "key": "hourly_port_53_requests_[{#ABUSER}]",
+                                "value_type": "FLOAT",
+                                "params": "count(\"port_53_abuser_request\",3600,\"\\\"{#ABUSER}\\\"\",like)",
+                                "applications": [
+                                    {
+                                        "name": "DNS"
+                                    }
+                                ]
+                            }
+                        ],
+                        "master_item": {
+                            "key": "logrt[\"/mnt/data/log/messages(\\.[0-9])?\",\"user.warn kernel.*SRC=(([0-9]{1,3}\\.){3}[0-9]{1,3}) DST=(([0-9]{1,3}\\.){3}[0-9]{1,3}).*DPT=8?53 .*\",,,,\"[ { \\\"ip\\\": \\\"\\1\\\", \\\"dns_server\\\":\\\"\\3\\\" } ]\"]"
+                        },
+                        "lld_macro_paths": [
+                            {
+                                "lld_macro": "{#ABUSER}",
+                                "path": "$.ip"
+                            },
+                            {
+                                "lld_macro": "{#DNS_SERVER}",
+                                "path": "$.dns_server"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Port 53 discovery DNS server",
+                        "type": "DEPENDENT",
+                        "key": "port_53_dns_server_discovery",
+                        "delay": "0",
+                        "item_prototypes": [
+                            {
+                                "name": "Hourly Port 53 Requests to {#DNS_SERVER}",
+                                "type": "CALCULATED",
+                                "key": "hourly_port_53_requests_to_[{#DNS_SERVER}]",
+                                "value_type": "FLOAT",
+                                "params": "count(\"port_53_abuser_request\",3600,\"\\\"{#DNS_SERVER}\\\"\",like)",
+                                "applications": [
+                                    {
+                                        "name": "DNS"
+                                    }
+                                ]
+                            }
+                        ],
+                        "master_item": {
+                            "key": "logrt[\"/mnt/data/log/messages(\\.[0-9])?\",\"user.warn kernel.*SRC=(([0-9]{1,3}\\.){3}[0-9]{1,3}) DST=(([0-9]{1,3}\\.){3}[0-9]{1,3}).*DPT=8?53 .*\",,,,\"[ { \\\"ip\\\": \\\"\\1\\\", \\\"dns_server\\\":\\\"\\3\\\" } ]\"]"
+                        },
+                        "lld_macro_paths": [
+                            {
+                                "lld_macro": "{#ABUSER}",
+                                "path": "$.ip"
+                            },
+                            {
+                                "lld_macro": "{#DNS_SERVER}",
+                                "path": "$.dns_server"
+                            }
+                        ]
                     }
                 ],
                 "macros": [
@@ -4317,7 +4423,7 @@
                         "key": "cpu_smooth",
                         "value_type": "FLOAT",
                         "units": "%",
-                        "params": "avg(cpu,{$UNIFI_SMOOTHING_COUNT})",
+                        "params": "avg(cpu,{$UNIFI_SMOOTHING_PERIOD})",
                         "applications": [
                             {
                                 "name": "Host"
@@ -4840,8 +4946,8 @@
                                         "expression": "{Unifi USG:uptime.nodata({$UNIFI_ALERT_LONG_PERIOD})}=1"
                                     },
                                     {
-                                        "name": "{HOST.NAME} SSH has not been available for  {$UNIFI_ALERT_PERIOD}",
-                                        "expression": "{Unifi SSH Host:ssh.run[uname].nodata({$UNIFI_ALERT_PERIOD})}=1"
+                                        "name": "{HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_PERIOD}",
+                                        "expression": "{Unifi SSH Host:load_avg_1mn.nodata({$UNIFI_ALERT_PERIOD})}=1"
                                     }
                                 ]
                             }
@@ -5156,14 +5262,23 @@
                 "priority": "INFO",
                 "dependencies": [
                     {
-                        "name": "Camera {HOST.NAME} has not been pingable for {$UNIFI_ALERT_PERIOD}",
+                        "name": "Camera {HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_PERIOD}",
                         "expression": "{Unifi Protect Camera:icmpping[].max({$UNIFI_ALERT_PERIOD})}=0"
+                    },
+                    {
+                        "name": "Camera {HOST.NAME} Outgoing Bandwidth Low",
+                        "expression": "{Unifi Protect Camera:tx_bandwidth.avg(10m)}<{$PROTECT_LOW_BANDWIDTH}"
                     },
                     {
                         "name": "Camera {HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_PERIOD}",
                         "expression": "{Unifi Protect Camera:ssh.run[uname].nodata({$UNIFI_ALERT_PERIOD})}=1"
                     }
                 ]
+            },
+            {
+                "expression": "{Unifi SSH Host:load_avg_15mn.last(#1)}>{Unifi SSH Host:ssh.run[nproc].last(#1)}",
+                "name": "Load average is high: {Unifi SSH Host:load_avg_15mn.last(#1)}",
+                "priority": "WARNING"
             },
             {
                 "expression": "{Unifi Protect Cloud Key:IpExtInOctets.avg(3600s)} < {Unifi Protect Cloud Key:incoming_bandwidth_moving_average_threshold.last(#1)}",
@@ -5335,6 +5450,28 @@
                         "item": {
                             "host": "UBNT Airmax",
                             "key": "wlanTxBandwidthSmooth"
+                        }
+                    }
+                ]
+            },
+            {
+                "name": "Charge and Voltage",
+                "graph_items": [
+                    {
+                        "sortorder": "1",
+                        "color": "1A7C11",
+                        "yaxisside": "RIGHT",
+                        "item": {
+                            "host": "SunMAX SolarPoint",
+                            "key": "batteryCharge"
+                        }
+                    },
+                    {
+                        "sortorder": "2",
+                        "color": "F63100",
+                        "item": {
+                            "host": "SunMAX SolarPoint",
+                            "key": "batteryVoltage"
                         }
                     }
                 ]
@@ -5516,14 +5653,30 @@
                 ]
             },
             {
-                "name": "Load Average",
+                "name": "Load Averages",
                 "graph_items": [
                     {
                         "sortorder": "1",
                         "color": "1A7C11",
                         "item": {
-                            "host": "Unifi Switch",
-                            "key": "loadavg_smooth"
+                            "host": "Unifi SSH Host",
+                            "key": "load_avg_1mn"
+                        }
+                    },
+                    {
+                        "sortorder": "2",
+                        "color": "F63100",
+                        "item": {
+                            "host": "Unifi SSH Host",
+                            "key": "load_avg_15mn"
+                        }
+                    },
+                    {
+                        "sortorder": "3",
+                        "color": "2774A4",
+                        "item": {
+                            "host": "Unifi SSH Host",
+                            "key": "load_avg_5mn"
                         }
                     }
                 ]
