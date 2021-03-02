@@ -91,7 +91,7 @@ For managed devices (APs, Switches), the Unifi controller has handy UI to instal
 
 for UDMPs and AirMax devices, you will need to do it by hand.  *ssh-copy-id* helps there, esp. on the UDMP since those will embarrasingly wipe all your keys at every firmware update and reboot (seriously UBNT):  
 
-	sudo -u zabbix ssh-copy-id -i <path_to_your_privateKey> yourUserName@oneOfYouUnifiDevicesIP
+	sudo -u zabbix ssh-copy-id -i <path_to_your_privateKey> yourUserName@oneOfYourUnifiDevicesIP
 
 I have a more sophisticated script I use to do this at https://github.com/patricegautier/certRenewalScripts/blob/master/updatePublicKey.sh
 
