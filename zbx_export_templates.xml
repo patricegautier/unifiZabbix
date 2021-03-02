@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.2</version>
-    <date>2021-02-26T01:26:23Z</date>
+    <date>2021-03-02T02:31:17Z</date>
     <groups>
         <group>
             <name>Patrice</name>
@@ -2550,11 +2550,19 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                     <key>load_avg_1mn</key>
                     <delay>0</delay>
                     <value_type>FLOAT</value_type>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                        <application>
+                            <name>Performance</name>
+                        </application>
+                    </applications>
                     <preprocessing>
                         <step>
                             <type>REGEX</type>
                             <parameters>
-                                <parameter>.*load average: ([0-9]([.][0-9]+))</parameter>
+                                <parameter>.*load average: ([0-9]+([.][0-9]+))</parameter>
                                 <parameter>\1</parameter>
                             </parameters>
                         </step>
@@ -2599,11 +2607,19 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                     <key>load_avg_5mn</key>
                     <delay>0</delay>
                     <value_type>FLOAT</value_type>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                        <application>
+                            <name>Performance</name>
+                        </application>
+                    </applications>
                     <preprocessing>
                         <step>
                             <type>REGEX</type>
                             <parameters>
-                                <parameter>.*load average: .*, ([0-9]([.][0-9]+))</parameter>
+                                <parameter>.*load average: .*, ([0-9]+([.][0-9]+))</parameter>
                                 <parameter>\1</parameter>
                             </parameters>
                         </step>
@@ -2618,11 +2634,19 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                     <key>load_avg_15mn</key>
                     <delay>0</delay>
                     <value_type>FLOAT</value_type>
+                    <applications>
+                        <application>
+                            <name>Host</name>
+                        </application>
+                        <application>
+                            <name>Performance</name>
+                        </application>
+                    </applications>
                     <preprocessing>
                         <step>
                             <type>REGEX</type>
                             <parameters>
-                                <parameter>.*load average: .*,.*, ([0-9]([.][0-9]+))</parameter>
+                                <parameter>.*load average: .*,.*, ([0-9]+([.][0-9]+))</parameter>
                                 <parameter>\1</parameter>
                             </parameters>
                         </step>
@@ -2699,28 +2723,6 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                     <applications>
                         <application>
                             <name>Network</name>
-                        </application>
-                    </applications>
-                </item>
-                <item>
-                    <name>mpstat</name>
-                    <type>SSH</type>
-                    <key>ssh.run[mpstat]</key>
-                    <delay>1d</delay>
-                    <trends>0</trends>
-                    <status>DISABLED</status>
-                    <value_type>TEXT</value_type>
-                    <params>mpstat -o JSON 1 1 | sed 's/&quot;cpu-load&quot;/&quot;cpuload&quot;/'</params>
-                    <authtype>PUBLIC_KEY</authtype>
-                    <username>{$UNIFI_USER}</username>
-                    <publickey>{$UNIFI_PUB_KEY}</publickey>
-                    <privatekey>{$UNIFI_PRIV_KEY}</privatekey>
-                    <applications>
-                        <application>
-                            <name>Host</name>
-                        </application>
-                        <application>
-                            <name>Performance</name>
                         </application>
                     </applications>
                 </item>
@@ -2886,18 +2888,6 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                     <master_item>
                         <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;]</key>
                     </master_item>
-                </item>
-                <item>
-                    <name>Load Average Smooth</name>
-                    <type>CALCULATED</type>
-                    <key>loadavg_smooth</key>
-                    <value_type>FLOAT</value_type>
-                    <params>avg(loadavg_1,{$UNIFI_SMOOTHING_COUNT})</params>
-                    <applications>
-                        <application>
-                            <name>Host</name>
-                        </application>
-                    </applications>
                 </item>
                 <item>
                     <name>Max Total Power</name>
@@ -3804,95 +3794,6 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                     </applications>
                 </item>
                 <item>
-                    <name>Load Average 1mn</name>
-                    <type>DEPENDENT</type>
-                    <key>loadavg_1</key>
-                    <delay>0</delay>
-                    <value_type>FLOAT</value_type>
-                    <applications>
-                        <application>
-                            <name>Host</name>
-                        </application>
-                    </applications>
-                    <preprocessing>
-                        <step>
-                            <type>JSONPATH</type>
-                            <parameters>
-                                <parameter>$.sys_stats.loadavg_1</parameter>
-                            </parameters>
-                        </step>
-                    </preprocessing>
-                    <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;]</key>
-                    </master_item>
-                </item>
-                <item>
-                    <name>Load Average 5mn</name>
-                    <type>DEPENDENT</type>
-                    <key>loadavg_5</key>
-                    <delay>0</delay>
-                    <value_type>FLOAT</value_type>
-                    <applications>
-                        <application>
-                            <name>Host</name>
-                        </application>
-                    </applications>
-                    <preprocessing>
-                        <step>
-                            <type>JSONPATH</type>
-                            <parameters>
-                                <parameter>$.sys_stats.loadavg_5</parameter>
-                            </parameters>
-                        </step>
-                    </preprocessing>
-                    <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;]</key>
-                    </master_item>
-                </item>
-                <item>
-                    <name>Load Average 15mn</name>
-                    <type>DEPENDENT</type>
-                    <key>loadavg_15</key>
-                    <delay>0</delay>
-                    <value_type>FLOAT</value_type>
-                    <applications>
-                        <application>
-                            <name>Host</name>
-                        </application>
-                    </applications>
-                    <preprocessing>
-                        <step>
-                            <type>JSONPATH</type>
-                            <parameters>
-                                <parameter>$.sys_stats.loadavg_15</parameter>
-                            </parameters>
-                        </step>
-                    </preprocessing>
-                    <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;]</key>
-                    </master_item>
-                    <triggers>
-                        <trigger>
-                            <expression>{avg(1)}&gt;4</expression>
-                            <name>{HOST.NAME} high load average</name>
-                            <priority>WARNING</priority>
-                            <manual_close>YES</manual_close>
-                        </trigger>
-                    </triggers>
-                </item>
-                <item>
-                    <name>Load Average Smooth</name>
-                    <type>CALCULATED</type>
-                    <key>loadavg_smooth</key>
-                    <value_type>FLOAT</value_type>
-                    <params>avg(loadavg_1,{$UNIFI_SMOOTHING_PERIOD})</params>
-                    <applications>
-                        <application>
-                            <name>Host</name>
-                        </application>
-                    </applications>
-                </item>
-                <item>
                     <name>Port 53 Abuser Request Raw</name>
                     <type>ZABBIX_ACTIVE</type>
                     <key>logrt[&quot;/mnt/data/log/messages(\.[0-9])?&quot;,&quot;user.warn kernel.*SRC=(([0-9]{1,3}\.){3}[0-9]{1,3}) DST=(([0-9]{1,3}\.){3}[0-9]{1,3}).*DPT=8?53 .*&quot;,,,,&quot;[ { \&quot;ip\&quot;: \&quot;\1\&quot;, \&quot;dns_server\&quot;:\&quot;\3\&quot; } ]&quot;]</key>
@@ -4651,87 +4552,6 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                     </master_item>
                 </item>
                 <item>
-                    <name>Load Average 1mn</name>
-                    <type>DEPENDENT</type>
-                    <key>loadavg_1</key>
-                    <delay>0</delay>
-                    <value_type>FLOAT</value_type>
-                    <applications>
-                        <application>
-                            <name>Host</name>
-                        </application>
-                    </applications>
-                    <preprocessing>
-                        <step>
-                            <type>JSONPATH</type>
-                            <parameters>
-                                <parameter>$.sys_stats.loadavg_1</parameter>
-                            </parameters>
-                        </step>
-                    </preprocessing>
-                    <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;]</key>
-                    </master_item>
-                </item>
-                <item>
-                    <name>Load Average 5mn</name>
-                    <type>DEPENDENT</type>
-                    <key>loadavg_5</key>
-                    <delay>0</delay>
-                    <value_type>FLOAT</value_type>
-                    <applications>
-                        <application>
-                            <name>Host</name>
-                        </application>
-                    </applications>
-                    <preprocessing>
-                        <step>
-                            <type>JSONPATH</type>
-                            <parameters>
-                                <parameter>$.sys_stats.loadavg_5</parameter>
-                            </parameters>
-                        </step>
-                    </preprocessing>
-                    <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;]</key>
-                    </master_item>
-                </item>
-                <item>
-                    <name>Load Average 15mn</name>
-                    <type>DEPENDENT</type>
-                    <key>loadavg_15</key>
-                    <delay>0</delay>
-                    <value_type>FLOAT</value_type>
-                    <applications>
-                        <application>
-                            <name>Host</name>
-                        </application>
-                    </applications>
-                    <preprocessing>
-                        <step>
-                            <type>JSONPATH</type>
-                            <parameters>
-                                <parameter>$.sys_stats.loadavg_15</parameter>
-                            </parameters>
-                        </step>
-                    </preprocessing>
-                    <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;]</key>
-                    </master_item>
-                </item>
-                <item>
-                    <name>Load Average Smooth</name>
-                    <type>CALCULATED</type>
-                    <key>loadavg_smooth</key>
-                    <value_type>FLOAT</value_type>
-                    <params>avg(loadavg_1,{$UNIFI_SMOOTHING_COUNT})</params>
-                    <applications>
-                        <application>
-                            <name>Host</name>
-                        </application>
-                    </applications>
-                </item>
-                <item>
                     <name>mca-dump</name>
                     <type>EXTERNAL</type>
                     <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;]</key>
@@ -5307,11 +5127,6 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
             </dependencies>
         </trigger>
         <trigger>
-            <expression>{Unifi SSH Host:load_avg_15mn.last(#1)}&gt;{Unifi SSH Host:ssh.run[nproc].last(#1)}</expression>
-            <name>Load average is high: {Unifi SSH Host:load_avg_15mn.last(#1)}</name>
-            <priority>WARNING</priority>
-        </trigger>
-        <trigger>
             <expression>{Unifi Protect Cloud Key:IpExtInOctets.avg(3600s)} &lt; {Unifi Protect Cloud Key:incoming_bandwidth_moving_average_threshold.last(#1)}</expression>
             <name>{HOST.NAME} Incoming Bandwidth Too Low</name>
             <priority>WARNING</priority>
@@ -5327,6 +5142,24 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
             <expression>{Unifi Protect NVR4:ssh.run[temp1].last(#1)}&gt;{$UNIFI_ALERT_TEMP} or {Unifi Protect NVR4:ssh.run[temp2].last(#1)}&gt;{$UNIFI_ALERT_TEMP} or {Unifi Protect NVR4:ssh.run[temp3].last(#1)}&gt;{$UNIFI_ALERT_TEMP}</expression>
             <name>{HOST.NAME} is hot</name>
             <priority>WARNING</priority>
+        </trigger>
+        <trigger>
+            <expression>{Unifi SSH Host:load_avg_15mn.last(#1)}&gt;{Unifi SSH Host:ssh.run[nproc].last(#1)}</expression>
+            <name>{HOST.NAME} Load average is &gt; 1 per processor</name>
+            <priority>INFO</priority>
+            <manual_close>YES</manual_close>
+            <dependencies>
+                <dependency>
+                    <name>{HOST.NAME} load average is &gt; 2 per processor</name>
+                    <expression>{Unifi SSH Host:load_avg_15mn.last(#1)}&gt;{Unifi SSH Host:ssh.run[nproc].last(#1)}*2</expression>
+                </dependency>
+            </dependencies>
+        </trigger>
+        <trigger>
+            <expression>{Unifi SSH Host:load_avg_15mn.last(#1)}&gt;{Unifi SSH Host:ssh.run[nproc].last(#1)}*2</expression>
+            <name>{HOST.NAME} load average is &gt; 2 per processor</name>
+            <priority>WARNING</priority>
+            <manual_close>YES</manual_close>
         </trigger>
     </triggers>
     <graphs>
@@ -5637,48 +5470,6 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                     <item>
                         <host>Unifi UDMP</host>
                         <key>wan_latency</key>
-                    </item>
-                </graph_item>
-            </graph_items>
-        </graph>
-        <graph>
-            <name>Load Average</name>
-            <graph_items>
-                <graph_item>
-                    <sortorder>1</sortorder>
-                    <color>1A7C11</color>
-                    <item>
-                        <host>Unifi UDMP</host>
-                        <key>loadavg_1</key>
-                    </item>
-                </graph_item>
-                <graph_item>
-                    <sortorder>2</sortorder>
-                    <color>F63100</color>
-                    <item>
-                        <host>Unifi UDMP</host>
-                        <key>loadavg_5</key>
-                    </item>
-                </graph_item>
-                <graph_item>
-                    <sortorder>3</sortorder>
-                    <color>2774A4</color>
-                    <item>
-                        <host>Unifi UDMP</host>
-                        <key>loadavg_15</key>
-                    </item>
-                </graph_item>
-            </graph_items>
-        </graph>
-        <graph>
-            <name>Load Average</name>
-            <graph_items>
-                <graph_item>
-                    <sortorder>1</sortorder>
-                    <color>1A7C11</color>
-                    <item>
-                        <host>Unifi USG</host>
-                        <key>loadavg_smooth</key>
                     </item>
                 </graph_item>
             </graph_items>
