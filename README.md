@@ -93,7 +93,7 @@ for UDMPs and AirMax devices, you will need to do it by hand.  *ssh-copy-id* hel
 
 	sudo -u zabbix ssh-copy-id -i <path_to_your_privateKey> yourUserName@oneOfYouUnifiDevicesIP
 
-I have a slightly more sophisticated script I use to do this at https://github.com/patricegautier/certRenewalScripts/blob/master/updatePublicKey.sh)
+I have a more sophisticated script I use to do this at https://github.com/patricegautier/certRenewalScripts/blob/master/updatePublicKey.sh
 
 
 3/ So now check that your zabbix server can actually get in with SSH with:
