@@ -67,6 +67,8 @@ These templates use public key SSH to access APs, Switches, Routers, AirMax stat
 
 1/ You should generate a new key pair for this.  
 
+The templates are set up to work with a public-private key pair.   For a primer on that you can check out for ex https://www.redhat.com/sysadmin/passwordless-ssh.  Since you need zabbix to be able to use those without you in front of the keyboard, you need an empty passphrase.
+
 Zabbix is finicky and this is the specific way I needed to run the generation get a workable keypair (no passphrase, pem format). From your Zabbix server, run:
 
 	sudo -u zabbix ssh-keygen -P "" -t rsa  -m pem -f zb_id_rsa
@@ -81,17 +83,22 @@ put that keypair somewhere on your zabbix server (I put it in ~/.ssh/zabbix/).  
 
 2/ You will need to specifically enable SSH access on the unifi devices.  
 
-There is one setting in the Unifi controller UI for devices at large in Settings > Site and one for the UDMP in the UDMP advanced settings which is separate.  The controller has handy UI to install your public key on all the devices.
+For most devices,  there is one setting in the Unifi controller UI in Settings > Site and one for the UDMP in the UDMP advanced settings which is separate.  
+
+3/ You then need to send your public key to all the devices you want to monitor
+ 
+For managed devices (APs, Switches), the Unifi controller has handy UI to install your public key on all the devices.
 
 for UDMPs and AirMax devices, you will need to do it by hand.  *ssh-copy-id* helps there, esp. on the UDMP since those will embarrasingly wipe all your keys at every firmware update and reboot (seriously UBNT):  
 
 	sudo -u zabbix ssh-copy-id -i <path_to_your_privateKey> yourUserName@oneOfYouUnifiDevicesIP
 
-(I have a slightly more sophisticated script to do this at https://github.com/patricegautier/certRenewalScripts/blob/master/updatePublicKey.sh)
+I have a slightly more sophisticated script I use to do this at https://github.com/patricegautier/certRenewalScripts/blob/master/updatePublicKey.sh)
+
 
 3/ So now check that your zabbix server can actually get in with SSH with:
 
-	sudo -u zabbix ssh -i <fullPathToYourPrivateKey> yourUserName@oneOfYouUnifiDevicesIP
+	sudo -u zabbix ssh -i <fullPathToYourPrivateKey> yourUserName@oneOfYourUnifiDevicesIP
   
 If you are set up correctly that should get you in *without asking for a password*
 
