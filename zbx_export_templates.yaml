@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2021-03-02T02:31:14Z'
+  date: '2021-03-03T06:25:37Z'
   groups:
     -
       name: Patrice
@@ -1905,7 +1905,7 @@ zabbix_export:
             -
               type: REGEX
               parameters:
-                - '.*load average: .*, ([0-9]+([.][0-9]+))'
+                - '.*load average: [^ ]*, ([0-9]+([.][0-9]+))'
                 - \1
           master_item:
             key: 'ssh.run[uptime]'
@@ -1924,7 +1924,7 @@ zabbix_export:
             -
               type: REGEX
               parameters:
-                - '.*load average: .*,.*, ([0-9]+([.][0-9]+))'
+                - '.*load average: .*, .*, ([0-9]+([.][0-9]+))'
                 - \1
           master_item:
             key: 'ssh.run[uptime]'
