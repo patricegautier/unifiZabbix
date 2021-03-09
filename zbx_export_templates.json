@@ -1,7 +1,7 @@
 {
     "zabbix_export": {
         "version": "5.2",
-        "date": "2021-03-09T05:17:10Z",
+        "date": "2021-03-09T22:39:22Z",
         "groups": [
             {
                 "name": "Patrice"
@@ -1742,6 +1742,16 @@
                                 "error_handler": "DISCARD_VALUE"
                             }
                         ]
+                    }
+                ],
+                "macros": [
+                    {
+                        "macro": "{$UNIFI_LOAD_AVERAGE_HIGH}",
+                        "value": "4"
+                    },
+                    {
+                        "macro": "{$UNIFI_LOAD_AVERAGE_MEDIUM}",
+                        "value": "3"
                     }
                 ]
             },
@@ -3502,6 +3512,16 @@
                             }
                         ]
                     }
+                ],
+                "macros": [
+                    {
+                        "macro": "{$UNIFI_LOAD_AVERAGE_HIGH}",
+                        "value": "5"
+                    },
+                    {
+                        "macro": "{$UNIFI_LOAD_AVERAGE_MEDIUM}",
+                        "value": "4"
+                    }
                 ]
             },
             {
@@ -5127,22 +5147,22 @@
                 "priority": "WARNING"
             },
             {
-                "expression": "{Unifi SSH Host:load_avg_15mn.last(#1)}>{Unifi SSH Host:ssh.run[nproc].last(#1)}",
-                "name": "{HOST.NAME} Load average is > 1 per processor",
+                "expression": "{Unifi SSH Host:load_avg_15mn.last(#1)}>{Unifi SSH Host:ssh.run[nproc].last(#1)}*{$UNIFI_LOAD_AVERAGE_HIGH}",
+                "name": "{HOST.NAME} load average is > {$UNIFI_LOAD_AVERAGE_HIGH} per processor",
+                "priority": "WARNING",
+                "manual_close": "YES"
+            },
+            {
+                "expression": "{Unifi SSH Host:load_avg_15mn.last(#1)}>{Unifi SSH Host:ssh.run[nproc].last(#1)}*{$UNIFI_LOAD_AVERAGE_MEDIUM}",
+                "name": "{HOST.NAME} Load average is > {$UNIFI_LOAD_AVERAGE_MEDIUM} per processor",
                 "priority": "INFO",
                 "manual_close": "YES",
                 "dependencies": [
                     {
-                        "name": "{HOST.NAME} load average is > 2 per processor",
-                        "expression": "{Unifi SSH Host:load_avg_15mn.last(#1)}>{Unifi SSH Host:ssh.run[nproc].last(#1)}*2"
+                        "name": "{HOST.NAME} load average is > {$UNIFI_LOAD_AVERAGE_HIGH} per processor",
+                        "expression": "{Unifi SSH Host:load_avg_15mn.last(#1)}>{Unifi SSH Host:ssh.run[nproc].last(#1)}*{$UNIFI_LOAD_AVERAGE_HIGH}"
                     }
                 ]
-            },
-            {
-                "expression": "{Unifi SSH Host:load_avg_15mn.last(#1)}>{Unifi SSH Host:ssh.run[nproc].last(#1)}*2",
-                "name": "{HOST.NAME} load average is > 2 per processor",
-                "priority": "WARNING",
-                "manual_close": "YES"
             }
         ],
         "graphs": [

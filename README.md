@@ -162,6 +162,12 @@ The threshold of camera outoing bandwidth below which to alert.  I have this set
 ### {$UNIFI_SMOOTHING_PERIOD}
 I have defined some moving average items with the suffix _smooth to help make graphs easier to read.  This is set to '10m' for me.
 
+### {$UNIFI_LOAD_AVERAGE_MEDIUM}
+The load average value above which to issue a info.  The consensus is 1 for this.  Note that for switches and APs this value has less meaning since they process packets with specialized HW and this macro is overridden in the template to avoid too many warnings
+
+### {$UNIFI_LOAD_AVERAGE_HIGH}
+The load average value above which to issue a warning.  I have this set to 2.  Note that for switches and APs this value has less meaning since they process packets with specialized HW and this macro is overridden in the template to avoid too many warnings
+
 
 
 # SUCCESS!

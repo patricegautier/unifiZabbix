@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.2</version>
-    <date>2021-03-09T05:17:07Z</date>
+    <date>2021-03-09T22:39:19Z</date>
     <groups>
         <group>
             <name>Patrice</name>
@@ -1746,6 +1746,16 @@ Assign this template to all APs in your site</description>
                     </preprocessing>
                 </discovery_rule>
             </discovery_rules>
+            <macros>
+                <macro>
+                    <macro>{$UNIFI_LOAD_AVERAGE_HIGH}</macro>
+                    <value>4</value>
+                </macro>
+                <macro>
+                    <macro>{$UNIFI_LOAD_AVERAGE_MEDIUM}</macro>
+                    <value>3</value>
+                </macro>
+            </macros>
         </template>
         <template>
             <template>Unifi Protect Camera</template>
@@ -3534,6 +3544,16 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                     </preprocessing>
                 </discovery_rule>
             </discovery_rules>
+            <macros>
+                <macro>
+                    <macro>{$UNIFI_LOAD_AVERAGE_HIGH}</macro>
+                    <value>5</value>
+                </macro>
+                <macro>
+                    <macro>{$UNIFI_LOAD_AVERAGE_MEDIUM}</macro>
+                    <value>4</value>
+                </macro>
+            </macros>
         </template>
         <template>
             <template>Unifi UDMP</template>
@@ -5158,22 +5178,22 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
             <priority>WARNING</priority>
         </trigger>
         <trigger>
-            <expression>{Unifi SSH Host:load_avg_15mn.last(#1)}&gt;{Unifi SSH Host:ssh.run[nproc].last(#1)}</expression>
-            <name>{HOST.NAME} Load average is &gt; 1 per processor</name>
+            <expression>{Unifi SSH Host:load_avg_15mn.last(#1)}&gt;{Unifi SSH Host:ssh.run[nproc].last(#1)}*{$UNIFI_LOAD_AVERAGE_HIGH}</expression>
+            <name>{HOST.NAME} load average is &gt; {$UNIFI_LOAD_AVERAGE_HIGH} per processor</name>
+            <priority>WARNING</priority>
+            <manual_close>YES</manual_close>
+        </trigger>
+        <trigger>
+            <expression>{Unifi SSH Host:load_avg_15mn.last(#1)}&gt;{Unifi SSH Host:ssh.run[nproc].last(#1)}*{$UNIFI_LOAD_AVERAGE_MEDIUM}</expression>
+            <name>{HOST.NAME} Load average is &gt; {$UNIFI_LOAD_AVERAGE_MEDIUM} per processor</name>
             <priority>INFO</priority>
             <manual_close>YES</manual_close>
             <dependencies>
                 <dependency>
-                    <name>{HOST.NAME} load average is &gt; 2 per processor</name>
-                    <expression>{Unifi SSH Host:load_avg_15mn.last(#1)}&gt;{Unifi SSH Host:ssh.run[nproc].last(#1)}*2</expression>
+                    <name>{HOST.NAME} load average is &gt; {$UNIFI_LOAD_AVERAGE_HIGH} per processor</name>
+                    <expression>{Unifi SSH Host:load_avg_15mn.last(#1)}&gt;{Unifi SSH Host:ssh.run[nproc].last(#1)}*{$UNIFI_LOAD_AVERAGE_HIGH}</expression>
                 </dependency>
             </dependencies>
-        </trigger>
-        <trigger>
-            <expression>{Unifi SSH Host:load_avg_15mn.last(#1)}&gt;{Unifi SSH Host:ssh.run[nproc].last(#1)}*2</expression>
-            <name>{HOST.NAME} load average is &gt; 2 per processor</name>
-            <priority>WARNING</priority>
-            <manual_close>YES</manual_close>
         </trigger>
     </triggers>
     <graphs>
