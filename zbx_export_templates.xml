@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.2</version>
-    <date>2021-03-03T06:25:41Z</date>
+    <date>2021-03-09T05:17:07Z</date>
     <groups>
         <group>
             <name>Patrice</name>
@@ -913,8 +913,8 @@ Assign this template to all APs in your site</description>
                     </applications>
                     <triggers>
                         <trigger>
-                            <expression>{avg({$UNIFI_ALERT_PERIOD})}&gt;40</expression>
-                            <name>{HOST.NAME} 2G Interference &gt; 40%</name>
+                            <expression>{avg({$UNIFI_ALERT_PERIOD})}&gt;50</expression>
+                            <name>{HOST.NAME} 2G Interference &gt; 50%</name>
                             <priority>AVERAGE</priority>
                             <manual_close>YES</manual_close>
                         </trigger>
@@ -959,8 +959,8 @@ Assign this template to all APs in your site</description>
                     </applications>
                     <triggers>
                         <trigger>
-                            <expression>{avg({$UNIFI_ALERT_PERIOD})}&gt;20</expression>
-                            <name>{HOST.NAME} 5G Interference &gt; 20%</name>
+                            <expression>{avg({$UNIFI_ALERT_PERIOD})}&gt;30</expression>
+                            <name>{HOST.NAME} 5G Interference &gt; 30%</name>
                             <priority>AVERAGE</priority>
                             <manual_close>YES</manual_close>
                         </trigger>
@@ -1158,8 +1158,8 @@ Assign this template to all APs in your site</description>
                     </master_item>
                     <triggers>
                         <trigger>
-                            <expression>{avg({$UNIFI_ALERT_PERIOD})}&gt;50</expression>
-                            <name>{HOST.NAME} 2G Channel Usage &gt; 50%</name>
+                            <expression>{avg({$UNIFI_ALERT_PERIOD})}&gt;60</expression>
+                            <name>{HOST.NAME} 2G Channel Usage &gt; 60%</name>
                             <priority>INFO</priority>
                             <manual_close>YES</manual_close>
                             <dependencies>
@@ -1201,8 +1201,8 @@ Assign this template to all APs in your site</description>
                     </master_item>
                     <triggers>
                         <trigger>
-                            <expression>{avg({$UNIFI_ALERT_PERIOD})}&gt;50</expression>
-                            <name>{HOST.NAME} 5G Channel Usage &gt; 50%</name>
+                            <expression>{avg({$UNIFI_ALERT_PERIOD})}&gt;60</expression>
+                            <name>{HOST.NAME} 5G Channel Usage &gt; 60%</name>
                             <priority>INFO</priority>
                             <manual_close>YES</manual_close>
                             <dependencies>
@@ -1425,8 +1425,8 @@ Assign this template to all APs in your site</description>
                     </master_item>
                     <triggers>
                         <trigger>
-                            <expression>{avg({$UNIFI_ALERT_PERIOD})}&lt;80</expression>
-                            <name>{HOST.NAME} Satisfaction &lt; 80 %</name>
+                            <expression>{avg({$UNIFI_ALERT_PERIOD})}&lt;70</expression>
+                            <name>{HOST.NAME} Satisfaction &lt; 70 %</name>
                             <priority>INFO</priority>
                             <manual_close>YES</manual_close>
                         </trigger>
@@ -2646,7 +2646,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         <step>
                             <type>REGEX</type>
                             <parameters>
-                                <parameter>.*load average: .*, .*, ([0-9]+([.][0-9]+))</parameter>
+                                <parameter>.*load average: [^ ]*, [^ ]*, ([0-9]+([.][0-9]+))</parameter>
                                 <parameter>\1</parameter>
                             </parameters>
                         </step>
@@ -2746,12 +2746,24 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                             <name>Host</name>
                         </application>
                     </applications>
+                    <preprocessing>
+                        <step>
+                            <type>REGEX</type>
+                            <parameters>
+                                <parameter>[0-9]</parameter>
+                                <parameter>\0</parameter>
+                            </parameters>
+                            <error_handler>CUSTOM_VALUE</error_handler>
+                            <error_handler_params>1</error_handler_params>
+                        </step>
+                    </preprocessing>
                 </item>
                 <item>
                     <name>uname</name>
                     <type>SSH</type>
                     <key>ssh.run[uname]</key>
-                    <delay>1d</delay>
+                    <delay>1h</delay>
+                    <history>7d</history>
                     <trends>0</trends>
                     <value_type>CHAR</value_type>
                     <params>uname -a</params>
@@ -4225,6 +4237,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                     <type>DEPENDENT</type>
                     <key>port_53_abuser_discovery</key>
                     <delay>0</delay>
+                    <lifetime>2d</lifetime>
                     <item_prototypes>
                         <item_prototype>
                             <name>Hourly Port 53 Requests from {#ABUSER}</name>
@@ -4258,6 +4271,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                     <type>DEPENDENT</type>
                     <key>port_53_dns_server_discovery</key>
                     <delay>0</delay>
+                    <lifetime>2d</lifetime>
                     <item_prototypes>
                         <item_prototype>
                             <name>Hourly Port 53 Requests to {#DNS_SERVER}</name>

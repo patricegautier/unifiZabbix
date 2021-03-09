@@ -1,7 +1,7 @@
 {
     "zabbix_export": {
         "version": "5.2",
-        "date": "2021-03-03T06:25:43Z",
+        "date": "2021-03-09T05:17:10Z",
         "groups": [
             {
                 "name": "Patrice"
@@ -911,8 +911,8 @@
                         ],
                         "triggers": [
                             {
-                                "expression": "{avg({$UNIFI_ALERT_PERIOD})}>40",
-                                "name": "{HOST.NAME} 2G Interference > 40%",
+                                "expression": "{avg({$UNIFI_ALERT_PERIOD})}>50",
+                                "name": "{HOST.NAME} 2G Interference > 50%",
                                 "priority": "AVERAGE",
                                 "manual_close": "YES"
                             }
@@ -957,8 +957,8 @@
                         ],
                         "triggers": [
                             {
-                                "expression": "{avg({$UNIFI_ALERT_PERIOD})}>20",
-                                "name": "{HOST.NAME} 5G Interference > 20%",
+                                "expression": "{avg({$UNIFI_ALERT_PERIOD})}>30",
+                                "name": "{HOST.NAME} 5G Interference > 30%",
                                 "priority": "AVERAGE",
                                 "manual_close": "YES"
                             }
@@ -1156,8 +1156,8 @@
                         },
                         "triggers": [
                             {
-                                "expression": "{avg({$UNIFI_ALERT_PERIOD})}>50",
-                                "name": "{HOST.NAME} 2G Channel Usage > 50%",
+                                "expression": "{avg({$UNIFI_ALERT_PERIOD})}>60",
+                                "name": "{HOST.NAME} 2G Channel Usage > 60%",
                                 "priority": "INFO",
                                 "manual_close": "YES",
                                 "dependencies": [
@@ -1199,8 +1199,8 @@
                         },
                         "triggers": [
                             {
-                                "expression": "{avg({$UNIFI_ALERT_PERIOD})}>50",
-                                "name": "{HOST.NAME} 5G Channel Usage > 50%",
+                                "expression": "{avg({$UNIFI_ALERT_PERIOD})}>60",
+                                "name": "{HOST.NAME} 5G Channel Usage > 60%",
                                 "priority": "INFO",
                                 "manual_close": "YES",
                                 "dependencies": [
@@ -1423,8 +1423,8 @@
                         },
                         "triggers": [
                             {
-                                "expression": "{avg({$UNIFI_ALERT_PERIOD})}<80",
-                                "name": "{HOST.NAME} Satisfaction < 80 %",
+                                "expression": "{avg({$UNIFI_ALERT_PERIOD})}<70",
+                                "name": "{HOST.NAME} Satisfaction < 70 %",
                                 "priority": "INFO",
                                 "manual_close": "YES"
                             }
@@ -2615,7 +2615,7 @@
                             {
                                 "type": "REGEX",
                                 "parameters": [
-                                    ".*load average: .*, .*, ([0-9]+([.][0-9]+))",
+                                    ".*load average: [^ ]*, [^ ]*, ([0-9]+([.][0-9]+))",
                                     "\\1"
                                 ]
                             }
@@ -2714,13 +2714,25 @@
                             {
                                 "name": "Host"
                             }
+                        ],
+                        "preprocessing": [
+                            {
+                                "type": "REGEX",
+                                "parameters": [
+                                    "[0-9]",
+                                    "\\0"
+                                ],
+                                "error_handler": "CUSTOM_VALUE",
+                                "error_handler_params": "1"
+                            }
                         ]
                     },
                     {
                         "name": "uname",
                         "type": "SSH",
                         "key": "ssh.run[uname]",
-                        "delay": "1d",
+                        "delay": "1h",
+                        "history": "7d",
                         "trends": "0",
                         "value_type": "CHAR",
                         "params": "uname -a",
@@ -4194,6 +4206,7 @@
                         "type": "DEPENDENT",
                         "key": "port_53_abuser_discovery",
                         "delay": "0",
+                        "lifetime": "2d",
                         "item_prototypes": [
                             {
                                 "name": "Hourly Port 53 Requests from {#ABUSER}",
@@ -4227,6 +4240,7 @@
                         "type": "DEPENDENT",
                         "key": "port_53_dns_server_discovery",
                         "delay": "0",
+                        "lifetime": "2d",
                         "item_prototypes": [
                             {
                                 "name": "Hourly Port 53 Requests to {#DNS_SERVER}",
