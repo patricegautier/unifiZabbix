@@ -53,7 +53,7 @@ You should now have the following templates available, and it should be pretty s
 	Unifi SSH Host
 
 
-• You will need to assign the templates with the matching type to hosts with the proper IP/fqdn that you have created in Zabbix.
+• You will need to assign the templates with the matching type to hosts you have to create in Zabbix for your unifi devices.  Use the 'Agent' interface in Zabbix with the proper IP or DNS entry.
 
 A couple of things on top of that:
 
