@@ -108,6 +108,8 @@ You can also check that the script used to retrieve data is working correctly fo
 
 You should get a JSON document in return.
 
+If you use a Zabbix proxy, it will initiate the connection to the hosts it monitors, so you need to run those tests there.
+
 
 4/ You then need to point Zabbix to those keys.  
 
