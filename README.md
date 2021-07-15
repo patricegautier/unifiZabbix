@@ -2,14 +2,14 @@
 
 This projet contains a collection of Templates to monitor Unifi and other UBNT devices with Zabbix: APs, Switches, Routers (USG and UDMP), AirMax devices, and NVRs
 
-I am currently running those on the current versions of the base software as of Dec 2020: Zabbix 5.2, a mix of Unifi 4.x and 5.x APs and switches, AirMax 8.7.1, UDMP 1.8.3, controller 6.0.41
+I am currently running those on the current versions of the base software as of July 2021: Zabbix 5.4.2, a mix of Unifi 4.x, 5.x and 6.x APs and switches, AirMax 8.7.1, UDMP 1.10.3, controller 6.3.x
 
 
 # Setup
 
-## Zabbix 5.2 
+## Zabbix 5.4 
 
-given I am exporting those templates from 5.2.3 as of now, you will need 5.2 minimum to be able to import the templates. 
+given I am exporting those templates from 5.4.2 as of now and it has a new expression syntax compared to 5.2, you will need 5.4 minimum to be able to import the templates. 
 
 
 ## Install jq on your Zabbix server
