@@ -53,13 +53,13 @@ You should now have the following templates available, and it should be pretty s
 	Unifi SSH Host
 
 
-• You will need to assign the templates with the matching type to hosts with the proper IP/fqdn that you have created in Zabbix.
+• You will need to assign the templates with the matching type to hosts you have to create in Zabbix for your unifi devices.  Use the 'Agent' interface in Zabbix with the proper IP or DNS entry.
 
 A couple of things on top of that:
 
 • Unifi SSH Host: assign that one to all your Unifi infrastructure devices, on top of the template for that specific type.  <i>(In a perfect world, I would have had the specific templates inherit from that one and all the right items appear that way but Zabbix does not support exporting and reimporting a template hierarchy as of 5.2.  Assigning both templates is the work-around)</i>
 
-• Unifi Wifi Site is meant to aggregate WiFi traffic across your wifi networks for a Unifi site.  Just assign it to one of the APs that can see all the networks in question and assign the {$UNIFI_AP_GROUP} macro for that host to the name of a zabbix host group that contains all the APs for that site.
+• Unifi Wifi Site is meant to aggregate WiFi traffic across your wifi networks for a Unifi site.  Just assign it to one of the APs that can see all the networks in question and assign the {$AP_GROUP} macro for that host to the name of a zabbix host group that contains all the APs for that site.
 
 ## Setup SSH from your Zabbix server to your Unifi devices via public/private keypair
 
@@ -107,6 +107,8 @@ You can also check that the script used to retrieve data is working correctly fo
 	sudo -u zabbix /usr/lib/zabbix/externalscripts/mca-dump-short.sh -d <theDeviceIP> -u <yourUnifiUserName> -i <fullPathToYourPrivateKey> -t <UDMP|AP|SWITCH|CK>
 
 You should get a JSON document in return.
+
+If you use a Zabbix proxy, it will initiate the connection to the hosts it monitors, so you need to run those tests there.
 
 
 4/ You then need to point Zabbix to those keys.  
