@@ -71,14 +71,17 @@ The templates are set up to work with a public-private key pair.   For a primer 
 
 Zabbix is finicky and this is the specific way I needed to run the generation get a workable keypair (no passphrase, pem format). From your Zabbix server, run:
 
+	sudo mkdir ~/.ssh/zabbix && sudo chown zabbix ~/.ssh/zabbix && cd ~/.ssh/zabbix
 	sudo -u zabbix ssh-keygen -P "" -t rsa  -m pem -f zb_id_rsa
 
-put that keypair somewhere on your zabbix server (I put it in ~/.ssh/zabbix/).  Check the permissions on those keys and directory.  This is what I have end up with for ex:
+This is what I end up with:
 
 	pi@pi:~/.ssh/zabbix $ ls -l
 	total 20
 	-rw------- 1 zabbix zabbix 1675 Jul 23 18:57 zb_id_rsa
 	-rw-r--r-- 1 zabbix zabbix 391 Jul 23 18:57 zb_id_rsa.pub
+	drwxr-xr-x 2 zabbix zabbix 4096 Sep 13  2020 .
+	drwxr-xr-x 3 pi     pi     4096 Mar  1 13:54 ..
 
 
 2/ You will need to specifically enable SSH access on the unifi devices.  
