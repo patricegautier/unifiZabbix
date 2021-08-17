@@ -265,6 +265,8 @@ This is my set of values
 
 • if some of your items randomly fail with 'Cannot read data from SSH server' (in the UI or in  /var/log/zabbix/zabbix_server.log), the likely culprit is an outdated version of libssh, which sometimes returns an error code even on success.  You have to compile the last version from sources from libssh.org and recompile I'm afraid..  This was a problem on Raspbian buster for libssh 0.8.x and is confirmed fixed with libssh 0.9.5 at least.  
 
+On Raspbian Bullseye you can find libssl at https://packages.debian.org/bullseye/amd64/libssh-4/download
+
 • if you import fails with <i>'Invalid parameter "/interfaceid": cannot be empty.'</i>, it might be caused by the presence of an older version of the templates.  Remove them before re-importing.. 
  
 • SSH to Unifi devices is invoked with the SSH option "-o StrictHostKeyChecking=accept-new" which means it will automatically accept their SSH host key on first connection to that IP or Host Name.  The default SSH setting is to ask for the user's confirmation on first connection but I deemed the extra convenience of not having to do this to be worth it in the context of a Home/Small Business Unifi setup
