@@ -90,13 +90,15 @@ For most devices,  there is one setting in the Unifi controller UI in Settings >
 
 3/ You then need to send your public key to all the devices you want to monitor
  
-For managed devices (APs, Switches), the Unifi controller has handy UI to install your public key on all the devices.
+For managed devices (APs, Switches), the Unifi controller has handy UI to install your public key on all the devices.  This is by far the easiest way to do this.
 
 for UDMPs and AirMax devices, you will need to do it by hand.  *ssh-copy-id* helps there, esp. on the UDMP since those will embarrasingly wipe all your keys at every firmware update and reboot (seriously UBNT):  
 
 	sudo -u zabbix ssh-copy-id -i <path_to_your_privateKey> yourUserName@oneOfYourUnifiDevicesIP
 
 I have a more sophisticated script I use to do this at https://github.com/patricegautier/certRenewalScripts/blob/master/updatePublicKey.sh
+
+IMPORTANT NOTE:  on some Unifi devices (APs and Switches in particular) the authorized keys are stored not in the usual ~/.ssh/authorized_keys, but in ./var/etc/dropbear/authorized_keys.  If you provision those keys from the controller UI or using the updatePublicKey script above it will hit the right spot, but ssh-copy-id will not
 
 
 3/ So now check that your zabbix server can actually get in with SSH with:
