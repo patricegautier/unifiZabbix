@@ -3,11 +3,14 @@
 
 usage()
 {
-	echo "Usage "${0}"  -i privateKeyPath -u user -d targetDevice [-t AP|SWITCH|UDMP|USG|CK]"
-	echo "-i specify private public key pair"
-	echo "-u SSH user name for Unifi device"
-	echo "-d IP or FQDN for Unifi device"
-	echo "-t Unifi device type"
+	cat << EOF
+Usage ${0}  -i privateKeyPath -u user -v -d targetDevice [-t AP|SWITCH|UDMP|USG|CK]
+	-i specify private public key pair
+	-u SSH user name for Unifi device
+	-d IP or FQDN for Unifi device
+	-t Unifi device type
+	-v verbose and non compressed output
+EOF
 	exit 2
 }
 
@@ -28,6 +31,8 @@ if [[ ${DEVICE_TYPE} == 'AP' ]]; then
 	JQ_OPTIONS='del (.port_table) | del(.radio_table[].scan_table) | del (.vap_table[].sta_table)'
 elif [[ ${DEVICE_TYPE} == 'SWITCH' ]]; then
 	JQ_OPTIONS='del (.port_table[].mac_table)'
+elif [[ ${DEVICE_TYPE} == 'SWITCH_DISCOVERY' ]]; then
+        JQ_OPTIONS='[ .port_table | { power:   any (  .poe_power >= 0 ) , key_name: "total_power_consumed" }    ]'
 elif [[ ${DEVICE_TYPE} == 'UDMP' ]]; then
 	JQ_OPTIONS='del (.dpi_stats) | del(.fingerprints)'
 elif [[ ${DEVICE_TYPE} == 'USG' ]]; then
@@ -41,13 +46,17 @@ fi
 	
 
 
+INDENT_OPTION="--indent 0"
+
+
 if ! [[ -z ${VERBOSE} ]]; then
-    echo 'ssh -o LogLevel=Error -o StrictHostKeyChecking=accept-new -i ${PRIVKEY_PATH} ${USER}@${TARGET_DEVICE} "mca-dump | gzip" | gunzip | jq --indent 0 "${JQ_OPTIONS}"'
+	INDENT_OPTION=
+    	echo 'ssh -o LogLevel=Error -o StrictHostKeyChecking=accept-new -i '${PRIVKEY_PATH} ${USER}@${TARGET_DEVICE}' "mca-dump | gzip" | gunzip | jq '${INDENT_OPTION} ${JQ_OPTIONS}
 fi
 
 
 
-ssh -o LogLevel=Error -o StrictHostKeyChecking=accept-new -i ${PRIVKEY_PATH} ${USER}@${TARGET_DEVICE} "mca-dump | gzip" | gunzip | jq --indent 0 "${JQ_OPTIONS}"
+ssh -o LogLevel=Error -o StrictHostKeyChecking=accept-new -i ${PRIVKEY_PATH} ${USER}@${TARGET_DEVICE} "mca-dump | gzip" | gunzip | jq ${INDENT_OPTION} "${JQ_OPTIONS}"
 
 
 
