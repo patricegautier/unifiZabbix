@@ -32,7 +32,13 @@ if [[ ${DEVICE_TYPE} == 'AP' ]]; then
 elif [[ ${DEVICE_TYPE} == 'SWITCH' ]]; then
 	JQ_OPTIONS='del (.port_table[].mac_table)'
 elif [[ ${DEVICE_TYPE} == 'SWITCH_FEATURE_DISCOVERY' ]]; then
-        JQ_OPTIONS='[ { power:  .port_table |  any (  .poe_power >= 0 ) , total_power_consumed_key_name: "total_power_consumed", max_power_key_name: "max_power", max_power: .total_max_power }    ]'
+        JQ_OPTIONS="[ { power:  .port_table |  any (  .poe_power >= 0 ) ,\
+	total_power_consumed_key_name: \"total_power_consumed\",\
+	max_power_key_name: \"max_power\",\
+	max_power: .total_max_power,\
+	has_eth1: .has_eth1,\
+	has_temperature: .has_temperature\
+	} ]"
 elif [[ ${DEVICE_TYPE} == 'UDMP' ]]; then
 	JQ_OPTIONS='del (.dpi_stats) | del(.fingerprints)'
 elif [[ ${DEVICE_TYPE} == 'USG' ]]; then
