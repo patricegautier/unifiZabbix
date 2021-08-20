@@ -4,7 +4,7 @@
 usage()
 {
 	cat << EOF
-Usage ${0}  -i privateKeyPath -u user -v -d targetDevice [-t AP|SWITCH|UDMP|USG|CK]
+Usage ${0}  -i privateKeyPath -u user -v -d targetDevice [-t AP|SWITCH|SWITCH_FEATURE_DISCOVERY|UDMP|USG|CK]
 	-i specify private public key pair
 	-u SSH user name for Unifi device
 	-d IP or FQDN for Unifi device
@@ -31,8 +31,8 @@ if [[ ${DEVICE_TYPE} == 'AP' ]]; then
 	JQ_OPTIONS='del (.port_table) | del(.radio_table[].scan_table) | del (.vap_table[].sta_table)'
 elif [[ ${DEVICE_TYPE} == 'SWITCH' ]]; then
 	JQ_OPTIONS='del (.port_table[].mac_table)'
-elif [[ ${DEVICE_TYPE} == 'SWITCH_DISCOVERY' ]]; then
-        JQ_OPTIONS='[ .port_table | { power:   any (  .poe_power >= 0 ) , key_name: "total_power_consumed" }    ]'
+elif [[ ${DEVICE_TYPE} == 'SWITCH_FEATURE_DISCOVERY' ]]; then
+        JQ_OPTIONS='[ .port_table | { power:   any (  .poe_power >= 0 ) , total_power_consumed_key_name: "total_power_consumed", max_power_key_name: "max_power" }    ]'
 elif [[ ${DEVICE_TYPE} == 'UDMP' ]]; then
 	JQ_OPTIONS='del (.dpi_stats) | del(.fingerprints)'
 elif [[ ${DEVICE_TYPE} == 'USG' ]]; then
