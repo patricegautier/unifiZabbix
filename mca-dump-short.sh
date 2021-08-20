@@ -1,11 +1,12 @@
 #!/bin/bash
-# set -x
+#set -x
 
 usage()
 {
 	cat << EOF
-Usage ${0}  -i privateKeyPath -u user -v -d targetDevice [-t AP|SWITCH|SWITCH_FEATURE_DISCOVERY|UDMP|USG|CK]
-	-i specify private public key pair
+Usage ${0}  -i privateKeyPath -p <passwordFilePath> -u user -v -d targetDevice [-t AP|SWITCH|SWITCH_FEATURE_DISCOVERY|UDMP|USG|CK]
+	-i specify private public key pair path
+	-p specify password file path to be passed to sshpass -f. Note if both -i and -p are provided, the password file will be used
 	-u SSH user name for Unifi device
 	-d IP or FQDN for Unifi device
 	-t Unifi device type
@@ -14,18 +15,33 @@ EOF
 	exit 2
 }
 
+SSHPASS_OPTIONS=
+PRIVKEY_OPTION=
+PASSWORD_FILE_PATH=
+VERBOSE_OPTION=
 
-while getopts 'i:u:t:hd:v' OPT
+while getopts 'i:u:t:hd:vp:' OPT
 do
   case $OPT in
-    i) PRIVKEY_PATH=${OPTARG} ;;
+    i) PRIVKEY_OPTION="-i "${OPTARG} ;;
     u) USER=${OPTARG} ;;
     t) DEVICE_TYPE=${OPTARG} ;;
     d) TARGET_DEVICE=${OPTARG} ;;
     v) VERBOSE=true ;;
+    p) PASSWORD_FILE_PATH=${OPTARG} ;;
     h) usage ;;
   esac
 done
+
+if ! [[ -z ${VERBOSE} ]]; then
+        VERBOSE_OPTION="-v"
+fi
+
+if ! [[ -z ${PASSWORD_FILE_PATH} ]]; then
+	SSHPASS_OPTIONS="-f "${PASSWORD_FILE_PATH}" "${VERBOSE_OPTION}
+	PRIVKEY_OPTION=
+fi
+
 
 if [[ ${DEVICE_TYPE} == 'AP' ]]; then
 	JQ_OPTIONS='del (.port_table) | del(.radio_table[].scan_table) | del (.vap_table[].sta_table)'
@@ -57,13 +73,15 @@ INDENT_OPTION="--indent 0"
 
 if ! [[ -z ${VERBOSE} ]]; then
 	INDENT_OPTION=
-    	echo 'ssh -o LogLevel=Error -o StrictHostKeyChecking=accept-new -i '${PRIVKEY_PATH} ${USER}@${TARGET_DEVICE}' "mca-dump | gzip" | gunzip | jq '${INDENT_OPTION} ${JQ_OPTIONS}
+    	echo ${SSHPASS_COMMAND} 'ssh -o LogLevel=Error -o StrictHostKeyChecking=accept-new '${PRIVKEY_OPTION} ${USER}@${TARGET_DEVICE}' "mca-dump | gzip" | gunzip | jq '${INDENT_OPTION} ${JQ_OPTIONS}
 fi
 
 
-
-ssh -o LogLevel=Error -o StrictHostKeyChecking=accept-new -i ${PRIVKEY_PATH} ${USER}@${TARGET_DEVICE} "mca-dump | gzip" | gunzip | jq ${INDENT_OPTION} "${JQ_OPTIONS}"
-
+if ! [[ -z ${SSHPASS_OPTIONS} ]]; then
+	sshpass ${SSHPASS_OPTIONS} ssh -o LogLevel=Error -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} ${USER}@${TARGET_DEVICE} "mca-dump | gzip" | gunzip | jq ${INDENT_OPTION} "${JQ_OPTIONS}"
+else
+	ssh -o LogLevel=Error -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} ${USER}@${TARGET_DEVICE} "mca-dump | gzip" | gunzip | jq ${INDENT_OPTION} "${JQ_OPTIONS}"
+fi
 
 
 
