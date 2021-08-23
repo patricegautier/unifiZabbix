@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.4</version>
-    <date>2021-07-15T03:27:19Z</date>
+    <date>2021-08-23T06:43:30Z</date>
     <groups>
         <group>
             <uuid>15155c95a3d048f4856272ae12fd42c5</uuid>
@@ -2739,7 +2739,7 @@ avg(//IpExtInOctets,1h:now-7d)
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>ssh.run[uptime]</key>
+                        <key>ssh-run.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;, &quot;uptime&quot; ]</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -2801,7 +2801,7 @@ avg(//IpExtInOctets,1h:now-7d)
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>ssh.run[uptime]</key>
+                        <key>ssh-run.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;, &quot;uptime&quot; ]</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -2831,7 +2831,7 @@ avg(//IpExtInOctets,1h:now-7d)
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>ssh.run[uptime]</key>
+                        <key>ssh-run.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;, &quot;uptime&quot; ]</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -2860,10 +2860,11 @@ avg(//IpExtInOctets,1h:now-7d)
                                 <parameter>.*HWaddr|ether ([a-fA-F0-9:]{17}|[a-fA-F0-9]{12})</parameter>
                                 <parameter>\1</parameter>
                             </parameters>
+                            <error_handler>DISCARD_VALUE</error_handler>
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>ssh.run[ifconfig]</key>
+                        <key>ssh-run.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;, &quot;ifconfig&quot; ]</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -2887,11 +2888,12 @@ avg(//IpExtInOctets,1h:now-7d)
                                 <parameter>(HWaddr|ether)(.|\n)*(HWaddr|ether) ([a-fA-F0-9:]{17})</parameter>
                                 <parameter>\4</parameter>
                             </parameters>
-                            <error_handler>DISCARD_VALUE</error_handler>
+                            <error_handler>CUSTOM_VALUE</error_handler>
+                            <error_handler_params>N/A</error_handler_params>
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>ssh.run[ifconfig]</key>
+                        <key>ssh-run.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;, &quot;ifconfig&quot; ]</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -2903,17 +2905,12 @@ avg(//IpExtInOctets,1h:now-7d)
                 <item>
                     <uuid>23e04f2d4e9c4e09925eb8a65f0f41dc</uuid>
                     <name>ifconfig</name>
-                    <type>SSH</type>
-                    <key>ssh.run[ifconfig]</key>
+                    <type>EXTERNAL</type>
+                    <key>ssh-run.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;, &quot;ifconfig&quot; ]</key>
                     <delay>1h</delay>
                     <history>0</history>
                     <trends>0</trends>
                     <value_type>CHAR</value_type>
-                    <params>ifconfig -a</params>
-                    <authtype>PUBLIC_KEY</authtype>
-                    <username>{$UNIFI_USER}</username>
-                    <publickey>{$UNIFI_PUB_KEY}</publickey>
-                    <privatekey>{$UNIFI_PRIV_KEY}</privatekey>
                     <tags>
                         <tag>
                             <tag>Application</tag>
@@ -2924,15 +2921,10 @@ avg(//IpExtInOctets,1h:now-7d)
                 <item>
                     <uuid>bffe19ef0bca4cb296bf55c9ef69a612</uuid>
                     <name>Number of processors</name>
-                    <type>SSH</type>
-                    <key>ssh.run[nproc]</key>
+                    <type>EXTERNAL</type>
+                    <key>ssh-run.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;, &quot;nproc&quot; ]</key>
                     <delay>1d</delay>
                     <units>Processors</units>
-                    <params>nproc</params>
-                    <authtype>PUBLIC_KEY</authtype>
-                    <username>{$UNIFI_USER}</username>
-                    <publickey>{$UNIFI_PUB_KEY}</publickey>
-                    <privatekey>{$UNIFI_PRIV_KEY}</privatekey>
                     <description>Number of processors</description>
                     <preprocessing>
                         <step>
@@ -2959,17 +2951,12 @@ avg(//IpExtInOctets,1h:now-7d)
                 <item>
                     <uuid>2371bcddb5e64826a68de1ffd034bc1f</uuid>
                     <name>uname</name>
-                    <type>SSH</type>
-                    <key>ssh.run[uname]</key>
+                    <type>EXTERNAL</type>
+                    <key>ssh-run.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;, &quot;uname -a&quot; ]</key>
                     <delay>1h</delay>
                     <history>7d</history>
                     <trends>0</trends>
                     <value_type>CHAR</value_type>
-                    <params>uname -a</params>
-                    <authtype>PUBLIC_KEY</authtype>
-                    <username>{$UNIFI_USER}</username>
-                    <publickey>{$UNIFI_PUB_KEY}</publickey>
-                    <privatekey>{$UNIFI_PRIV_KEY}</privatekey>
                     <inventory_link>OS_FULL</inventory_link>
                     <tags>
                         <tag>
@@ -2980,7 +2967,7 @@ avg(//IpExtInOctets,1h:now-7d)
                     <triggers>
                         <trigger>
                             <uuid>61e39b8d10334b2eb0673169b3f54510</uuid>
-                            <expression>change(/Unifi SSH High Priority Host/ssh.run[uname])=1</expression>
+                            <expression>change(/Unifi SSH High Priority Host/ssh-run.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;, &quot;uname -a&quot; ])=1</expression>
                             <name>{HOST.NAME} Version Change</name>
                             <priority>INFO</priority>
                             <manual_close>YES</manual_close>
@@ -2990,16 +2977,11 @@ avg(//IpExtInOctets,1h:now-7d)
                 <item>
                     <uuid>73f78f9e0e3041f0a258cd41122fe3af</uuid>
                     <name>uptime</name>
-                    <type>SSH</type>
-                    <key>ssh.run[uptime]</key>
+                    <type>EXTERNAL</type>
+                    <key>ssh-run.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;, &quot;uptime&quot; ]</key>
                     <history>0</history>
                     <trends>0</trends>
                     <value_type>CHAR</value_type>
-                    <params>uptime</params>
-                    <authtype>PUBLIC_KEY</authtype>
-                    <username>{$UNIFI_USER}</username>
-                    <publickey>{$UNIFI_PUB_KEY}</publickey>
-                    <privatekey>{$UNIFI_PRIV_KEY}</privatekey>
                     <tags>
                         <tag>
                             <tag>Application</tag>
@@ -3079,7 +3061,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>ssh.run[uptime]</key>
+                        <key>ssh-run.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;, &quot;uptime&quot; ]</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -3141,7 +3123,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>ssh.run[uptime]</key>
+                        <key>ssh-run.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;, &quot;uptime&quot; ]</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -3171,7 +3153,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>ssh.run[uptime]</key>
+                        <key>ssh-run.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;, &quot;uptime&quot; ]</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -3200,10 +3182,11 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                                 <parameter>.*HWaddr|ether ([a-fA-F0-9:]{17}|[a-fA-F0-9]{12})</parameter>
                                 <parameter>\1</parameter>
                             </parameters>
+                            <error_handler>DISCARD_VALUE</error_handler>
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>ssh.run[ifconfig]</key>
+                        <key>ssh-run.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;, &quot;ifconfig&quot; ]</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -3227,11 +3210,12 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                                 <parameter>(HWaddr|ether)(.|\n)*(HWaddr|ether) ([a-fA-F0-9:]{17})</parameter>
                                 <parameter>\4</parameter>
                             </parameters>
-                            <error_handler>DISCARD_VALUE</error_handler>
+                            <error_handler>CUSTOM_VALUE</error_handler>
+                            <error_handler_params>N/A</error_handler_params>
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>ssh.run[ifconfig]</key>
+                        <key>ssh-run.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;, &quot;ifconfig&quot; ]</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -3243,17 +3227,12 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                 <item>
                     <uuid>2877b47ec7514bb392b4a4ba99c5af18</uuid>
                     <name>ifconfig</name>
-                    <type>SSH</type>
-                    <key>ssh.run[ifconfig]</key>
+                    <type>EXTERNAL</type>
+                    <key>ssh-run.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;, &quot;ifconfig&quot; ]</key>
                     <delay>1h</delay>
                     <history>0</history>
                     <trends>0</trends>
                     <value_type>CHAR</value_type>
-                    <params>ifconfig -a</params>
-                    <authtype>PUBLIC_KEY</authtype>
-                    <username>{$UNIFI_USER}</username>
-                    <publickey>{$UNIFI_PUB_KEY}</publickey>
-                    <privatekey>{$UNIFI_PRIV_KEY}</privatekey>
                     <tags>
                         <tag>
                             <tag>Application</tag>
@@ -3264,15 +3243,10 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                 <item>
                     <uuid>ae2f6914da0f4ea7be6de28638e521c9</uuid>
                     <name>Number of processors</name>
-                    <type>SSH</type>
-                    <key>ssh.run[nproc]</key>
+                    <type>EXTERNAL</type>
+                    <key>ssh-run.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;, &quot;nproc&quot; ]</key>
                     <delay>1d</delay>
                     <units>Processors</units>
-                    <params>nproc</params>
-                    <authtype>PUBLIC_KEY</authtype>
-                    <username>{$UNIFI_USER}</username>
-                    <publickey>{$UNIFI_PUB_KEY}</publickey>
-                    <privatekey>{$UNIFI_PRIV_KEY}</privatekey>
                     <description>Number of processors</description>
                     <preprocessing>
                         <step>
@@ -3299,17 +3273,12 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                 <item>
                     <uuid>d1c0a1d2e0504e4391d297566e2e8465</uuid>
                     <name>uname</name>
-                    <type>SSH</type>
-                    <key>ssh.run[uname]</key>
+                    <type>EXTERNAL</type>
+                    <key>ssh-run.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;, &quot;uname -a&quot; ]</key>
                     <delay>1h</delay>
                     <history>7d</history>
                     <trends>0</trends>
                     <value_type>CHAR</value_type>
-                    <params>uname -a</params>
-                    <authtype>PUBLIC_KEY</authtype>
-                    <username>{$UNIFI_USER}</username>
-                    <publickey>{$UNIFI_PUB_KEY}</publickey>
-                    <privatekey>{$UNIFI_PRIV_KEY}</privatekey>
                     <inventory_link>OS_FULL</inventory_link>
                     <tags>
                         <tag>
@@ -3320,7 +3289,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                     <triggers>
                         <trigger>
                             <uuid>5558237e8dab41a0b5070c3dcf8120a3</uuid>
-                            <expression>change(/Unifi SSH Host/ssh.run[uname])=1</expression>
+                            <expression>change(/Unifi SSH Host/ssh-run.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;, &quot;uname -a&quot; ])=1</expression>
                             <name>{HOST.NAME} Version Change</name>
                             <priority>INFO</priority>
                             <manual_close>YES</manual_close>
@@ -3330,16 +3299,11 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                 <item>
                     <uuid>0cdc86cae6b742e4bf08e06e10d4da1b</uuid>
                     <name>uptime</name>
-                    <type>SSH</type>
-                    <key>ssh.run[uptime]</key>
+                    <type>EXTERNAL</type>
+                    <key>ssh-run.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;, &quot;uptime&quot; ]</key>
                     <history>0</history>
                     <trends>0</trends>
                     <value_type>CHAR</value_type>
-                    <params>uptime</params>
-                    <authtype>PUBLIC_KEY</authtype>
-                    <username>{$UNIFI_USER}</username>
-                    <publickey>{$UNIFI_PUB_KEY}</publickey>
-                    <privatekey>{$UNIFI_PRIV_KEY}</privatekey>
                     <tags>
                         <tag>
                             <tag>Application</tag>
@@ -3390,7 +3354,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot; ]</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -3432,32 +3396,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;]</key>
-                    </master_item>
-                    <tags>
-                        <tag>
-                            <tag>Application</tag>
-                            <value>Host</value>
-                        </tag>
-                    </tags>
-                </item>
-                <item>
-                    <uuid>b7931f1fe5fe4aad9556a67a34b941ac</uuid>
-                    <name>Max Total Power</name>
-                    <type>DEPENDENT</type>
-                    <key>max_total_power</key>
-                    <delay>0</delay>
-                    <units>W</units>
-                    <preprocessing>
-                        <step>
-                            <type>JSONPATH</type>
-                            <parameters>
-                                <parameter>$.total_max_power</parameter>
-                            </parameters>
-                        </step>
-                    </preprocessing>
-                    <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot; ]</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -3470,7 +3409,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                     <uuid>c4668b5e15954379bbe9515188d96624</uuid>
                     <name>mca-dump</name>
                     <type>EXTERNAL</type>
-                    <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;]</key>
+                    <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot; ]</key>
                     <delay>{$UNIFI_CHECK_FREQUENCY}</delay>
                     <history>0</history>
                     <trends>0</trends>
@@ -3479,6 +3418,22 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         <tag>
                             <tag>Application</tag>
                             <value>Host</value>
+                        </tag>
+                    </tags>
+                </item>
+                <item>
+                    <uuid>3dbc59ea31d54d20b49a1b8aacbd31b0</uuid>
+                    <name>mca-dump-feature-discovery</name>
+                    <type>EXTERNAL</type>
+                    <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH_FEATURE_DISCOVERY&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot; ]</key>
+                    <delay>1h</delay>
+                    <history>0</history>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <tags>
+                        <tag>
+                            <tag>Application</tag>
+                            <value>Power</value>
                         </tag>
                     </tags>
                 </item>
@@ -3513,7 +3468,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot; ]</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -3538,7 +3493,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot; ]</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -3565,7 +3520,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot; ]</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -3573,144 +3528,6 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                             <value>Host</value>
                         </tag>
                     </tags>
-                </item>
-                <item>
-                    <uuid>64a4b7051427463886b728481b6d374c</uuid>
-                    <name>Overheating</name>
-                    <type>DEPENDENT</type>
-                    <key>overheating</key>
-                    <delay>0</delay>
-                    <trends>0</trends>
-                    <value_type>CHAR</value_type>
-                    <preprocessing>
-                        <step>
-                            <type>JSONPATH</type>
-                            <parameters>
-                                <parameter>$.overheating</parameter>
-                            </parameters>
-                        </step>
-                        <step>
-                            <type>STR_REPLACE</type>
-                            <parameters>
-                                <parameter>false</parameter>
-                                <parameter>f</parameter>
-                            </parameters>
-                        </step>
-                        <step>
-                            <type>STR_REPLACE</type>
-                            <parameters>
-                                <parameter>true</parameter>
-                                <parameter>t</parameter>
-                            </parameters>
-                        </step>
-                    </preprocessing>
-                    <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;]</key>
-                    </master_item>
-                    <tags>
-                        <tag>
-                            <tag>Application</tag>
-                            <value>Host</value>
-                        </tag>
-                    </tags>
-                    <triggers>
-                        <trigger>
-                            <uuid>3ed946d2f10f4981b55a4be13a3a1bf6</uuid>
-                            <expression>last(/Unifi Switch/overheating)&lt;&gt;&quot;f&quot;</expression>
-                            <name>{HOST.NAME} is overheating</name>
-                            <priority>HIGH</priority>
-                        </trigger>
-                    </triggers>
-                </item>
-                <item>
-                    <uuid>eea13ea024e84ba5bc22ad7fd9f52c1b</uuid>
-                    <name>Percentage Max Power</name>
-                    <type>CALCULATED</type>
-                    <key>percentage_max_power</key>
-                    <value_type>FLOAT</value_type>
-                    <units>%</units>
-                    <params>100*last(//power_consumed_smooth)/last(//max_total_power)</params>
-                    <tags>
-                        <tag>
-                            <tag>Application</tag>
-                            <value>Host</value>
-                        </tag>
-                    </tags>
-                </item>
-                <item>
-                    <uuid>7f63a9daddcd4f9e872d545632dd3216</uuid>
-                    <name>Power Consumed</name>
-                    <type>DEPENDENT</type>
-                    <key>power_consumed</key>
-                    <delay>0</delay>
-                    <value_type>FLOAT</value_type>
-                    <units>W</units>
-                    <preprocessing>
-                        <step>
-                            <type>JSONPATH</type>
-                            <parameters>
-                                <parameter>$.port_table.[*].poe_power.sum()</parameter>
-                            </parameters>
-                        </step>
-                    </preprocessing>
-                    <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;]</key>
-                    </master_item>
-                    <tags>
-                        <tag>
-                            <tag>Application</tag>
-                            <value>Host</value>
-                        </tag>
-                    </tags>
-                </item>
-                <item>
-                    <uuid>e019d44aa50b401d97d302469ac7c9f9</uuid>
-                    <name>Power Consumed Smooth</name>
-                    <type>CALCULATED</type>
-                    <key>power_consumed_smooth</key>
-                    <value_type>FLOAT</value_type>
-                    <units>W</units>
-                    <params>avg(//power_consumed,{$UNIFI_SMOOTHING_PERIOD})</params>
-                    <tags>
-                        <tag>
-                            <tag>Application</tag>
-                            <value>Host</value>
-                        </tag>
-                    </tags>
-                </item>
-                <item>
-                    <uuid>9cbb03e19e9948789355e73e3b6c6e1d</uuid>
-                    <name>Temperature</name>
-                    <type>DEPENDENT</type>
-                    <key>temperature</key>
-                    <delay>0</delay>
-                    <value_type>FLOAT</value_type>
-                    <units>ºC</units>
-                    <preprocessing>
-                        <step>
-                            <type>JSONPATH</type>
-                            <parameters>
-                                <parameter>$.general_temperature</parameter>
-                            </parameters>
-                        </step>
-                    </preprocessing>
-                    <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;]</key>
-                    </master_item>
-                    <tags>
-                        <tag>
-                            <tag>Application</tag>
-                            <value>Host</value>
-                        </tag>
-                    </tags>
-                    <triggers>
-                        <trigger>
-                            <uuid>505eeadd12cf417797ef5ecb7b284916</uuid>
-                            <expression>last(/Unifi Switch/temperature) &gt; {$UNIFI_ALERT_TEMP}</expression>
-                            <name>{HOST.NAME} Temperature is &gt; {$UNIFI_ALERT_TEMP}C</name>
-                            <priority>AVERAGE</priority>
-                        </trigger>
-                    </triggers>
                 </item>
                 <item>
                     <uuid>d42df9b654fc4a2c88ed8e70106dca82</uuid>
@@ -3740,7 +3557,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot; ]</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -3777,7 +3594,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot; ]</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -3802,7 +3619,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot; ]</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -3850,6 +3667,102 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
             </items>
             <discovery_rules>
                 <discovery_rule>
+                    <uuid>3440ec98490a4b40bcc1dddca0955cb8</uuid>
+                    <name>POE Discovery</name>
+                    <type>DEPENDENT</type>
+                    <key>poe_discovery</key>
+                    <delay>0</delay>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH_FEATURE_DISCOVERY&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot; ]</key>
+                    </master_item>
+                    <lld_macro_paths>
+                        <lld_macro_path>
+                            <lld_macro>{#MAX_POWER_KEY_NAME}</lld_macro>
+                            <path>$.max_power_key_name</path>
+                        </lld_macro_path>
+                        <lld_macro_path>
+                            <lld_macro>{#TOTAL_POWER_CONSUMED_KEY_NAME}</lld_macro>
+                            <path>$.total_power_consumed_key_name</path>
+                        </lld_macro_path>
+                    </lld_macro_paths>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$[?(@.power==&quot;true&quot;)]</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                </discovery_rule>
+                <discovery_rule>
+                    <uuid>ccacdb7fcb1c41d1a3e58f7a201e6603</uuid>
+                    <name>POE Discovery by Port</name>
+                    <type>DEPENDENT</type>
+                    <key>poe_discovery_by_port</key>
+                    <delay>0</delay>
+                    <item_prototypes>
+                        <item_prototype>
+                            <uuid>1793fb114e2d4fa3b40820d8c51e1d51</uuid>
+                            <name>Power Consumed Port {#PORT_IDX}</name>
+                            <type>DEPENDENT</type>
+                            <key>power_consumed_port[{#PORT_IDX}]</key>
+                            <delay>0</delay>
+                            <value_type>FLOAT</value_type>
+                            <units>W</units>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <parameters>
+                                        <parameter>$.port_table.[ ?(@.port_idx=='{#PORT_IDX}') ].poe_power.first()</parameter>
+                                    </parameters>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot; ]</key>
+                            </master_item>
+                            <tags>
+                                <tag>
+                                    <tag>Application</tag>
+                                    <value>Power</value>
+                                </tag>
+                            </tags>
+                        </item_prototype>
+                    </item_prototypes>
+                    <graph_prototypes>
+                        <graph_prototype>
+                            <uuid>e919a515e0b14d94aa0f3424f790c5a2</uuid>
+                            <name>Power Consumed by Port {#PORT_IDX}</name>
+                            <graph_items>
+                                <graph_item>
+                                    <sortorder>1</sortorder>
+                                    <color>1A7C11</color>
+                                    <item>
+                                        <host>Unifi Switch</host>
+                                        <key>power_consumed_port[{#PORT_IDX}]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                    </graph_prototypes>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot; ]</key>
+                    </master_item>
+                    <lld_macro_paths>
+                        <lld_macro_path>
+                            <lld_macro>{#PORT_IDX}</lld_macro>
+                            <path>$.port_idx</path>
+                        </lld_macro_path>
+                    </lld_macro_paths>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.port_table[?(@.poe_power&gt;=0)]</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                </discovery_rule>
+                <discovery_rule>
                     <uuid>2363ae0485a84853af24157aab6ed5f5</uuid>
                     <name>Switch Port Discovery</name>
                     <type>DEPENDENT</type>
@@ -3878,7 +3791,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                                 </step>
                             </preprocessing>
                             <master_item>
-                                <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;]</key>
+                                <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot; ]</key>
                             </master_item>
                             <tags>
                                 <tag>
@@ -3904,7 +3817,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                                 </step>
                             </preprocessing>
                             <master_item>
-                                <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;]</key>
+                                <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot; ]</key>
                             </master_item>
                             <tags>
                                 <tag>
@@ -3941,7 +3854,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                                 </step>
                             </preprocessing>
                             <master_item>
-                                <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;]</key>
+                                <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot; ]</key>
                             </master_item>
                             <tags>
                                 <tag>
@@ -3967,7 +3880,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                                 </step>
                             </preprocessing>
                             <master_item>
-                                <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;]</key>
+                                <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot; ]</key>
                             </master_item>
                             <tags>
                                 <tag>
@@ -4004,7 +3917,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                                 </step>
                             </preprocessing>
                             <master_item>
-                                <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;]</key>
+                                <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot; ]</key>
                             </master_item>
                             <tags>
                                 <tag>
@@ -4030,7 +3943,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                                 </step>
                             </preprocessing>
                             <master_item>
-                                <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;]</key>
+                                <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot; ]</key>
                             </master_item>
                             <tags>
                                 <tag>
@@ -4097,9 +4010,13 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         </graph_prototype>
                     </graph_prototypes>
                     <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot; ]</key>
                     </master_item>
                     <lld_macro_paths>
+                        <lld_macro_path>
+                            <lld_macro>{#LOCAL_PORT_NAME}</lld_macro>
+                            <path>$.local_port_name</path>
+                        </lld_macro_path>
                         <lld_macro_path>
                             <lld_macro>{#PORT_IDX}</lld_macro>
                             <path>$.port_idx</path>
@@ -4118,6 +4035,88 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                             <type>JSONPATH</type>
                             <parameters>
                                 <parameter>$.port_table</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                </discovery_rule>
+                <discovery_rule>
+                    <uuid>a520f7c4997947a4865af775a70e1ac7</uuid>
+                    <name>Temperature Discovery</name>
+                    <type>DEPENDENT</type>
+                    <key>temperature_discovery</key>
+                    <delay>0</delay>
+                    <item_prototypes>
+                        <item_prototype>
+                            <uuid>bb33a8f4a3ad4b44b1171de47669577e</uuid>
+                            <name>Overheating</name>
+                            <type>DEPENDENT</type>
+                            <key>_[{#OVERHEATING_KEY_NAME}]</key>
+                            <delay>0</delay>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <parameters>
+                                        <parameter>$.overheating</parameter>
+                                    </parameters>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot; ]</key>
+                            </master_item>
+                            <tags>
+                                <tag>
+                                    <tag>Application</tag>
+                                    <value>Power</value>
+                                </tag>
+                            </tags>
+                        </item_prototype>
+                        <item_prototype>
+                            <uuid>1ee44c1518f441bd9ad5d3c585049926</uuid>
+                            <name>Temperature</name>
+                            <type>DEPENDENT</type>
+                            <key>_[{#TEMPERATURE_KEY_NAME}]</key>
+                            <delay>0</delay>
+                            <value_type>FLOAT</value_type>
+                            <units>ºC</units>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <parameters>
+                                        <parameter>$.general_temperature</parameter>
+                                    </parameters>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot; ]</key>
+                            </master_item>
+                            <tags>
+                                <tag>
+                                    <tag>Application</tag>
+                                    <value>Power</value>
+                                </tag>
+                            </tags>
+                        </item_prototype>
+                    </item_prototypes>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH_FEATURE_DISCOVERY&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot; ]</key>
+                    </master_item>
+                    <lld_macro_paths>
+                        <lld_macro_path>
+                            <lld_macro>{#OVERHEATING_KEY_NAME}</lld_macro>
+                            <path>$.overheating_key_name</path>
+                        </lld_macro_path>
+                        <lld_macro_path>
+                            <lld_macro>{#TEMPERATURE_KEY_NAME}</lld_macro>
+                            <path>$.temperature_key_name</path>
+                        </lld_macro_path>
+                    </lld_macro_paths>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$[?(@.has_temperature==&quot;true&quot;)]</parameter>
                             </parameters>
                         </step>
                     </preprocessing>
@@ -4168,7 +4167,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;]</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -4220,7 +4219,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;]</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -4266,7 +4265,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;]</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -4297,7 +4296,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;]</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -4328,7 +4327,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;]</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -4359,7 +4358,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;]</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -4385,7 +4384,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;]</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -4427,7 +4426,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                     <uuid>8eb698db79b94fa18684ebcee01876b7</uuid>
                     <name>mca-dump</name>
                     <type>EXTERNAL</type>
-                    <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;]</key>
+                    <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;]</key>
                     <delay>{$UNIFI_CHECK_FREQUENCY}</delay>
                     <history>0</history>
                     <trends>0</trends>
@@ -4470,7 +4469,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;]</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -4495,7 +4494,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;]</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -4522,7 +4521,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;]</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -4566,7 +4565,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;]</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -4592,7 +4591,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;]</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -4629,7 +4628,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;]</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -4669,7 +4668,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;]</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -4720,7 +4719,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;]</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -4782,7 +4781,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                                 </step>
                             </preprocessing>
                             <master_item>
-                                <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;]</key>
+                                <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;]</key>
                             </master_item>
                             <tags>
                                 <tag>
@@ -4819,7 +4818,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                                 </step>
                             </preprocessing>
                             <master_item>
-                                <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;]</key>
+                                <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;]</key>
                             </master_item>
                             <tags>
                                 <tag>
@@ -4854,7 +4853,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         </graph_prototype>
                     </graph_prototypes>
                     <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;UDMP&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;]</key>
                     </master_item>
                     <lld_macro_paths>
                         <lld_macro_path>
@@ -4988,7 +4987,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;]</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -5040,7 +5039,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;]</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -5086,7 +5085,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;]</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -5117,7 +5116,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;]</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -5148,7 +5147,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;]</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -5179,7 +5178,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;]</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -5206,7 +5205,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;]</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -5219,7 +5218,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                     <uuid>01ee1019a6924fb68849a55218890a6f</uuid>
                     <name>mca-dump</name>
                     <type>EXTERNAL</type>
-                    <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;]</key>
+                    <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;]</key>
                     <delay>{$UNIFI_CHECK_FREQUENCY}</delay>
                     <history>0</history>
                     <trends>0</trends>
@@ -5262,7 +5261,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;]</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -5287,7 +5286,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;]</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -5314,7 +5313,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;]</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -5346,7 +5345,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;]</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -5378,7 +5377,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;]</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -5415,7 +5414,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;]</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -5455,7 +5454,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;]</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -5506,7 +5505,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;]</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -5567,7 +5566,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                                 </step>
                             </preprocessing>
                             <master_item>
-                                <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;]</key>
+                                <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;]</key>
                             </master_item>
                             <tags>
                                 <tag>
@@ -5604,7 +5603,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                                 </step>
                             </preprocessing>
                             <master_item>
-                                <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;]</key>
+                                <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;]</key>
                             </master_item>
                             <tags>
                                 <tag>
@@ -5639,7 +5638,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         </graph_prototype>
                     </graph_prototypes>
                     <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;USG&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;]</key>
                     </master_item>
                     <lld_macro_paths>
                         <lld_macro_path>
@@ -5707,7 +5706,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                     <uuid>24671ab8f5d44096b16f5e5b1dcb9326</uuid>
                     <name>mca-dump</name>
                     <type>EXTERNAL</type>
-                    <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;AP&quot;]</key>
+                    <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;AP&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;]</key>
                     <delay>{$UNIFI_CHECK_FREQUENCY}</delay>
                     <history>0</history>
                     <trends>0</trends>
@@ -5784,7 +5783,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         </graph_prototype>
                     </graph_prototypes>
                     <master_item>
-                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;AP&quot;]</key>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;AP&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;]</key>
                     </master_item>
                     <lld_macro_paths>
                         <lld_macro_path>
@@ -5854,41 +5853,41 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
         </trigger>
         <trigger>
             <uuid>d71b7c4cdb084f10b4556d2cadd84f8d</uuid>
-            <expression>last(/Unifi SSH High Priority Host/load_avg_15mn,#1)&gt;last(/Unifi SSH High Priority Host/ssh.run[nproc],#1)*{$UNIFI_LOAD_AVERAGE_HIGH}</expression>
+            <expression>last(/Unifi SSH High Priority Host/load_avg_15mn,#1)&gt;last(/Unifi SSH High Priority Host/ssh-run.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;, &quot;nproc&quot; ],#1)*{$UNIFI_LOAD_AVERAGE_HIGH}</expression>
             <name>{HOST.NAME} load average is &gt; {$UNIFI_LOAD_AVERAGE_HIGH} per processor</name>
             <priority>WARNING</priority>
             <manual_close>YES</manual_close>
         </trigger>
         <trigger>
             <uuid>665ee1289cf94f318e26c9e7474e4229</uuid>
-            <expression>last(/Unifi SSH Host/load_avg_15mn,#1)&gt;last(/Unifi SSH Host/ssh.run[nproc],#1)*{$UNIFI_LOAD_AVERAGE_HIGH}</expression>
+            <expression>last(/Unifi SSH Host/load_avg_15mn,#1)&gt;last(/Unifi SSH Host/ssh-run.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;, &quot;nproc&quot; ],#1)*{$UNIFI_LOAD_AVERAGE_HIGH}</expression>
             <name>{HOST.NAME} load average is &gt; {$UNIFI_LOAD_AVERAGE_HIGH} per processor</name>
             <priority>WARNING</priority>
             <manual_close>YES</manual_close>
         </trigger>
         <trigger>
             <uuid>b601c0fbee6e48668ec03ff912b5304c</uuid>
-            <expression>last(/Unifi SSH High Priority Host/load_avg_15mn,#1)&gt;last(/Unifi SSH High Priority Host/ssh.run[nproc],#1)*{$UNIFI_LOAD_AVERAGE_MEDIUM}</expression>
+            <expression>last(/Unifi SSH High Priority Host/load_avg_15mn,#1)&gt;last(/Unifi SSH High Priority Host/ssh-run.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;, &quot;nproc&quot; ],#1)*{$UNIFI_LOAD_AVERAGE_MEDIUM}</expression>
             <name>{HOST.NAME} Load average is &gt; {$UNIFI_LOAD_AVERAGE_MEDIUM} per processor</name>
             <priority>INFO</priority>
             <manual_close>YES</manual_close>
             <dependencies>
                 <dependency>
                     <name>{HOST.NAME} load average is &gt; {$UNIFI_LOAD_AVERAGE_HIGH} per processor</name>
-                    <expression>last(/Unifi SSH High Priority Host/load_avg_15mn,#1)&gt;last(/Unifi SSH High Priority Host/ssh.run[nproc],#1)*{$UNIFI_LOAD_AVERAGE_HIGH}</expression>
+                    <expression>last(/Unifi SSH High Priority Host/load_avg_15mn,#1)&gt;last(/Unifi SSH High Priority Host/ssh-run.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;, &quot;nproc&quot; ],#1)*{$UNIFI_LOAD_AVERAGE_HIGH}</expression>
                 </dependency>
             </dependencies>
         </trigger>
         <trigger>
             <uuid>22986a62ed9b40ec9c89acecff5045fa</uuid>
-            <expression>last(/Unifi SSH Host/load_avg_15mn,#1)&gt;last(/Unifi SSH Host/ssh.run[nproc],#1)*{$UNIFI_LOAD_AVERAGE_MEDIUM}</expression>
+            <expression>last(/Unifi SSH Host/load_avg_15mn,#1)&gt;last(/Unifi SSH Host/ssh-run.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;, &quot;nproc&quot; ],#1)*{$UNIFI_LOAD_AVERAGE_MEDIUM}</expression>
             <name>{HOST.NAME} Load average is &gt; {$UNIFI_LOAD_AVERAGE_MEDIUM} per processor</name>
             <priority>INFO</priority>
             <manual_close>YES</manual_close>
             <dependencies>
                 <dependency>
                     <name>{HOST.NAME} load average is &gt; {$UNIFI_LOAD_AVERAGE_HIGH} per processor</name>
-                    <expression>last(/Unifi SSH Host/load_avg_15mn,#1)&gt;last(/Unifi SSH Host/ssh.run[nproc],#1)*{$UNIFI_LOAD_AVERAGE_HIGH}</expression>
+                    <expression>last(/Unifi SSH Host/load_avg_15mn,#1)&gt;last(/Unifi SSH Host/ssh-run.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;, &quot;nproc&quot; ],#1)*{$UNIFI_LOAD_AVERAGE_HIGH}</expression>
                 </dependency>
             </dependencies>
         </trigger>
