@@ -1,5 +1,5 @@
 #!/bin/bash
-#set -x
+# set -x
 
 usage()
 {
@@ -20,6 +20,7 @@ PRIVKEY_OPTION=
 PASSWORD_FILE_PATH=
 VERBOSE_OPTION=
 
+
 while getopts 'i:u:t:hd:vp:' OPT
 do
   case $OPT in
@@ -37,7 +38,8 @@ if ! [[ -z ${VERBOSE} ]]; then
         VERBOSE_OPTION="-v"
 fi
 
-if ! [[ -z ${PASSWORD_FILE_PATH} ]]; then
+# {$UNIFI_SSHPASS_PASSWORD_PATH} means the macro didn't resolve in Zabbix
+if ! [[ -z ${PASSWORD_FILE_PATH} ]] && ! [[ ${PASSWORD_FILE_PATH} == "{\$UNIFI_SSHPASS_PASSWORD_PATH}" ]]; then 
 	SSHPASS_OPTIONS="-f "${PASSWORD_FILE_PATH}" "${VERBOSE_OPTION}
 	PRIVKEY_OPTION=
 fi
