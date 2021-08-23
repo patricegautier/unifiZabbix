@@ -55,7 +55,9 @@ elif [[ ${DEVICE_TYPE} == 'SWITCH_FEATURE_DISCOVERY' ]]; then
 	max_power_key_name: \"max_power\",\
 	max_power: .total_max_power,\
 	has_eth1: .has_eth1,\
-	has_temperature: .has_temperature\
+	has_temperature: .has_temperature,\
+	temperature_key_name: \"temperature\",\
+        overheating_key_name: \"overheating\",\
 	} ]"
 elif [[ ${DEVICE_TYPE} == 'UDMP' ]]; then
 	JQ_OPTIONS='del (.dpi_stats) | del(.fingerprints)'
