@@ -54,6 +54,7 @@ elif [[ ${DEVICE_TYPE} == 'SWITCH_FEATURE_DISCOVERY' ]]; then
 	total_power_consumed_key_name: \"total_power_consumed\",\
 	max_power_key_name: \"max_power\",\
 	max_power: .total_max_power,\
+	percent_power_consumed_key_name: \"percent_power_consumed\",\
 	has_eth1: .has_eth1,\
 	has_temperature: .has_temperature,\
 	temperature_key_name: \"temperature\",\
