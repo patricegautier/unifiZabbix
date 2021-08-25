@@ -20,19 +20,20 @@ On Raspbian, this can be done with:
 
 	apt-get install jq
 
-## Install mca-dump-short script as a Zabbix external script
+## Install mca-dump-short and ssh-run scripts as a Zabbix external script
 
-You need to install mca-dump-short.sh in Zabbix's external script directory
+You need to install mca-dump-short.sh and ssh-run in Zabbix's external script directory
 
 Please confirm where that directory is from the variable ExternalScripts in your zabbix server conf at /etc/zabbix/zabbix_server.conf.  On my system this is set to:
 
 	ExternalScripts=/usr/lib/zabbix/externalscripts
 
-After cp-ing the script to that directory, make sure you have the permissions necessary for zabbix to execute this script:
+After cp-ing the scripta to that directory, make sure you have the permissions necessary for zabbix to execute this script:
 
 	chown zabbix:zabbix /usr/lib/zabbix/externalscripts /usr/lib/zabbix/externalscripts/mca-dump-short.sh
 	chmod a+x /usr/lib/zabbix/externalscripts /usr/lib/zabbix/externalscripts/mca-dump-short.sh
 
+and the same for ssh-run
 
 ## Import the Unifi templates into Zabbix
 
@@ -143,6 +144,9 @@ The file name for your private key in SSHKeyLocation.  For me this is set to zb_
 ### {$UNIFI_PUB_KEY}
 The file name for your public key in SSHKeyLocation.  For me this is set to zb_id_rsa.pub
 
+### {$UNIFI_SSHPASS_PASSWORD_PATH}
+If you are having trouble geting ssh going with public/private key pair authentication, you can optionally supply the path of a file that contains the SSH password to your Unifi devices.  If supplied, the template will use sshpass to provide the password to ssh.  There are more security implications to doing this than using the keypair method.. 
+
 ### {$UNIFI_CHECK_FREQUENCY}
 I have this set to '1m'
 
@@ -174,7 +178,6 @@ The load average value above which to issue a info.  The consensus is 1 for this
 
 ### {$UNIFI_LOAD_AVERAGE_HIGH}
 The load average value above which to issue a warning.  I have this set to 2.  Note that for switches and APs this value has less meaning since they process packets with specialized HW and this macro is overridden in the template to avoid too many warnings
-
 
 
 # SUCCESS!
