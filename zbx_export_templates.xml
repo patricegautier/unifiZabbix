@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.4</version>
-    <date>2021-08-23T06:43:30Z</date>
+    <date>2021-08-25T21:27:50Z</date>
     <groups>
         <group>
             <uuid>15155c95a3d048f4856272ae12fd42c5</uuid>
@@ -3426,7 +3426,6 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                     <name>mca-dump-feature-discovery</name>
                     <type>EXTERNAL</type>
                     <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH_FEATURE_DISCOVERY&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot; ]</key>
-                    <delay>1h</delay>
                     <history>0</history>
                     <trends>0</trends>
                     <value_type>TEXT</value_type>
@@ -3672,6 +3671,72 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                     <type>DEPENDENT</type>
                     <key>poe_discovery</key>
                     <delay>0</delay>
+                    <item_prototypes>
+                        <item_prototype>
+                            <uuid>2ae16684b40b44adb53ae3363094beef</uuid>
+                            <name>Max Power</name>
+                            <type>DEPENDENT</type>
+                            <key>_[{#MAX_POWER_KEY_NAME}]</key>
+                            <delay>0</delay>
+                            <units>W</units>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <parameters>
+                                        <parameter>$.total_max_power</parameter>
+                                    </parameters>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot; ]</key>
+                            </master_item>
+                            <tags>
+                                <tag>
+                                    <tag>Application</tag>
+                                    <value>Power</value>
+                                </tag>
+                            </tags>
+                        </item_prototype>
+                        <item_prototype>
+                            <uuid>a8f107c6ff074de28b110c188b139f79</uuid>
+                            <name>Percent Power Consumed</name>
+                            <type>CALCULATED</type>
+                            <key>_[{#PERCENT_POWER_CONSUMED_KEY_NAME}]</key>
+                            <params>100 * last(//_[{#TOTAL_POWER_CONSUMED_KEY_NAME}]) / last(//_[{#MAX_POWER_KEY_NAME}])</params>
+                            <tags>
+                                <tag>
+                                    <tag>Application</tag>
+                                    <value>Power</value>
+                                </tag>
+                            </tags>
+                        </item_prototype>
+                        <item_prototype>
+                            <uuid>318b0db443194b53afe55ccbda40bd4c</uuid>
+                            <name>Total Power Consumed</name>
+                            <type>DEPENDENT</type>
+                            <key>_[{#TOTAL_POWER_CONSUMED_KEY_NAME}]</key>
+                            <delay>0</delay>
+                            <value_type>FLOAT</value_type>
+                            <units>W</units>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <parameters>
+                                        <parameter>$.port_table[*].poe_power.sum()</parameter>
+                                    </parameters>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot; ]</key>
+                            </master_item>
+                            <tags>
+                                <tag>
+                                    <tag>Application</tag>
+                                    <value>Power</value>
+                                </tag>
+                            </tags>
+                        </item_prototype>
+                    </item_prototypes>
                     <master_item>
                         <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH_FEATURE_DISCOVERY&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot; ]</key>
                     </master_item>
@@ -3679,6 +3744,10 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         <lld_macro_path>
                             <lld_macro>{#MAX_POWER_KEY_NAME}</lld_macro>
                             <path>$.max_power_key_name</path>
+                        </lld_macro_path>
+                        <lld_macro_path>
+                            <lld_macro>{#PERCENT_POWER_CONSUMED_KEY_NAME}</lld_macro>
+                            <path>$.percent_power_consumed_key_name</path>
                         </lld_macro_path>
                         <lld_macro_path>
                             <lld_macro>{#TOTAL_POWER_CONSUMED_KEY_NAME}</lld_macro>

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-08-23T06:43:27Z'
+  date: '2021-08-25T21:27:47Z'
   groups:
     -
       uuid: 15155c95a3d048f4856272ae12fd42c5
@@ -2579,7 +2579,6 @@ zabbix_export:
           name: mca-dump-feature-discovery
           type: EXTERNAL
           key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "SWITCH_FEATURE_DISCOVERY", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}" ]'
-          delay: 1h
           history: '0'
           trends: '0'
           value_type: TEXT
@@ -2759,12 +2758,63 @@ zabbix_export:
           type: DEPENDENT
           key: poe_discovery
           delay: '0'
+          item_prototypes:
+            -
+              uuid: 2ae16684b40b44adb53ae3363094beef
+              name: 'Max Power'
+              type: DEPENDENT
+              key: '_[{#MAX_POWER_KEY_NAME}]'
+              delay: '0'
+              units: W
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.total_max_power
+              master_item:
+                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "SWITCH", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}" ]'
+              tags:
+                -
+                  tag: Application
+                  value: Power
+            -
+              uuid: a8f107c6ff074de28b110c188b139f79
+              name: 'Percent Power Consumed'
+              type: CALCULATED
+              key: '_[{#PERCENT_POWER_CONSUMED_KEY_NAME}]'
+              params: '100 * last(//_[{#TOTAL_POWER_CONSUMED_KEY_NAME}]) / last(//_[{#MAX_POWER_KEY_NAME}])'
+              tags:
+                -
+                  tag: Application
+                  value: Power
+            -
+              uuid: 318b0db443194b53afe55ccbda40bd4c
+              name: 'Total Power Consumed'
+              type: DEPENDENT
+              key: '_[{#TOTAL_POWER_CONSUMED_KEY_NAME}]'
+              delay: '0'
+              value_type: FLOAT
+              units: W
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.port_table[*].poe_power.sum()'
+              master_item:
+                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "SWITCH", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}" ]'
+              tags:
+                -
+                  tag: Application
+                  value: Power
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "SWITCH_FEATURE_DISCOVERY", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}" ]'
           lld_macro_paths:
             -
               lld_macro: '{#MAX_POWER_KEY_NAME}'
               path: $.max_power_key_name
+            -
+              lld_macro: '{#PERCENT_POWER_CONSUMED_KEY_NAME}'
+              path: $.percent_power_consumed_key_name
             -
               lld_macro: '{#TOTAL_POWER_CONSUMED_KEY_NAME}'
               path: $.total_power_consumed_key_name
