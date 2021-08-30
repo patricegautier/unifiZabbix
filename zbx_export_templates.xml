@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.4</version>
-    <date>2021-08-25T21:27:50Z</date>
+    <date>2021-08-30T22:33:54Z</date>
     <groups>
         <group>
             <uuid>15155c95a3d048f4856272ae12fd42c5</uuid>
@@ -3426,6 +3426,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                     <name>mca-dump-feature-discovery</name>
                     <type>EXTERNAL</type>
                     <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH_FEATURE_DISCOVERY&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot; ]</key>
+                    <delay>15m</delay>
                     <history>0</history>
                     <trends>0</trends>
                     <value_type>TEXT</value_type>
@@ -3665,6 +3666,57 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                 </item>
             </items>
             <discovery_rules>
+                <discovery_rule>
+                    <uuid>c63e03a538104cdebad4f428337e2952</uuid>
+                    <name>Fan Discovery</name>
+                    <type>DEPENDENT</type>
+                    <key>fan_discovery</key>
+                    <delay>0</delay>
+                    <item_prototypes>
+                        <item_prototype>
+                            <uuid>b84302d8102645eb882c4cec6131dddc</uuid>
+                            <name>Fan Level</name>
+                            <type>DEPENDENT</type>
+                            <key>_[{#FAN_LEVEL_KEY_NAME}]</key>
+                            <delay>0</delay>
+                            <units>%</units>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <parameters>
+                                        <parameter>$.fan_level</parameter>
+                                    </parameters>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot; ]</key>
+                            </master_item>
+                            <tags>
+                                <tag>
+                                    <tag>Application</tag>
+                                    <value>Power</value>
+                                </tag>
+                            </tags>
+                        </item_prototype>
+                    </item_prototypes>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;SWITCH_FEATURE_DISCOVERY&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot; ]</key>
+                    </master_item>
+                    <lld_macro_paths>
+                        <lld_macro_path>
+                            <lld_macro>{#FAN_LEVEL_KEY_NAME}</lld_macro>
+                            <path>$.fan_level_key_name</path>
+                        </lld_macro_path>
+                    </lld_macro_paths>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$[?(@.has_fan==&quot;true&quot;)]</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                </discovery_rule>
                 <discovery_rule>
                     <uuid>3440ec98490a4b40bcc1dddca0955cb8</uuid>
                     <name>POE Discovery</name>

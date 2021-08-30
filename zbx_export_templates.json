@@ -1,7 +1,7 @@
 {
     "zabbix_export": {
         "version": "5.4",
-        "date": "2021-08-25T21:27:52Z",
+        "date": "2021-08-30T22:33:56Z",
         "groups": [
             {
                 "uuid": "15155c95a3d048f4856272ae12fd42c5",
@@ -3395,6 +3395,7 @@
                         "name": "mca-dump-feature-discovery",
                         "type": "EXTERNAL",
                         "key": "mca-dump-short.sh[\"-d\",\"{HOST.CONN}\", \"-u\", \"{$UNIFI_USER}\", \"-i\", \"{$UNIFI_SSH_PRIV_KEY_PATH}\", \"-t\", \"SWITCH_FEATURE_DISCOVERY\", \"-p\", \"{$UNIFI_SSHPASS_PASSWORD_PATH}\" ]",
+                        "delay": "15m",
                         "history": "0",
                         "trends": "0",
                         "value_type": "TEXT",
@@ -3634,6 +3635,57 @@
                     }
                 ],
                 "discovery_rules": [
+                    {
+                        "uuid": "c63e03a538104cdebad4f428337e2952",
+                        "name": "Fan Discovery",
+                        "type": "DEPENDENT",
+                        "key": "fan_discovery",
+                        "delay": "0",
+                        "item_prototypes": [
+                            {
+                                "uuid": "b84302d8102645eb882c4cec6131dddc",
+                                "name": "Fan Level",
+                                "type": "DEPENDENT",
+                                "key": "_[{#FAN_LEVEL_KEY_NAME}]",
+                                "delay": "0",
+                                "units": "%",
+                                "preprocessing": [
+                                    {
+                                        "type": "JSONPATH",
+                                        "parameters": [
+                                            "$.fan_level"
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "mca-dump-short.sh[\"-d\",\"{HOST.CONN}\", \"-u\", \"{$UNIFI_USER}\", \"-i\", \"{$UNIFI_SSH_PRIV_KEY_PATH}\", \"-t\", \"SWITCH\", \"-p\", \"{$UNIFI_SSHPASS_PASSWORD_PATH}\" ]"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "Application",
+                                        "value": "Power"
+                                    }
+                                ]
+                            }
+                        ],
+                        "master_item": {
+                            "key": "mca-dump-short.sh[\"-d\",\"{HOST.CONN}\", \"-u\", \"{$UNIFI_USER}\", \"-i\", \"{$UNIFI_SSH_PRIV_KEY_PATH}\", \"-t\", \"SWITCH_FEATURE_DISCOVERY\", \"-p\", \"{$UNIFI_SSHPASS_PASSWORD_PATH}\" ]"
+                        },
+                        "lld_macro_paths": [
+                            {
+                                "lld_macro": "{#FAN_LEVEL_KEY_NAME}",
+                                "path": "$.fan_level_key_name"
+                            }
+                        ],
+                        "preprocessing": [
+                            {
+                                "type": "JSONPATH",
+                                "parameters": [
+                                    "$[?(@.has_fan==\"true\")]"
+                                ]
+                            }
+                        ]
+                    },
                     {
                         "uuid": "3440ec98490a4b40bcc1dddca0955cb8",
                         "name": "POE Discovery",
