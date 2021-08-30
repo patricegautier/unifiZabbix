@@ -59,6 +59,8 @@ elif [[ ${DEVICE_TYPE} == 'SWITCH_FEATURE_DISCOVERY' ]]; then
 	has_temperature: .has_temperature,\
 	temperature_key_name: \"temperature\",\
         overheating_key_name: \"overheating\",\
+	has_fan: .has_fan,\
+	fan_level_key_name: \"fan_level\"
 	} ]"
 elif [[ ${DEVICE_TYPE} == 'UDMP' ]]; then
 	JQ_OPTIONS='del (.dpi_stats) | del(.fingerprints)'
