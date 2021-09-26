@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-08-30T22:33:51Z'
+  date: '2021-09-26T21:39:05Z'
   groups:
     -
       uuid: 15155c95a3d048f4856272ae12fd42c5
@@ -2006,7 +2006,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          url: 'https://{HOST.NAME}:7443'
+          url: 'https://{HOST.NAME}'
           retrieve_mode: HEADERS
     -
       uuid: 0dbc328172e34d8c8b7f3cdfd554d08d
@@ -3519,6 +3519,60 @@ zabbix_export:
               tag: Application
               value: Host
         -
+          uuid: ff07a3572bfa4f089c7abf60cdc45163
+          name: 'Total Switch Rx Bandwidth'
+          type: DEPENDENT
+          key: total_switch_rx_bandwidth
+          delay: '0'
+          units: bps
+          description: 'Total Bandwidth Received by the 8 port switch embedded in the UDMP (ports 1-8)'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.port_table[?(@.port_idx < 9)].rx_bytes.sum()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+            -
+              type: MULTIPLIER
+              parameters:
+                - '8'
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}"]'
+          tags:
+            -
+              tag: Application
+              value: Traffic
+        -
+          uuid: 1ef97d3bf6b84e179d80ffe44c00bb40
+          name: 'Total Switch Tx Bandwidth'
+          type: DEPENDENT
+          key: total_switch_tx_bandwidth
+          delay: '0'
+          units: bps
+          description: 'Total Bandwidth Sent by the 8 port switch embedded in the UDMP (ports 1-8)'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.port_table[?(@.port_idx < 9)].tx_bytes.sum()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+            -
+              type: MULTIPLIER
+              parameters:
+                - '8'
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}"]'
+          tags:
+            -
+              tag: Application
+              value: Traffic
+        -
           uuid: b5b81d4dab514d4680b987094da82541
           name: 'Upload Bandwidth'
           type: DEPENDENT
@@ -3769,6 +3823,273 @@ zabbix_export:
             -
               lld_macro: '{#DNS_SERVER}'
               path: $.dns_server
+        -
+          uuid: 58568f925c7c4f7bb44800d431141b69
+          name: 'Site to Site VPN Discovery'
+          type: DEPENDENT
+          key: site_to_site_vpn_discovery
+          delay: '0'
+          item_prototypes:
+            -
+              uuid: cad8d443b86d43ebb33c90541668565d
+              name: 'Remote Site Rx Bandwidth - {#REMOTE_SITE_IP}'
+              type: DEPENDENT
+              key: 'remote_site_rx_bandwitdh[{#REMOTE_SITE_IP}]'
+              delay: '0'
+              units: bps
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.vpn[*].remotes[?(@.ip  == ''{#REMOTE_SITE_IP}'')].rxBytes.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+              master_item:
+                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}"]'
+              tags:
+                -
+                  tag: Application
+                  value: Traffic
+            -
+              uuid: f1d38f4931a640e49b8c68d027d5f968
+              name: 'Remote Site Tx Bandwidth - {#REMOTE_SITE_IP}'
+              type: DEPENDENT
+              key: 'remote_site_tx_bandwitdh[{#REMOTE_SITE_IP}]'
+              delay: '0'
+              units: bps
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.vpn[*].remotes[?(@.ip  == ''{#REMOTE_SITE_IP}'')].txBytes.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+              master_item:
+                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}"]'
+              tags:
+                -
+                  tag: Application
+                  value: Traffic
+          graph_prototypes:
+            -
+              uuid: 3195d5951a92422bb2a2c992ab0cb348
+              name: 'Remote Site Bandwidth {#REMOTE_SITE_IP}'
+              graph_items:
+                -
+                  sortorder: '1'
+                  color: 1A7C11
+                  item:
+                    host: 'Unifi UDMP'
+                    key: 'remote_site_rx_bandwitdh[{#REMOTE_SITE_IP}]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'Unifi UDMP'
+                    key: 'remote_site_tx_bandwitdh[{#REMOTE_SITE_IP}]'
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}"]'
+          lld_macro_paths:
+            -
+              lld_macro: '{#REMOTE_SITE_IP}'
+              path: $.ip
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.vpn[*].remotes[0]'
+        -
+          uuid: c4593426190a422dbdf3341a066c4214
+          name: 'Switch Port Discovery'
+          type: DEPENDENT
+          key: switch_port_discovery
+          delay: '0'
+          item_prototypes:
+            -
+              uuid: 679a3e2856dd46c6a966843c44738a5b
+              name: '{{#PORT_IS_UPLINK}.regsub("true", "Uplink")} {{#PORT_MEDIA}.regsub("SFP", \0)} Port {#PORT_IDX} Connection Speed'
+              type: DEPENDENT
+              key: 'connection_speed_[{#PORT_IDX}]'
+              delay: '0'
+              units: bps
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.port_table[ ?(@.port_idx==''{#PORT_IDX}'')].speed.first()'
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1000000'
+              master_item:
+                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}"]'
+              tags:
+                -
+                  tag: Application
+                  value: Traffic
+            -
+              uuid: 1b52fd26f9654509a911f6a43d8658ab
+              name: '{{#PORT_IS_UPLINK}.regsub("true", "Uplink")} {{#PORT_MEDIA}.regsub("SFP", \0)} Port {#PORT_IDX} Uplink'
+              type: DEPENDENT
+              key: 'is_uplink_[{#PORT_IDX}]'
+              delay: '0'
+              trends: '0'
+              value_type: CHAR
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.port_table[ ?(@.port_idx==''{#PORT_IDX}'')].is_uplink.first()'
+              master_item:
+                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}"]'
+              tags:
+                -
+                  tag: Application
+                  value: Traffic
+            -
+              uuid: 0d02ff3c40e94f4b9c0495fafc3f9a1c
+              name: '{{#PORT_IS_UPLINK}.regsub("true", "Uplink")} {{#PORT_MEDIA}.regsub("SFP", \0)} Port {#PORT_IDX} Rx Bandwidth'
+              type: DEPENDENT
+              key: 'rx_port_[{#PORT_IDX}]'
+              delay: '0'
+              units: bps
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.port_table[ ?(@.port_idx==''{#PORT_IDX}'')].rx_bytes.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+              master_item:
+                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}"]'
+              tags:
+                -
+                  tag: Application
+                  value: Traffic
+            -
+              uuid: 78a554f976144a7ea4db83051148a91b
+              name: '{{#PORT_IS_UPLINK}.regsub("true", "Uplink")} {{#PORT_MEDIA}.regsub("SFP", \0)} Port {#PORT_IDX} Tx Bandwidth'
+              type: DEPENDENT
+              key: 'tx_port_[{#PORT_IDX}]'
+              delay: '0'
+              units: bps
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.port_table[ ?(@.port_idx==''{#PORT_IDX}'')].tx_bytes.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+              master_item:
+                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}"]'
+              tags:
+                -
+                  tag: Application
+                  value: Traffic
+            -
+              uuid: c42462fcfe1e47b4abc2ca083d18d458
+              name: '{{#PORT_IS_UPLINK}.regsub("true", "Uplink")} {{#PORT_MEDIA}.regsub("SFP", \0)} Port {#PORT_IDX} Up'
+              type: DEPENDENT
+              key: 'up_[{#PORT_IDX}]'
+              delay: '0'
+              trends: '0'
+              value_type: CHAR
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.port_table[ ?(@.port_idx==''{#PORT_IDX}'')].up.first()'
+              master_item:
+                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}"]'
+              tags:
+                -
+                  tag: Application
+                  value: Traffic
+          trigger_prototypes:
+            -
+              uuid: 6e678d3587d944b8bb4a87b7a5ef5935
+              expression: 'last(/Unifi UDMP/connection_speed_[{#PORT_IDX}],#1)>0 and last(/Unifi UDMP/up_[{#PORT_IDX}],#1)="true" and ( avg(/Unifi UDMP/rx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})>last(/Unifi UDMP/connection_speed_[{#PORT_IDX}],#1)*.25 or avg(/Unifi UDMP/tx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})>last(/Unifi UDMP/connection_speed_[{#PORT_IDX}],#1)*.25 )'
+              name: '{{#PORT_IS_UPLINK}.regsub("true", "Uplink")} {{#PORT_MEDIA}.regsub("SFP", \0)} Port {#PORT_IDX} above 25%'
+              priority: INFO
+              dependencies:
+                -
+                  name: '{{#PORT_IS_UPLINK}.regsub("true", "Uplink")} {{#PORT_MEDIA}.regsub("SFP", \0)} Port {#PORT_IDX} above 50%'
+                  expression: 'last(/Unifi UDMP/connection_speed_[{#PORT_IDX}],#1)>0 and last(/Unifi UDMP/up_[{#PORT_IDX}],#1)="true" and (  avg(/Unifi UDMP/rx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})>last(/Unifi UDMP/connection_speed_[{#PORT_IDX}],#1)*.5 or avg(/Unifi UDMP/tx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})>last(/Unifi UDMP/connection_speed_[{#PORT_IDX}],#1)*.5 )'
+            -
+              uuid: 14c2ce7629714ff38b1ed1fcaae6ebd3
+              expression: 'last(/Unifi UDMP/connection_speed_[{#PORT_IDX}],#1)>0 and last(/Unifi UDMP/up_[{#PORT_IDX}],#1)="true" and (  avg(/Unifi UDMP/rx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})>last(/Unifi UDMP/connection_speed_[{#PORT_IDX}],#1)*.5 or avg(/Unifi UDMP/tx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})>last(/Unifi UDMP/connection_speed_[{#PORT_IDX}],#1)*.5 )'
+              name: '{{#PORT_IS_UPLINK}.regsub("true", "Uplink")} {{#PORT_MEDIA}.regsub("SFP", \0)} Port {#PORT_IDX} above 50%'
+              priority: WARNING
+              dependencies:
+                -
+                  name: '{{#PORT_IS_UPLINK}.regsub("true", "Uplink")} {{#PORT_MEDIA}.regsub("SFP", \0)} Port {#PORT_IDX} above 75%'
+                  expression: 'last(/Unifi UDMP/connection_speed_[{#PORT_IDX}],#1)>0 and last(/Unifi UDMP/up_[{#PORT_IDX}],#1)="true" and ( avg(/Unifi UDMP/rx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})>last(/Unifi UDMP/connection_speed_[{#PORT_IDX}],#1)*.75 or avg(/Unifi UDMP/tx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})>last(/Unifi UDMP/connection_speed_[{#PORT_IDX}],#1)*.75 )'
+            -
+              uuid: 37beea9d4c814e8f8818ddc65c207e3c
+              expression: 'last(/Unifi UDMP/connection_speed_[{#PORT_IDX}],#1)>0 and last(/Unifi UDMP/up_[{#PORT_IDX}],#1)="true" and ( avg(/Unifi UDMP/rx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})>last(/Unifi UDMP/connection_speed_[{#PORT_IDX}],#1)*.75 or avg(/Unifi UDMP/tx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})>last(/Unifi UDMP/connection_speed_[{#PORT_IDX}],#1)*.75 )'
+              name: '{{#PORT_IS_UPLINK}.regsub("true", "Uplink")} {{#PORT_MEDIA}.regsub("SFP", \0)} Port {#PORT_IDX} above 75%'
+              priority: AVERAGE
+          graph_prototypes:
+            -
+              uuid: 877968bc3fbb4d2daf2421e3e4b31569
+              name: '{{#PORT_IS_UPLINK}.regsub("true", "Uplink")} {{#PORT_MEDIA}.regsub("SFP", \0)} Port {#PORT_IDX} Port I/O'
+              graph_items:
+                -
+                  sortorder: '1'
+                  color: 1A7C11
+                  item:
+                    host: 'Unifi UDMP'
+                    key: 'rx_port_[{#PORT_IDX}]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'Unifi UDMP'
+                    key: 'tx_port_[{#PORT_IDX}]'
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}"]'
+          lld_macro_paths:
+            -
+              lld_macro: '{#LOCAL_PORT_NAME}'
+              path: $.local_port_name
+            -
+              lld_macro: '{#PORT_IDX}'
+              path: $.port_idx
+            -
+              lld_macro: '{#PORT_IS_UPLINK}'
+              path: $.is_uplink
+            -
+              lld_macro: '{#PORT_MEDIA}'
+              path: $.media
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.port_table
       macros:
         -
           macro: '{$UNIFI_USER}'
@@ -4475,50 +4796,6 @@ zabbix_export:
             host: 'UBNT Airmax'
             key: airTimeSmooth
     -
-      uuid: d09d7d135dfc49d0b35e2a0ed5d2ac20
-      name: Bandwidth
-      graph_items:
-        -
-          sortorder: '1'
-          color: 1A7C11
-          item:
-            host: 'Unifi USG'
-            key: download_bandwidth_smooth
-        -
-          sortorder: '2'
-          color: F63100
-          item:
-            host: 'Unifi USG'
-            key: upload_bandwidth_smooth
-    -
-      uuid: fad2952510f34a4897c8194393d3e6e3
-      name: Bandwidth
-      graph_items:
-        -
-          sortorder: '1'
-          color: 1A7C11
-          item:
-            host: 'Unifi Protect Camera'
-            key: rx_bandwidth
-        -
-          sortorder: '2'
-          color: F63100
-          item:
-            host: 'Unifi Protect Camera'
-            key: tx_bandwidth
-        -
-          sortorder: '3'
-          color: 2774A4
-          item:
-            host: 'Unifi Protect Camera'
-            key: tx_bandwidth_smooth
-        -
-          sortorder: '4'
-          color: A54F10
-          item:
-            host: 'Unifi Protect Camera'
-            key: outgoing_bandwidth_moving_average_threshold_raw
-    -
       uuid: 97ccfef4197444c69af57ca79513fd16
       name: Bandwidth
       graph_items:
@@ -4550,6 +4827,50 @@ zabbix_export:
           item:
             host: 'Unifi UDMP'
             key: upload_bandwidth
+    -
+      uuid: fad2952510f34a4897c8194393d3e6e3
+      name: Bandwidth
+      graph_items:
+        -
+          sortorder: '1'
+          color: 1A7C11
+          item:
+            host: 'Unifi Protect Camera'
+            key: rx_bandwidth
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Unifi Protect Camera'
+            key: tx_bandwidth
+        -
+          sortorder: '3'
+          color: 2774A4
+          item:
+            host: 'Unifi Protect Camera'
+            key: tx_bandwidth_smooth
+        -
+          sortorder: '4'
+          color: A54F10
+          item:
+            host: 'Unifi Protect Camera'
+            key: outgoing_bandwidth_moving_average_threshold_raw
+    -
+      uuid: d09d7d135dfc49d0b35e2a0ed5d2ac20
+      name: Bandwidth
+      graph_items:
+        -
+          sortorder: '1'
+          color: 1A7C11
+          item:
+            host: 'Unifi USG'
+            key: download_bandwidth_smooth
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Unifi USG'
+            key: upload_bandwidth_smooth
     -
       uuid: 0d21337806de4d03bda1b762c0a98ee4
       name: Bandwidth
@@ -4600,22 +4921,6 @@ zabbix_export:
             host: 'SunMAX SolarPoint'
             key: batteryVoltage
     -
-      uuid: 347ef23ef5a94b629dabcc89b74331a0
-      name: 'CPU and Memory'
-      graph_items:
-        -
-          sortorder: '1'
-          color: 1A7C11
-          item:
-            host: 'Unifi USG'
-            key: cpu_smooth
-        -
-          sortorder: '2'
-          color: F63100
-          item:
-            host: 'Unifi USG'
-            key: memory
-    -
       uuid: f7f3c8e61e564d0d9f8057f70d9c0072
       name: 'CPU and Memory'
       graph_items:
@@ -4646,6 +4951,22 @@ zabbix_export:
           color: F63100
           item:
             host: 'Unifi Switch'
+            key: memory
+    -
+      uuid: 347ef23ef5a94b629dabcc89b74331a0
+      name: 'CPU and Memory'
+      graph_items:
+        -
+          sortorder: '1'
+          color: 1A7C11
+          item:
+            host: 'Unifi USG'
+            key: cpu_smooth
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Unifi USG'
             key: memory
     -
       uuid: 2cec753f0a24451fb95a06fd19a0ae8d
@@ -4772,12 +5093,34 @@ zabbix_export:
             host: 'UBNT Airmax'
             key: signalSmooth
     -
+      uuid: 32f787121dc94a769829896a44364785
+      name: 'Total Embedded Switch Bandwidth'
+      graph_items:
+        -
+          sortorder: '1'
+          color: 1A7C11
+          item:
+            host: 'Unifi UDMP'
+            key: total_switch_rx_bandwidth
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Unifi UDMP'
+            key: total_switch_tx_bandwidth
+    -
       uuid: 160a7ded8ed04fbdba40c5126962be4a
       name: 'Total Traffic'
       graph_items:
         -
           sortorder: '1'
           color: 1A7C11
+          item:
+            host: 'Unifi Switch'
+            key: total_rx_bandwidth
+        -
+          sortorder: '2'
+          color: F63100
           item:
             host: 'Unifi Switch'
             key: total_rx_bandwidth
