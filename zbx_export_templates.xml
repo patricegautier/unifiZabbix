@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.4</version>
-    <date>2021-09-26T21:39:07Z</date>
+    <date>2021-10-01T20:15:12Z</date>
     <groups>
         <group>
             <uuid>15155c95a3d048f4856272ae12fd42c5</uuid>
@@ -5149,7 +5149,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                     <delay>0</delay>
                     <item_prototypes>
                         <item_prototype>
-                            <uuid>cad8d443b86d43ebb33c90541668565d</uuid>
+                            <uuid>c797de40215b4b99a2e6fec77cbf6d6e</uuid>
                             <name>Remote Site Rx Bandwidth - {#REMOTE_SITE_IP}</name>
                             <type>DEPENDENT</type>
                             <key>remote_site_rx_bandwitdh[{#REMOTE_SITE_IP}]</key>
@@ -5159,19 +5159,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                                 <step>
                                     <type>JSONPATH</type>
                                     <parameters>
-                                        <parameter>$.vpn[*].remotes[?(@.ip  == '{#REMOTE_SITE_IP}')].rxBytes.first()</parameter>
-                                    </parameters>
-                                </step>
-                                <step>
-                                    <type>CHANGE_PER_SECOND</type>
-                                    <parameters>
-                                        <parameter/>
-                                    </parameters>
-                                </step>
-                                <step>
-                                    <type>MULTIPLIER</type>
-                                    <parameters>
-                                        <parameter>8</parameter>
+                                        <parameter>$.vpn[*].remotes[?(@.ip  == '{#REMOTE_SITE_IP}')].rxRate.first()</parameter>
                                     </parameters>
                                 </step>
                             </preprocessing>
@@ -5186,7 +5174,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                             </tags>
                         </item_prototype>
                         <item_prototype>
-                            <uuid>f1d38f4931a640e49b8c68d027d5f968</uuid>
+                            <uuid>699f174819c64cf79820addab60c3a67</uuid>
                             <name>Remote Site Tx Bandwidth - {#REMOTE_SITE_IP}</name>
                             <type>DEPENDENT</type>
                             <key>remote_site_tx_bandwitdh[{#REMOTE_SITE_IP}]</key>
@@ -5196,19 +5184,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                                 <step>
                                     <type>JSONPATH</type>
                                     <parameters>
-                                        <parameter>$.vpn[*].remotes[?(@.ip  == '{#REMOTE_SITE_IP}')].txBytes.first()</parameter>
-                                    </parameters>
-                                </step>
-                                <step>
-                                    <type>CHANGE_PER_SECOND</type>
-                                    <parameters>
-                                        <parameter/>
-                                    </parameters>
-                                </step>
-                                <step>
-                                    <type>MULTIPLIER</type>
-                                    <parameters>
-                                        <parameter>8</parameter>
+                                        <parameter>$.vpn[*].remotes[?(@.ip  == '{#REMOTE_SITE_IP}')].txRate.first()</parameter>
                                     </parameters>
                                 </step>
                             </preprocessing>
@@ -5225,8 +5201,8 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                     </item_prototypes>
                     <graph_prototypes>
                         <graph_prototype>
-                            <uuid>3195d5951a92422bb2a2c992ab0cb348</uuid>
-                            <name>Remote Site Bandwidth {#REMOTE_SITE_IP}</name>
+                            <uuid>25bf1af2bd6b4629bd724b6251d197c1</uuid>
+                            <name>Remote Site Bandwidth - {#REMOTE_SITE_IP}</name>
                             <graph_items>
                                 <graph_item>
                                     <sortorder>1</sortorder>

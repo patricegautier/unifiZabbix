@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-09-26T21:39:05Z'
+  date: '2021-10-01T20:15:09Z'
   groups:
     -
       uuid: 15155c95a3d048f4856272ae12fd42c5
@@ -3831,7 +3831,7 @@ zabbix_export:
           delay: '0'
           item_prototypes:
             -
-              uuid: cad8d443b86d43ebb33c90541668565d
+              uuid: c797de40215b4b99a2e6fec77cbf6d6e
               name: 'Remote Site Rx Bandwidth - {#REMOTE_SITE_IP}'
               type: DEPENDENT
               key: 'remote_site_rx_bandwitdh[{#REMOTE_SITE_IP}]'
@@ -3841,15 +3841,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.vpn[*].remotes[?(@.ip  == ''{#REMOTE_SITE_IP}'')].rxBytes.first()'
-                -
-                  type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
-                -
-                  type: MULTIPLIER
-                  parameters:
-                    - '8'
+                    - '$.vpn[*].remotes[?(@.ip  == ''{#REMOTE_SITE_IP}'')].rxRate.first()'
               master_item:
                 key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}"]'
               tags:
@@ -3857,7 +3849,7 @@ zabbix_export:
                   tag: Application
                   value: Traffic
             -
-              uuid: f1d38f4931a640e49b8c68d027d5f968
+              uuid: 699f174819c64cf79820addab60c3a67
               name: 'Remote Site Tx Bandwidth - {#REMOTE_SITE_IP}'
               type: DEPENDENT
               key: 'remote_site_tx_bandwitdh[{#REMOTE_SITE_IP}]'
@@ -3867,15 +3859,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.vpn[*].remotes[?(@.ip  == ''{#REMOTE_SITE_IP}'')].txBytes.first()'
-                -
-                  type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
-                -
-                  type: MULTIPLIER
-                  parameters:
-                    - '8'
+                    - '$.vpn[*].remotes[?(@.ip  == ''{#REMOTE_SITE_IP}'')].txRate.first()'
               master_item:
                 key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}"]'
               tags:
@@ -3884,8 +3868,8 @@ zabbix_export:
                   value: Traffic
           graph_prototypes:
             -
-              uuid: 3195d5951a92422bb2a2c992ab0cb348
-              name: 'Remote Site Bandwidth {#REMOTE_SITE_IP}'
+              uuid: 25bf1af2bd6b4629bd724b6251d197c1
+              name: 'Remote Site Bandwidth - {#REMOTE_SITE_IP}'
               graph_items:
                 -
                   sortorder: '1'
