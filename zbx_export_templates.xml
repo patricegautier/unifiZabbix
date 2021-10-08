@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.4</version>
-    <date>2021-10-08T00:25:22Z</date>
+    <date>2021-10-08T01:11:51Z</date>
     <groups>
         <group>
             <uuid>15155c95a3d048f4856272ae12fd42c5</uuid>
@@ -4296,34 +4296,34 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                     </item_prototypes>
                     <trigger_prototypes>
                         <trigger_prototype>
+                            <uuid>2bb9f140e9254b83b86f5318fd3a5240</uuid>
+                            <expression>last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)&gt;0 and last(/Unifi Switch/up_[{#PORT_IDX}],#1)=&quot;true&quot; and last(/Unifi Switch/stp_state_[{#PORT_IDX}],#1)=&quot;forwarding&quot; and ( avg(/Unifi Switch/rx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})&gt;last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)*{$UNIFI_PORT_USAGE_AVERAGE_THRESHOLD}/100 or avg(/Unifi Switch/tx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})&gt;last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)*{$UNIFI_PORT_USAGE_AVERAGE_THRESHOLD}/100 )</expression>
+                            <name>{{#PORT_IS_UPLINK}.regsub(&quot;true&quot;, &quot;Uplink&quot;)} {{#PORT_MEDIA}.regsub(&quot;SFP&quot;, \0)} Port {#PORT_IDX} above {$UNIFI_PORT_USAGE_AVERAGE_THRESHOLD}%</name>
+                            <priority>AVERAGE</priority>
+                        </trigger_prototype>
+                        <trigger_prototype>
                             <uuid>ce61140da14e4a1ea919f2e083ee6835</uuid>
-                            <expression>last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)&gt;0 and last(/Unifi Switch/up_[{#PORT_IDX}],#1)=&quot;true&quot; and last(/Unifi Switch/stp_state_[{#PORT_IDX}],#1)=&quot;forwarding&quot; and ( avg(/Unifi Switch/rx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})&gt;last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)*.25 or avg(/Unifi Switch/tx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})&gt;last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)*.25 )</expression>
-                            <name>{{#PORT_IS_UPLINK}.regsub(&quot;true&quot;, &quot;Uplink&quot;)} {{#PORT_MEDIA}.regsub(&quot;SFP&quot;, \0)} Port {#PORT_IDX} above 25%</name>
+                            <expression>last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)&gt;0 and last(/Unifi Switch/up_[{#PORT_IDX}],#1)=&quot;true&quot; and last(/Unifi Switch/stp_state_[{#PORT_IDX}],#1)=&quot;forwarding&quot; and ( avg(/Unifi Switch/rx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})&gt;last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)*{$UNIFI_PORT_USAGE_INFO_THRESHOLD}/100 or avg(/Unifi Switch/tx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})&gt;last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)*{$UNIFI_PORT_USAGE_INFO_THRESHOLD}/100 )</expression>
+                            <name>{{#PORT_IS_UPLINK}.regsub(&quot;true&quot;, &quot;Uplink&quot;)} {{#PORT_MEDIA}.regsub(&quot;SFP&quot;, \0)} Port {#PORT_IDX} above {$UNIFI_PORT_USAGE_INFO_THRESHOLD}%</name>
                             <priority>INFO</priority>
                             <dependencies>
                                 <dependency>
-                                    <name>{{#PORT_IS_UPLINK}.regsub(&quot;true&quot;, &quot;Uplink&quot;)} {{#PORT_MEDIA}.regsub(&quot;SFP&quot;, \0)} Port {#PORT_IDX} above 50%</name>
-                                    <expression>last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)&gt;0 and last(/Unifi Switch/up_[{#PORT_IDX}],#1)=&quot;true&quot; and last(/Unifi Switch/stp_state_[{#PORT_IDX}],#1)=&quot;forwarding&quot; and (  avg(/Unifi Switch/rx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})&gt;last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)*.5 or avg(/Unifi Switch/tx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})&gt;last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)*.5 )</expression>
+                                    <name>{{#PORT_IS_UPLINK}.regsub(&quot;true&quot;, &quot;Uplink&quot;)} {{#PORT_MEDIA}.regsub(&quot;SFP&quot;, \0)} Port {#PORT_IDX} above {$UNIFI_PORT_USAGE_WARNING_THRESHOLD}%</name>
+                                    <expression>last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)&gt;0 and last(/Unifi Switch/up_[{#PORT_IDX}],#1)=&quot;true&quot; and last(/Unifi Switch/stp_state_[{#PORT_IDX}],#1)=&quot;forwarding&quot; and (  avg(/Unifi Switch/rx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})&gt;last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)*{$UNIFI_PORT_USAGE_WARNING_THRESHOLD}/100 or avg(/Unifi Switch/tx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})&gt;last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)*{$UNIFI_PORT_USAGE_WARNING_THRESHOLD}/100 )</expression>
                                 </dependency>
                             </dependencies>
                         </trigger_prototype>
                         <trigger_prototype>
                             <uuid>054404edaf6b444a9c293b68a48a9adf</uuid>
-                            <expression>last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)&gt;0 and last(/Unifi Switch/up_[{#PORT_IDX}],#1)=&quot;true&quot; and last(/Unifi Switch/stp_state_[{#PORT_IDX}],#1)=&quot;forwarding&quot; and (  avg(/Unifi Switch/rx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})&gt;last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)*.5 or avg(/Unifi Switch/tx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})&gt;last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)*.5 )</expression>
-                            <name>{{#PORT_IS_UPLINK}.regsub(&quot;true&quot;, &quot;Uplink&quot;)} {{#PORT_MEDIA}.regsub(&quot;SFP&quot;, \0)} Port {#PORT_IDX} above 50%</name>
+                            <expression>last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)&gt;0 and last(/Unifi Switch/up_[{#PORT_IDX}],#1)=&quot;true&quot; and last(/Unifi Switch/stp_state_[{#PORT_IDX}],#1)=&quot;forwarding&quot; and (  avg(/Unifi Switch/rx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})&gt;last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)*{$UNIFI_PORT_USAGE_WARNING_THRESHOLD}/100 or avg(/Unifi Switch/tx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})&gt;last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)*{$UNIFI_PORT_USAGE_WARNING_THRESHOLD}/100 )</expression>
+                            <name>{{#PORT_IS_UPLINK}.regsub(&quot;true&quot;, &quot;Uplink&quot;)} {{#PORT_MEDIA}.regsub(&quot;SFP&quot;, \0)} Port {#PORT_IDX} above {$UNIFI_PORT_USAGE_WARNING_THRESHOLD}%</name>
                             <priority>WARNING</priority>
                             <dependencies>
                                 <dependency>
-                                    <name>{{#PORT_IS_UPLINK}.regsub(&quot;true&quot;, &quot;Uplink&quot;)} {{#PORT_MEDIA}.regsub(&quot;SFP&quot;, \0)} Port {#PORT_IDX} above 75%</name>
-                                    <expression>last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)&gt;0 and last(/Unifi Switch/up_[{#PORT_IDX}],#1)=&quot;true&quot; and last(/Unifi Switch/stp_state_[{#PORT_IDX}],#1)=&quot;forwarding&quot; and ( avg(/Unifi Switch/rx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})&gt;last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)*.75 or avg(/Unifi Switch/tx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})&gt;last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)*.75 )</expression>
+                                    <name>{{#PORT_IS_UPLINK}.regsub(&quot;true&quot;, &quot;Uplink&quot;)} {{#PORT_MEDIA}.regsub(&quot;SFP&quot;, \0)} Port {#PORT_IDX} above {$UNIFI_PORT_USAGE_AVERAGE_THRESHOLD}%</name>
+                                    <expression>last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)&gt;0 and last(/Unifi Switch/up_[{#PORT_IDX}],#1)=&quot;true&quot; and last(/Unifi Switch/stp_state_[{#PORT_IDX}],#1)=&quot;forwarding&quot; and ( avg(/Unifi Switch/rx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})&gt;last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)*{$UNIFI_PORT_USAGE_AVERAGE_THRESHOLD}/100 or avg(/Unifi Switch/tx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})&gt;last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)*{$UNIFI_PORT_USAGE_AVERAGE_THRESHOLD}/100 )</expression>
                                 </dependency>
                             </dependencies>
-                        </trigger_prototype>
-                        <trigger_prototype>
-                            <uuid>2bb9f140e9254b83b86f5318fd3a5240</uuid>
-                            <expression>last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)&gt;0 and last(/Unifi Switch/up_[{#PORT_IDX}],#1)=&quot;true&quot; and last(/Unifi Switch/stp_state_[{#PORT_IDX}],#1)=&quot;forwarding&quot; and ( avg(/Unifi Switch/rx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})&gt;last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)*.75 or avg(/Unifi Switch/tx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})&gt;last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)*.75 )</expression>
-                            <name>{{#PORT_IS_UPLINK}.regsub(&quot;true&quot;, &quot;Uplink&quot;)} {{#PORT_MEDIA}.regsub(&quot;SFP&quot;, \0)} Port {#PORT_IDX} above 75%</name>
-                            <priority>AVERAGE</priority>
                         </trigger_prototype>
                     </trigger_prototypes>
                     <graph_prototypes>

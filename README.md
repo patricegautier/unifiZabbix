@@ -180,15 +180,21 @@ The load average value above which to issue a info.  The consensus is 1 for this
 The load average value above which to issue a warning.  I have this set to 2.  Note that for switches and APs this value has less meaning since they process packets with specialized HW and this macro is overridden in the template to avoid too many warnings
 
 ### {$UNIFI_CHANNEL_INTERFERENCE_INFO_THRESHOLD}
-### {$UNIFI_CHANNEL_INTERFERENCE_INFO_THRESHOLD}
+### {$UNIFI_CHANNEL_INTERFERENCE_AVERAGE_THRESHOLD}
 The percentages above which to issue and info/average event for channel interferences.  I have this set to 30 and 50 respectively
-You can customize this for 2G/5G with {$UNIFI_CHANNEL_INTERFERENCE_INFO_THRESHOLD:"ng"} or {$UNIFI_CHANNEL_INTERFERENCE_INFO_THRESHOLD:"na"} values
+You can customize this for 2G/5G with {$UNIFI_CHANNEL_INTERFERENCE_INFO_THRESHOLD:"ng"} or {$UNIFI_CHANNEL_INTERFERENCE_AVERAGE_THRESHOLD:"na"} values
 
 
 ### {$UNIFI_CHANNEL_USAGE_INFO_THRESHOLD}
 ### {$UNIFI_CHANNEL_USAGE_AVERAGE_THRESHOLD}
 The percentages above which to issue and info/average event for Channel usage.  I have this set to 30 and 50 respectively
 You can customize this for 2G/5G with {$UNIFI_CHANNEL_USAGE_INFO_THRESHOLD:"ng"} or {$UNIFI_USAGE_INTERFERENCE_INFO_THRESHOLD:"na"} values
+
+### {$UNIFI_PORT_USAGE_INFO_THRESHOLD}
+### {$UNIFI_PORT_USAGE_WARNING_THRESHOLD}
+### {$UNIFI_PORT_USAGE_AVERAGE_THRESHOLD}
+The percentages above which to issue and info/average event for switch Port usage.  I have this set to 40, 60 and 50 respectively
+
 
 
 
@@ -200,7 +206,7 @@ If you got this far, congratulations the install is complete!  Now for the funne
 
 # Graphs
 
-If everything is working you should be able to see data flowing in the Monitoring > Latest Data section of Zabbix.  Time to set up some graphs..  Unfortunately Zabbix doesn't to have a good way to share graphs as it does for templates, so here is a quick rundown of what I have setup..:
+If everything is working you should be able to see data flowing in the Monitoring > Latest Data section of Zabbix.  Time to set up some graphs..  I have some basic graphs setup in the templates themselves, unfortunately Zabbix doesn't to have a good way to share the fancier graphs as it does for templates, so here is a quick rundown of what I have setup..:
 
 
 ## UDMP|USG Wan Download
@@ -209,7 +215,7 @@ If everything is working you should be able to see data flowing in the Monitorin
 ## UDMP|USG Wan Upload
 ![Wan Upload](/images/wanUpload.png)
 
-Observe the tight correlation between upload bandwidt and latency.. Cable technology at its finest!
+Observe the tight correlation between upload bandwidth and latency.. Cable technology at its finest!
 
 ## Router: InterVLAN traffic by network
 ![InterVLAN](/images/intervlan.png)
@@ -302,7 +308,6 @@ i.e automatically create all the proper hosts connected to the proper templates 
 
 Most of the pain in setting those templates up is debugging the SSH connections..  Add pre-processing to check for valid json on mca-dump-short to all templates
 
-## SolarPoint support
 
 ## Even Moar data!
 

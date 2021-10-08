@@ -1,7 +1,7 @@
 {
     "zabbix_export": {
         "version": "5.4",
-        "date": "2021-10-08T00:25:24Z",
+        "date": "2021-10-08T01:11:53Z",
         "groups": [
             {
                 "uuid": "15155c95a3d048f4856272ae12fd42c5",
@@ -4265,34 +4265,34 @@
                         ],
                         "trigger_prototypes": [
                             {
+                                "uuid": "2bb9f140e9254b83b86f5318fd3a5240",
+                                "expression": "last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)>0 and last(/Unifi Switch/up_[{#PORT_IDX}],#1)=\"true\" and last(/Unifi Switch/stp_state_[{#PORT_IDX}],#1)=\"forwarding\" and ( avg(/Unifi Switch/rx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})>last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)*{$UNIFI_PORT_USAGE_AVERAGE_THRESHOLD}/100 or avg(/Unifi Switch/tx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})>last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)*{$UNIFI_PORT_USAGE_AVERAGE_THRESHOLD}/100 )",
+                                "name": "{{#PORT_IS_UPLINK}.regsub(\"true\", \"Uplink\")} {{#PORT_MEDIA}.regsub(\"SFP\", \\0)} Port {#PORT_IDX} above {$UNIFI_PORT_USAGE_AVERAGE_THRESHOLD}%",
+                                "priority": "AVERAGE"
+                            },
+                            {
                                 "uuid": "ce61140da14e4a1ea919f2e083ee6835",
-                                "expression": "last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)>0 and last(/Unifi Switch/up_[{#PORT_IDX}],#1)=\"true\" and last(/Unifi Switch/stp_state_[{#PORT_IDX}],#1)=\"forwarding\" and ( avg(/Unifi Switch/rx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})>last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)*.25 or avg(/Unifi Switch/tx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})>last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)*.25 )",
-                                "name": "{{#PORT_IS_UPLINK}.regsub(\"true\", \"Uplink\")} {{#PORT_MEDIA}.regsub(\"SFP\", \\0)} Port {#PORT_IDX} above 25%",
+                                "expression": "last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)>0 and last(/Unifi Switch/up_[{#PORT_IDX}],#1)=\"true\" and last(/Unifi Switch/stp_state_[{#PORT_IDX}],#1)=\"forwarding\" and ( avg(/Unifi Switch/rx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})>last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)*{$UNIFI_PORT_USAGE_INFO_THRESHOLD}/100 or avg(/Unifi Switch/tx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})>last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)*{$UNIFI_PORT_USAGE_INFO_THRESHOLD}/100 )",
+                                "name": "{{#PORT_IS_UPLINK}.regsub(\"true\", \"Uplink\")} {{#PORT_MEDIA}.regsub(\"SFP\", \\0)} Port {#PORT_IDX} above {$UNIFI_PORT_USAGE_INFO_THRESHOLD}%",
                                 "priority": "INFO",
                                 "dependencies": [
                                     {
-                                        "name": "{{#PORT_IS_UPLINK}.regsub(\"true\", \"Uplink\")} {{#PORT_MEDIA}.regsub(\"SFP\", \\0)} Port {#PORT_IDX} above 50%",
-                                        "expression": "last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)>0 and last(/Unifi Switch/up_[{#PORT_IDX}],#1)=\"true\" and last(/Unifi Switch/stp_state_[{#PORT_IDX}],#1)=\"forwarding\" and (  avg(/Unifi Switch/rx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})>last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)*.5 or avg(/Unifi Switch/tx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})>last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)*.5 )"
+                                        "name": "{{#PORT_IS_UPLINK}.regsub(\"true\", \"Uplink\")} {{#PORT_MEDIA}.regsub(\"SFP\", \\0)} Port {#PORT_IDX} above {$UNIFI_PORT_USAGE_WARNING_THRESHOLD}%",
+                                        "expression": "last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)>0 and last(/Unifi Switch/up_[{#PORT_IDX}],#1)=\"true\" and last(/Unifi Switch/stp_state_[{#PORT_IDX}],#1)=\"forwarding\" and (  avg(/Unifi Switch/rx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})>last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)*{$UNIFI_PORT_USAGE_WARNING_THRESHOLD}/100 or avg(/Unifi Switch/tx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})>last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)*{$UNIFI_PORT_USAGE_WARNING_THRESHOLD}/100 )"
                                     }
                                 ]
                             },
                             {
                                 "uuid": "054404edaf6b444a9c293b68a48a9adf",
-                                "expression": "last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)>0 and last(/Unifi Switch/up_[{#PORT_IDX}],#1)=\"true\" and last(/Unifi Switch/stp_state_[{#PORT_IDX}],#1)=\"forwarding\" and (  avg(/Unifi Switch/rx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})>last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)*.5 or avg(/Unifi Switch/tx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})>last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)*.5 )",
-                                "name": "{{#PORT_IS_UPLINK}.regsub(\"true\", \"Uplink\")} {{#PORT_MEDIA}.regsub(\"SFP\", \\0)} Port {#PORT_IDX} above 50%",
+                                "expression": "last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)>0 and last(/Unifi Switch/up_[{#PORT_IDX}],#1)=\"true\" and last(/Unifi Switch/stp_state_[{#PORT_IDX}],#1)=\"forwarding\" and (  avg(/Unifi Switch/rx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})>last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)*{$UNIFI_PORT_USAGE_WARNING_THRESHOLD}/100 or avg(/Unifi Switch/tx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})>last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)*{$UNIFI_PORT_USAGE_WARNING_THRESHOLD}/100 )",
+                                "name": "{{#PORT_IS_UPLINK}.regsub(\"true\", \"Uplink\")} {{#PORT_MEDIA}.regsub(\"SFP\", \\0)} Port {#PORT_IDX} above {$UNIFI_PORT_USAGE_WARNING_THRESHOLD}%",
                                 "priority": "WARNING",
                                 "dependencies": [
                                     {
-                                        "name": "{{#PORT_IS_UPLINK}.regsub(\"true\", \"Uplink\")} {{#PORT_MEDIA}.regsub(\"SFP\", \\0)} Port {#PORT_IDX} above 75%",
-                                        "expression": "last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)>0 and last(/Unifi Switch/up_[{#PORT_IDX}],#1)=\"true\" and last(/Unifi Switch/stp_state_[{#PORT_IDX}],#1)=\"forwarding\" and ( avg(/Unifi Switch/rx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})>last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)*.75 or avg(/Unifi Switch/tx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})>last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)*.75 )"
+                                        "name": "{{#PORT_IS_UPLINK}.regsub(\"true\", \"Uplink\")} {{#PORT_MEDIA}.regsub(\"SFP\", \\0)} Port {#PORT_IDX} above {$UNIFI_PORT_USAGE_AVERAGE_THRESHOLD}%",
+                                        "expression": "last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)>0 and last(/Unifi Switch/up_[{#PORT_IDX}],#1)=\"true\" and last(/Unifi Switch/stp_state_[{#PORT_IDX}],#1)=\"forwarding\" and ( avg(/Unifi Switch/rx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})>last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)*{$UNIFI_PORT_USAGE_AVERAGE_THRESHOLD}/100 or avg(/Unifi Switch/tx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})>last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)*{$UNIFI_PORT_USAGE_AVERAGE_THRESHOLD}/100 )"
                                     }
                                 ]
-                            },
-                            {
-                                "uuid": "2bb9f140e9254b83b86f5318fd3a5240",
-                                "expression": "last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)>0 and last(/Unifi Switch/up_[{#PORT_IDX}],#1)=\"true\" and last(/Unifi Switch/stp_state_[{#PORT_IDX}],#1)=\"forwarding\" and ( avg(/Unifi Switch/rx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})>last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)*.75 or avg(/Unifi Switch/tx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})>last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)*.75 )",
-                                "name": "{{#PORT_IS_UPLINK}.regsub(\"true\", \"Uplink\")} {{#PORT_MEDIA}.regsub(\"SFP\", \\0)} Port {#PORT_IDX} above 75%",
-                                "priority": "AVERAGE"
                             }
                         ],
                         "graph_prototypes": [
