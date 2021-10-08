@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.4</version>
-    <date>2021-10-01T20:15:12Z</date>
+    <date>2021-10-08T00:25:22Z</date>
     <groups>
         <group>
             <uuid>15155c95a3d048f4856272ae12fd42c5</uuid>
@@ -944,6 +944,7 @@ Assign this template to all APs in your site</description>
                     <name>2G Channel Interference</name>
                     <type>CALCULATED</type>
                     <key>2g_interference</key>
+                    <status>DISABLED</status>
                     <units>%</units>
                     <params>(last(//2g_interference_raw)&gt;0)*last(//2g_interference_raw)</params>
                     <tags>
@@ -958,6 +959,7 @@ Assign this template to all APs in your site</description>
                     <name>2G Channel Interference raw</name>
                     <type>CALCULATED</type>
                     <key>2g_interference_raw</key>
+                    <status>DISABLED</status>
                     <units>%</units>
                     <params>((last(//cu_total_2g)- last(//cu_self_tx_2g) - last(//cu_self_rx_2g))&gt;0)*(last(//cu_total_2g)- last(//cu_self_tx_2g) - last(//cu_self_rx_2g))</params>
                     <tags>
@@ -971,6 +973,7 @@ Assign this template to all APs in your site</description>
                             <uuid>cf75968434a1434d861b7b06a42f03fd</uuid>
                             <expression>avg(/Unifi AP/2g_interference_raw,{$UNIFI_ALERT_PERIOD})&gt;50</expression>
                             <name>{HOST.NAME} 2G Interference &gt; 50%</name>
+                            <status>DISABLED</status>
                             <priority>AVERAGE</priority>
                             <manual_close>YES</manual_close>
                         </trigger>
@@ -981,6 +984,7 @@ Assign this template to all APs in your site</description>
                     <name>2G Channel Interference Smooth</name>
                     <type>CALCULATED</type>
                     <key>2g_interference_smooth</key>
+                    <status>DISABLED</status>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
                     <params>avg(//2g_interference,{$UNIFI_SMOOTHING_PERIOD})</params>
@@ -996,6 +1000,7 @@ Assign this template to all APs in your site</description>
                     <name>5G Channel Interference</name>
                     <type>CALCULATED</type>
                     <key>5g_interference</key>
+                    <status>DISABLED</status>
                     <units>%</units>
                     <params>(last(//5g_interference_raw)&gt;0)*last(//5g_interference_raw)</params>
                     <tags>
@@ -1010,6 +1015,7 @@ Assign this template to all APs in your site</description>
                     <name>5G Channel Interference Raw</name>
                     <type>CALCULATED</type>
                     <key>5g_interference_raw</key>
+                    <status>DISABLED</status>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
                     <params>last(//cu_total_5g) - last(//cu_self_rx_5g) - last(//cu_self_tx_5g)</params>
@@ -1024,6 +1030,7 @@ Assign this template to all APs in your site</description>
                             <uuid>c1fc0b2a82da4b4eb48105f385cfe730</uuid>
                             <expression>avg(/Unifi AP/5g_interference_raw,{$UNIFI_ALERT_PERIOD})&gt;30</expression>
                             <name>{HOST.NAME} 5G Interference &gt; 30%</name>
+                            <status>DISABLED</status>
                             <priority>AVERAGE</priority>
                             <manual_close>YES</manual_close>
                         </trigger>
@@ -1034,6 +1041,7 @@ Assign this template to all APs in your site</description>
                     <name>5G Channel Interference Smooth</name>
                     <type>CALCULATED</type>
                     <key>5g_interference_smooth</key>
+                    <status>DISABLED</status>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
                     <params>avg(//5g_interference,{$UNIFI_SMOOTHING_PERIOD})</params>
@@ -1090,6 +1098,7 @@ Assign this template to all APs in your site</description>
                     <name>2G Channel Utilization Smooth</name>
                     <type>CALCULATED</type>
                     <key>cu_avg_5mn_2g</key>
+                    <status>DISABLED</status>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
                     <params>avg(//cu_total_2g,{$UNIFI_SMOOTHING_PERIOD})</params>
@@ -1105,6 +1114,7 @@ Assign this template to all APs in your site</description>
                     <name>5G Channel Utilization Smooth</name>
                     <type>CALCULATED</type>
                     <key>cu_avg_5mn_5g</key>
+                    <status>DISABLED</status>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
                     <params>avg(//cu_total_5g,{$UNIFI_SMOOTHING_PERIOD})</params>
@@ -1121,6 +1131,7 @@ Assign this template to all APs in your site</description>
                     <type>DEPENDENT</type>
                     <key>cu_self_rx_2g</key>
                     <delay>0</delay>
+                    <status>DISABLED</status>
                     <units>%</units>
                     <preprocessing>
                         <step>
@@ -1146,6 +1157,7 @@ Assign this template to all APs in your site</description>
                     <type>DEPENDENT</type>
                     <key>cu_self_rx_5g</key>
                     <delay>0</delay>
+                    <status>DISABLED</status>
                     <units>%</units>
                     <preprocessing>
                         <step>
@@ -1171,6 +1183,7 @@ Assign this template to all APs in your site</description>
                     <type>DEPENDENT</type>
                     <key>cu_self_tx_2g</key>
                     <delay>0</delay>
+                    <status>DISABLED</status>
                     <units>%</units>
                     <preprocessing>
                         <step>
@@ -1196,6 +1209,7 @@ Assign this template to all APs in your site</description>
                     <type>DEPENDENT</type>
                     <key>cu_self_tx_5g</key>
                     <delay>0</delay>
+                    <status>DISABLED</status>
                     <units>%</units>
                     <preprocessing>
                         <step>
@@ -1221,6 +1235,7 @@ Assign this template to all APs in your site</description>
                     <type>DEPENDENT</type>
                     <key>cu_total_2g</key>
                     <delay>0</delay>
+                    <status>DISABLED</status>
                     <units>%</units>
                     <preprocessing>
                         <step>
@@ -1244,6 +1259,7 @@ Assign this template to all APs in your site</description>
                             <uuid>80b61c5fae364d7bb980798bd1c63a75</uuid>
                             <expression>avg(/Unifi AP/cu_total_2g,{$UNIFI_ALERT_PERIOD})&gt;60</expression>
                             <name>{HOST.NAME} 2G Channel Usage &gt; 60%</name>
+                            <status>DISABLED</status>
                             <priority>INFO</priority>
                             <manual_close>YES</manual_close>
                             <dependencies>
@@ -1257,6 +1273,7 @@ Assign this template to all APs in your site</description>
                             <uuid>594de384d46d456d8de6cd6c3fefcb48</uuid>
                             <expression>avg(/Unifi AP/cu_total_2g,{$UNIFI_ALERT_PERIOD})&gt;80</expression>
                             <name>{HOST.NAME} 2G Channel Usage &gt; 80%</name>
+                            <status>DISABLED</status>
                             <priority>AVERAGE</priority>
                             <manual_close>YES</manual_close>
                         </trigger>
@@ -1268,6 +1285,7 @@ Assign this template to all APs in your site</description>
                     <type>DEPENDENT</type>
                     <key>cu_total_5g</key>
                     <delay>0</delay>
+                    <status>DISABLED</status>
                     <units>%</units>
                     <preprocessing>
                         <step>
@@ -1291,6 +1309,7 @@ Assign this template to all APs in your site</description>
                             <uuid>8da227da0b974562af1fa8a4f80f8a4e</uuid>
                             <expression>avg(/Unifi AP/cu_total_5g,{$UNIFI_ALERT_PERIOD})&gt;60</expression>
                             <name>{HOST.NAME} 5G Channel Usage &gt; 60%</name>
+                            <status>DISABLED</status>
                             <priority>INFO</priority>
                             <manual_close>YES</manual_close>
                             <dependencies>
@@ -1304,6 +1323,7 @@ Assign this template to all APs in your site</description>
                             <uuid>16dd939288264f70979aa7349ccf9202</uuid>
                             <expression>avg(/Unifi AP/cu_total_5g,{$UNIFI_ALERT_PERIOD})&gt;80</expression>
                             <name>{HOST.NAME} 5G Channel Usage &gt; 80%</name>
+                            <status>DISABLED</status>
                             <priority>AVERAGE</priority>
                             <manual_close>YES</manual_close>
                         </trigger>
@@ -1444,6 +1464,7 @@ Assign this template to all APs in your site</description>
                     <type>DEPENDENT</type>
                     <key>n_tx_xretries_2g</key>
                     <delay>0</delay>
+                    <status>DISABLED</status>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
@@ -1474,6 +1495,7 @@ Assign this template to all APs in your site</description>
                     <type>DEPENDENT</type>
                     <key>n_tx_xretries_5g</key>
                     <delay>0</delay>
+                    <status>DISABLED</status>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
@@ -1720,6 +1742,200 @@ Assign this template to all APs in your site</description>
             </items>
             <discovery_rules>
                 <discovery_rule>
+                    <uuid>6e857bdd5a674e4e8be70b0e01d00d1a</uuid>
+                    <name>Active Radio Discovery</name>
+                    <type>DEPENDENT</type>
+                    <key>active_radio_discovery</key>
+                    <delay>0</delay>
+                    <description>List all active radios to create channel items</description>
+                    <item_prototypes>
+                        <item_prototype>
+                            <uuid>f35732598f6f4aed84477b0932b496cb</uuid>
+                            <name>Channel Interference {#RADIO_NAME}</name>
+                            <type>CALCULATED</type>
+                            <key>cint[{#RADIO_NAME}]</key>
+                            <units>%</units>
+                            <params>((last( //cu_total[{#RADIO_NAME}] )- last( //cu_tx[{#RADIO_NAME}])-last(//cu_rx[{#RADIO_NAME}]))&gt;0)*(last( //cu_total[{#RADIO_NAME}] )- last( //cu_tx[{#RADIO_NAME}])-last(//cu_rx[{#RADIO_NAME}]))</params>
+                            <tags>
+                                <tag>
+                                    <tag>Application</tag>
+                                    <value>Radio</value>
+                                </tag>
+                            </tags>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <uuid>3f72d760eb204eceafe82682fbda16a5</uuid>
+                                    <expression>avg(/Unifi AP/cint[{#RADIO_NAME}],{$UNIFI_ALERT_PERIOD})&gt;{$UNIFI_CHANNEL_INTERFERENCE_AVERAGE_THRESHOLD:&quot;{#RADIO_NAME}&quot;}</expression>
+                                    <name>{HOST.NAME}  {#RADIO_NAME} Channel Interference &gt; {$UNIFI_CHANNEL_INTERFERENCE_AVERAGE_THRESHOLD:&quot;{#RADIO_NAME}&quot;}%</name>
+                                    <opdata>{$UNIFI_CHANNEL_INTERFERENCE_INFO_THRESHOLD:&quot;{#RADIO_NAME&quot;}</opdata>
+                                    <priority>AVERAGE</priority>
+                                    <manual_close>YES</manual_close>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <uuid>e774c76335834241b15c4e203889e7e0</uuid>
+                                    <expression>avg(/Unifi AP/cint[{#RADIO_NAME}],{$UNIFI_ALERT_PERIOD})&gt;{$UNIFI_CHANNEL_INTERFERENCE_INFO_THRESHOLD:&quot;{#RADIO_NAME&quot;}</expression>
+                                    <name>{HOST.NAME}  {#RADIO_NAME} Channel Interference &gt; {$UNIFI_CHANNEL_INTERFERENCE_INFO_THRESHOLD:&quot;{#RADIO_NAME}&quot;}%</name>
+                                    <opdata>{$UNIFI_CHANNEL_INTERFERENCE_INFO_THRESHOLD:&quot;{#RADIO_NAME&quot;}</opdata>
+                                    <priority>INFO</priority>
+                                    <manual_close>YES</manual_close>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>{HOST.NAME}  {#RADIO_NAME} Channel Interference &gt; {$UNIFI_CHANNEL_INTERFERENCE_AVERAGE_THRESHOLD:&quot;{#RADIO_NAME}&quot;}%</name>
+                                            <expression>avg(/Unifi AP/cint[{#RADIO_NAME}],{$UNIFI_ALERT_PERIOD})&gt;{$UNIFI_CHANNEL_INTERFERENCE_AVERAGE_THRESHOLD:&quot;{#RADIO_NAME}&quot;}</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <uuid>60ae3f2aea144c1bb42780bc424d7184</uuid>
+                            <name>Channel Reception Utilization {#RADIO_NAME}</name>
+                            <type>DEPENDENT</type>
+                            <key>cu_rx[{#RADIO_NAME}]</key>
+                            <delay>0</delay>
+                            <units>%</units>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <parameters>
+                                        <parameter>$.radio_table[?(@.radio == '{#RADIO_NAME}')].athstats.cu_self_rx.first()</parameter>
+                                    </parameters>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;AP&quot;]</key>
+                            </master_item>
+                            <tags>
+                                <tag>
+                                    <tag>Application</tag>
+                                    <value>Radio</value>
+                                </tag>
+                            </tags>
+                        </item_prototype>
+                        <item_prototype>
+                            <uuid>466eee19400040749764a086133c4342</uuid>
+                            <name>Channel Total Utilization {#RADIO_NAME}</name>
+                            <type>DEPENDENT</type>
+                            <key>cu_total[{#RADIO_NAME}]</key>
+                            <delay>0</delay>
+                            <units>%</units>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <parameters>
+                                        <parameter>$.radio_table[?(@.radio == '{#RADIO_NAME}')].athstats.cu_total.first()</parameter>
+                                    </parameters>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;AP&quot;]</key>
+                            </master_item>
+                            <tags>
+                                <tag>
+                                    <tag>Application</tag>
+                                    <value>Radio</value>
+                                </tag>
+                            </tags>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <uuid>9047af0eb978454aab5768341986f29b</uuid>
+                                    <expression>avg(/Unifi AP/cu_total[{#RADIO_NAME}],{$UNIFI_ALERT_PERIOD})&gt;{$UNIFI_CHANNEL_USAGE_AVERAGE_THRESHOLD:&quot;{#RADIO_NAME&quot;}</expression>
+                                    <name>{HOST.NAME}  {#RADIO_NAME} Channel Utilization &gt; {$UNIFI_CHANNEL_USAGE_AVERAGE_THRESHOLD:&quot;{#RADIO_NAME}&quot;}%</name>
+                                    <opdata>{$UNIFI_CHANNEL_USAGE_INFO_THRESHOLD:&quot;{#RADIO_NAME}&quot;</opdata>
+                                    <priority>AVERAGE</priority>
+                                    <manual_close>YES</manual_close>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <uuid>69372713ad284b79a905f5942c321b55</uuid>
+                                    <expression>avg(/Unifi AP/cu_total[{#RADIO_NAME}],{$UNIFI_ALERT_PERIOD})&gt;{$UNIFI_CHANNEL_USAGE_INFO_THRESHOLD:&quot;{#RADIO_NAME}&quot;}</expression>
+                                    <name>{HOST.NAME}  {#RADIO_NAME} Channel Utilization &gt; {$UNIFI_CHANNEL_USAGE_INFO_THRESHOLD:&quot;{#RADIO_NAME}&quot;}%</name>
+                                    <opdata>{$UNIFI_CHANNEL_USAGE_INFO_THRESHOLD:&quot;{#RADIO_NAME}&quot;</opdata>
+                                    <priority>INFO</priority>
+                                    <manual_close>YES</manual_close>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>{HOST.NAME}  {#RADIO_NAME} Channel Utilization &gt; {$UNIFI_CHANNEL_USAGE_AVERAGE_THRESHOLD:&quot;{#RADIO_NAME}&quot;}%</name>
+                                            <expression>avg(/Unifi AP/cu_total[{#RADIO_NAME}],{$UNIFI_ALERT_PERIOD})&gt;{$UNIFI_CHANNEL_USAGE_AVERAGE_THRESHOLD:&quot;{#RADIO_NAME&quot;}</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <uuid>11b74b119dea413ea1152b15a8e3eacb</uuid>
+                            <name>Channel Transmission Utilization {#RADIO_NAME}</name>
+                            <type>DEPENDENT</type>
+                            <key>cu_tx[{#RADIO_NAME}]</key>
+                            <delay>0</delay>
+                            <units>%</units>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <parameters>
+                                        <parameter>$.radio_table[?(@.radio == '{#RADIO_NAME}')].athstats.cu_self_tx.first()</parameter>
+                                    </parameters>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;AP&quot;]</key>
+                            </master_item>
+                            <tags>
+                                <tag>
+                                    <tag>Application</tag>
+                                    <value>Radio</value>
+                                </tag>
+                            </tags>
+                        </item_prototype>
+                        <item_prototype>
+                            <uuid>13bbc5518393491eb303198385799fbf</uuid>
+                            <name>Channel Retries {#RADIO_NAME}</name>
+                            <type>DEPENDENT</type>
+                            <key>retries[{#RADIO_NAME}]</key>
+                            <delay>0</delay>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <parameters>
+                                        <parameter>$.radio_table[?(@.radio == '{#RADIO_NAME}')].athstats.n_tx_xretries.first()</parameter>
+                                    </parameters>
+                                </step>
+                                <step>
+                                    <type>SIMPLE_CHANGE</type>
+                                    <parameters>
+                                        <parameter/>
+                                    </parameters>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;AP&quot;]</key>
+                            </master_item>
+                            <tags>
+                                <tag>
+                                    <tag>Application</tag>
+                                    <value>Radio</value>
+                                </tag>
+                            </tags>
+                        </item_prototype>
+                    </item_prototypes>
+                    <master_item>
+                        <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;AP&quot;]</key>
+                    </master_item>
+                    <lld_macro_paths>
+                        <lld_macro_path>
+                            <lld_macro>{#RADIO_NAME}</lld_macro>
+                            <path>$.radio</path>
+                        </lld_macro_path>
+                    </lld_macro_paths>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.radio_table[?(@.athstats.cu_total &gt;0)]</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                </discovery_rule>
+                <discovery_rule>
                     <uuid>90e43b647faa4a6fa7af643960bcf0a5</uuid>
                     <name>Wifi Network Discovery</name>
                     <type>DEPENDENT</type>
@@ -1729,16 +1945,16 @@ Assign this template to all APs in your site</description>
                     <item_prototypes>
                         <item_prototype>
                             <uuid>99af4e53516341b1b4e40d814fe7a258</uuid>
-                            <name>{#ESSID} Rx Bandwidth</name>
+                            <name>{#ESSID}-{#RADIO_NAME} Rx Bandwidth</name>
                             <type>DEPENDENT</type>
-                            <key>rx_bandwidth[{#ESSID}]</key>
+                            <key>rx_bandwidth[{#ESSID}-{#RADIO_NAME}]</key>
                             <delay>0</delay>
                             <units>bps</units>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
                                     <parameters>
-                                        <parameter>$.vap_table.[ ?(@.essid == '{#ESSID}' ) ].rx_bytes.sum()</parameter>
+                                        <parameter>$.vap_table.[ ?(@.essid == '{#ESSID}' &amp;&amp; @.radio == '{#RADIO_NAME}' ) ].rx_bytes.sum()</parameter>
                                     </parameters>
                                 </step>
                                 <step>
@@ -1766,12 +1982,12 @@ Assign this template to all APs in your site</description>
                         </item_prototype>
                         <item_prototype>
                             <uuid>3748f96463d74affa9340b398c34f1a0</uuid>
-                            <name>{#ESSID} Reception Bandwidth Smooth</name>
+                            <name>{#ESSID}-{#RADIO_NAME} Reception Bandwidth Smooth</name>
                             <type>CALCULATED</type>
-                            <key>rx_bandwidth_smooth[{#ESSID}]</key>
+                            <key>rx_bandwidth_smooth[{#ESSID}-{#RADIO_NAME}]</key>
                             <value_type>FLOAT</value_type>
                             <units>bps</units>
-                            <params>avg(//rx_bandwidth[{#ESSID}],{$UNIFI_SMOOTHING_PERIOD})</params>
+                            <params>avg(//rx_bandwidth[{#ESSID}-{#RADIO_NAME}],{$UNIFI_SMOOTHING_PERIOD})</params>
                             <tags>
                                 <tag>
                                     <tag>Application</tag>
@@ -1781,16 +1997,16 @@ Assign this template to all APs in your site</description>
                         </item_prototype>
                         <item_prototype>
                             <uuid>b18528ee504149118ecc6aac93c51135</uuid>
-                            <name>{#ESSID} Tx Bandwidth</name>
+                            <name>{#ESSID}-{#RADIO_NAME} Tx Bandwidth</name>
                             <type>DEPENDENT</type>
-                            <key>tx_bandwidth[{#ESSID}]</key>
+                            <key>tx_bandwidth[{#ESSID}-{#RADIO_NAME}]</key>
                             <delay>0</delay>
                             <units>bps</units>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
                                     <parameters>
-                                        <parameter>$.vap_table.[ ?(@.essid == &quot;{#ESSID}&quot;) ].tx_bytes.sum()</parameter>
+                                        <parameter>$.vap_table.[ ?(@.essid == &quot;{#ESSID}&quot;  &amp;&amp; @.radio == &quot;{#RADIO_NAME}&quot;) ].tx_bytes.sum()</parameter>
                                     </parameters>
                                 </step>
                                 <step>
@@ -1818,12 +2034,12 @@ Assign this template to all APs in your site</description>
                         </item_prototype>
                         <item_prototype>
                             <uuid>ec606cedd02f45518d7a0c030b25849e</uuid>
-                            <name>{#ESSID} Transmission Bandwidth Smooth</name>
+                            <name>{#ESSID}-{#RADIO_NAME} Transmission Bandwidth Smooth</name>
                             <type>CALCULATED</type>
-                            <key>tx_bandwidth_smooth[{#ESSID}]</key>
+                            <key>tx_bandwidth_smooth[{#ESSID}-{#RADIO_NAME}]</key>
                             <value_type>FLOAT</value_type>
                             <units>bps</units>
-                            <params>avg(//tx_bandwidth[{#ESSID}],{$UNIFI_SMOOTHING_PERIOD})</params>
+                            <params>avg(//tx_bandwidth[{#ESSID}-{#RADIO_NAME}],{$UNIFI_SMOOTHING_PERIOD})</params>
                             <tags>
                                 <tag>
                                     <tag>Application</tag>
@@ -1835,14 +2051,14 @@ Assign this template to all APs in your site</description>
                     <graph_prototypes>
                         <graph_prototype>
                             <uuid>27c2c173f4d24b48b7341f0762c727a4</uuid>
-                            <name>{#ESSID} Bandwidth</name>
+                            <name>{#ESSID}-{#RADIO_NAME} Bandwidth</name>
                             <graph_items>
                                 <graph_item>
                                     <sortorder>1</sortorder>
                                     <color>1A7C11</color>
                                     <item>
                                         <host>Unifi AP</host>
-                                        <key>rx_bandwidth[{#ESSID}]</key>
+                                        <key>rx_bandwidth[{#ESSID}-{#RADIO_NAME}]</key>
                                     </item>
                                 </graph_item>
                                 <graph_item>
@@ -1850,7 +2066,7 @@ Assign this template to all APs in your site</description>
                                     <color>F63100</color>
                                     <item>
                                         <host>Unifi AP</host>
-                                        <key>tx_bandwidth[{#ESSID}]</key>
+                                        <key>tx_bandwidth[{#ESSID}-{#RADIO_NAME}]</key>
                                     </item>
                                 </graph_item>
                             </graph_items>
@@ -1863,6 +2079,10 @@ Assign this template to all APs in your site</description>
                         <lld_macro_path>
                             <lld_macro>{#ESSID}</lld_macro>
                             <path>$.essid</path>
+                        </lld_macro_path>
+                        <lld_macro_path>
+                            <lld_macro>{#RADIO_NAME}</lld_macro>
+                            <path>$.radio</path>
                         </lld_macro_path>
                     </lld_macro_paths>
                     <preprocessing>
@@ -6277,12 +6497,12 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                     <item_prototypes>
                         <item_prototype>
                             <uuid>460c978a4cfb40b1930c4a47dac748e9</uuid>
-                            <name>{#ESSID} Total Reception Bandwidth</name>
+                            <name>{#ESSID}-{#RADIO_NAME} Total Reception Bandwidth</name>
                             <type>CALCULATED</type>
-                            <key>grpsum[&quot;{$AP_GROUP}&quot;, &quot;rx_bandwidth[{#ESSID}]&quot;, avg, {$UNIFI_SMOOTHING_PERIOD}]</key>
+                            <key>grpsum[&quot;{$AP_GROUP}&quot;, &quot;rx_bandwidth[{#ESSID}-{#RADIO_NAME}]&quot;, avg, {$UNIFI_SMOOTHING_PERIOD}]</key>
                             <value_type>FLOAT</value_type>
                             <units>bps</units>
-                            <params>sum(avg_foreach(/*/rx_bandwidth[{#ESSID}]?[group=&quot;{$AP_GROUP}&quot;],{$UNIFI_SMOOTHING_PERIOD}))</params>
+                            <params>sum(avg_foreach(/*/rx_bandwidth[{#ESSID}-{#RADIO_NAME}]?[group=&quot;{$AP_GROUP}&quot;],{$UNIFI_SMOOTHING_PERIOD}))</params>
                             <tags>
                                 <tag>
                                     <tag>Application</tag>
@@ -6292,12 +6512,12 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         </item_prototype>
                         <item_prototype>
                             <uuid>c91e55731b9d4dae8fb3d5d1ab8e1cb0</uuid>
-                            <name>{#ESSID} Total Transmission Bandwidth</name>
+                            <name>{#ESSID}-{#RADIO_NAME} Total Transmission Bandwidth</name>
                             <type>CALCULATED</type>
-                            <key>grpsum[&quot;{$AP_GROUP}&quot;, &quot;tx_bandwidth[{#ESSID}]&quot;, avg, &quot;{$UNIFI_SMOOTHING_PERIOD}&quot;]</key>
+                            <key>grpsum[&quot;{$AP_GROUP}&quot;, &quot;tx_bandwidth[{#ESSID}-{#RADIO_NAME}]&quot;, avg, &quot;{$UNIFI_SMOOTHING_PERIOD}&quot;]</key>
                             <value_type>FLOAT</value_type>
                             <units>bps</units>
-                            <params>sum(avg_foreach(/*/tx_bandwidth[{#ESSID}]?[group=&quot;{$AP_GROUP}&quot;],{$UNIFI_SMOOTHING_PERIOD}))</params>
+                            <params>sum(avg_foreach(/*/tx_bandwidth[{#ESSID}-{#RADIO_NAME}]?[group=&quot;{$AP_GROUP}&quot;],{$UNIFI_SMOOTHING_PERIOD}))</params>
                             <tags>
                                 <tag>
                                     <tag>Application</tag>
@@ -6316,7 +6536,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                                     <color>1A7C11</color>
                                     <item>
                                         <host>Unifi WiFi Site</host>
-                                        <key>grpsum[&quot;{$AP_GROUP}&quot;, &quot;rx_bandwidth[{#ESSID}]&quot;, avg, {$UNIFI_SMOOTHING_PERIOD}]</key>
+                                        <key>grpsum[&quot;{$AP_GROUP}&quot;, &quot;rx_bandwidth[{#ESSID}-{#RADIO_NAME}]&quot;, avg, {$UNIFI_SMOOTHING_PERIOD}]</key>
                                     </item>
                                 </graph_item>
                                 <graph_item>
@@ -6324,7 +6544,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                                     <color>F63100</color>
                                     <item>
                                         <host>Unifi WiFi Site</host>
-                                        <key>grpsum[&quot;{$AP_GROUP}&quot;, &quot;tx_bandwidth[{#ESSID}]&quot;, avg, &quot;{$UNIFI_SMOOTHING_PERIOD}&quot;]</key>
+                                        <key>grpsum[&quot;{$AP_GROUP}&quot;, &quot;tx_bandwidth[{#ESSID}-{#RADIO_NAME}]&quot;, avg, &quot;{$UNIFI_SMOOTHING_PERIOD}&quot;]</key>
                                     </item>
                                 </graph_item>
                             </graph_items>
@@ -6337,6 +6557,10 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         <lld_macro_path>
                             <lld_macro>{#ESSID}</lld_macro>
                             <path>$.essid</path>
+                        </lld_macro_path>
+                        <lld_macro_path>
+                            <lld_macro>{#RADIO_NAME}</lld_macro>
+                            <path>$.radio</path>
                         </lld_macro_path>
                     </lld_macro_paths>
                     <preprocessing>

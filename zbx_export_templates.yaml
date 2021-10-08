@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-10-01T20:15:09Z'
+  date: '2021-10-08T00:25:19Z'
   groups:
     -
       uuid: 15155c95a3d048f4856272ae12fd42c5
@@ -699,6 +699,7 @@ zabbix_export:
           name: '2G Channel Interference'
           type: CALCULATED
           key: 2g_interference
+          status: DISABLED
           units: '%'
           params: '(last(//2g_interference_raw)>0)*last(//2g_interference_raw)'
           tags:
@@ -710,6 +711,7 @@ zabbix_export:
           name: '2G Channel Interference raw'
           type: CALCULATED
           key: 2g_interference_raw
+          status: DISABLED
           units: '%'
           params: '((last(//cu_total_2g)- last(//cu_self_tx_2g) - last(//cu_self_rx_2g))>0)*(last(//cu_total_2g)- last(//cu_self_tx_2g) - last(//cu_self_rx_2g))'
           tags:
@@ -721,6 +723,7 @@ zabbix_export:
               uuid: cf75968434a1434d861b7b06a42f03fd
               expression: 'avg(/Unifi AP/2g_interference_raw,{$UNIFI_ALERT_PERIOD})>50'
               name: '{HOST.NAME} 2G Interference > 50%'
+              status: DISABLED
               priority: AVERAGE
               manual_close: 'YES'
         -
@@ -728,6 +731,7 @@ zabbix_export:
           name: '2G Channel Interference Smooth'
           type: CALCULATED
           key: 2g_interference_smooth
+          status: DISABLED
           value_type: FLOAT
           units: '%'
           params: 'avg(//2g_interference,{$UNIFI_SMOOTHING_PERIOD})'
@@ -740,6 +744,7 @@ zabbix_export:
           name: '5G Channel Interference'
           type: CALCULATED
           key: 5g_interference
+          status: DISABLED
           units: '%'
           params: '(last(//5g_interference_raw)>0)*last(//5g_interference_raw)'
           tags:
@@ -751,6 +756,7 @@ zabbix_export:
           name: '5G Channel Interference Raw'
           type: CALCULATED
           key: 5g_interference_raw
+          status: DISABLED
           value_type: FLOAT
           units: '%'
           params: 'last(//cu_total_5g) - last(//cu_self_rx_5g) - last(//cu_self_tx_5g)'
@@ -763,6 +769,7 @@ zabbix_export:
               uuid: c1fc0b2a82da4b4eb48105f385cfe730
               expression: 'avg(/Unifi AP/5g_interference_raw,{$UNIFI_ALERT_PERIOD})>30'
               name: '{HOST.NAME} 5G Interference > 30%'
+              status: DISABLED
               priority: AVERAGE
               manual_close: 'YES'
         -
@@ -770,6 +777,7 @@ zabbix_export:
           name: '5G Channel Interference Smooth'
           type: CALCULATED
           key: 5g_interference_smooth
+          status: DISABLED
           value_type: FLOAT
           units: '%'
           params: 'avg(//5g_interference,{$UNIFI_SMOOTHING_PERIOD})'
@@ -813,6 +821,7 @@ zabbix_export:
           name: '2G Channel Utilization Smooth'
           type: CALCULATED
           key: cu_avg_5mn_2g
+          status: DISABLED
           value_type: FLOAT
           units: '%'
           params: 'avg(//cu_total_2g,{$UNIFI_SMOOTHING_PERIOD})'
@@ -825,6 +834,7 @@ zabbix_export:
           name: '5G Channel Utilization Smooth'
           type: CALCULATED
           key: cu_avg_5mn_5g
+          status: DISABLED
           value_type: FLOAT
           units: '%'
           params: 'avg(//cu_total_5g,{$UNIFI_SMOOTHING_PERIOD})'
@@ -838,6 +848,7 @@ zabbix_export:
           type: DEPENDENT
           key: cu_self_rx_2g
           delay: '0'
+          status: DISABLED
           units: '%'
           preprocessing:
             -
@@ -856,6 +867,7 @@ zabbix_export:
           type: DEPENDENT
           key: cu_self_rx_5g
           delay: '0'
+          status: DISABLED
           units: '%'
           preprocessing:
             -
@@ -874,6 +886,7 @@ zabbix_export:
           type: DEPENDENT
           key: cu_self_tx_2g
           delay: '0'
+          status: DISABLED
           units: '%'
           preprocessing:
             -
@@ -892,6 +905,7 @@ zabbix_export:
           type: DEPENDENT
           key: cu_self_tx_5g
           delay: '0'
+          status: DISABLED
           units: '%'
           preprocessing:
             -
@@ -910,6 +924,7 @@ zabbix_export:
           type: DEPENDENT
           key: cu_total_2g
           delay: '0'
+          status: DISABLED
           units: '%'
           preprocessing:
             -
@@ -927,6 +942,7 @@ zabbix_export:
               uuid: 80b61c5fae364d7bb980798bd1c63a75
               expression: 'avg(/Unifi AP/cu_total_2g,{$UNIFI_ALERT_PERIOD})>60'
               name: '{HOST.NAME} 2G Channel Usage > 60%'
+              status: DISABLED
               priority: INFO
               manual_close: 'YES'
               dependencies:
@@ -937,6 +953,7 @@ zabbix_export:
               uuid: 594de384d46d456d8de6cd6c3fefcb48
               expression: 'avg(/Unifi AP/cu_total_2g,{$UNIFI_ALERT_PERIOD})>80'
               name: '{HOST.NAME} 2G Channel Usage > 80%'
+              status: DISABLED
               priority: AVERAGE
               manual_close: 'YES'
         -
@@ -945,6 +962,7 @@ zabbix_export:
           type: DEPENDENT
           key: cu_total_5g
           delay: '0'
+          status: DISABLED
           units: '%'
           preprocessing:
             -
@@ -962,6 +980,7 @@ zabbix_export:
               uuid: 8da227da0b974562af1fa8a4f80f8a4e
               expression: 'avg(/Unifi AP/cu_total_5g,{$UNIFI_ALERT_PERIOD})>60'
               name: '{HOST.NAME} 5G Channel Usage > 60%'
+              status: DISABLED
               priority: INFO
               manual_close: 'YES'
               dependencies:
@@ -972,6 +991,7 @@ zabbix_export:
               uuid: 16dd939288264f70979aa7349ccf9202
               expression: 'avg(/Unifi AP/cu_total_5g,{$UNIFI_ALERT_PERIOD})>80'
               name: '{HOST.NAME} 5G Channel Usage > 80%'
+              status: DISABLED
               priority: AVERAGE
               manual_close: 'YES'
         -
@@ -1077,6 +1097,7 @@ zabbix_export:
           type: DEPENDENT
           key: n_tx_xretries_2g
           delay: '0'
+          status: DISABLED
           preprocessing:
             -
               type: JSONPATH
@@ -1098,6 +1119,7 @@ zabbix_export:
           type: DEPENDENT
           key: n_tx_xretries_5g
           delay: '0'
+          status: DISABLED
           preprocessing:
             -
               type: JSONPATH
@@ -1277,6 +1299,149 @@ zabbix_export:
               value: Radio
       discovery_rules:
         -
+          uuid: 6e857bdd5a674e4e8be70b0e01d00d1a
+          name: 'Active Radio Discovery'
+          type: DEPENDENT
+          key: active_radio_discovery
+          delay: '0'
+          description: 'List all active radios to create channel items'
+          item_prototypes:
+            -
+              uuid: f35732598f6f4aed84477b0932b496cb
+              name: 'Channel Interference {#RADIO_NAME}'
+              type: CALCULATED
+              key: 'cint[{#RADIO_NAME}]'
+              units: '%'
+              params: '((last( //cu_total[{#RADIO_NAME}] )- last( //cu_tx[{#RADIO_NAME}])-last(//cu_rx[{#RADIO_NAME}]))>0)*(last( //cu_total[{#RADIO_NAME}] )- last( //cu_tx[{#RADIO_NAME}])-last(//cu_rx[{#RADIO_NAME}]))'
+              tags:
+                -
+                  tag: Application
+                  value: Radio
+              trigger_prototypes:
+                -
+                  uuid: 3f72d760eb204eceafe82682fbda16a5
+                  expression: 'avg(/Unifi AP/cint[{#RADIO_NAME}],{$UNIFI_ALERT_PERIOD})>{$UNIFI_CHANNEL_INTERFERENCE_AVERAGE_THRESHOLD:"{#RADIO_NAME}"}'
+                  name: '{HOST.NAME}  {#RADIO_NAME} Channel Interference > {$UNIFI_CHANNEL_INTERFERENCE_AVERAGE_THRESHOLD:"{#RADIO_NAME}"}%'
+                  opdata: '{$UNIFI_CHANNEL_INTERFERENCE_INFO_THRESHOLD:"{#RADIO_NAME"}'
+                  priority: AVERAGE
+                  manual_close: 'YES'
+                -
+                  uuid: e774c76335834241b15c4e203889e7e0
+                  expression: 'avg(/Unifi AP/cint[{#RADIO_NAME}],{$UNIFI_ALERT_PERIOD})>{$UNIFI_CHANNEL_INTERFERENCE_INFO_THRESHOLD:"{#RADIO_NAME"}'
+                  name: '{HOST.NAME}  {#RADIO_NAME} Channel Interference > {$UNIFI_CHANNEL_INTERFERENCE_INFO_THRESHOLD:"{#RADIO_NAME}"}%'
+                  opdata: '{$UNIFI_CHANNEL_INTERFERENCE_INFO_THRESHOLD:"{#RADIO_NAME"}'
+                  priority: INFO
+                  manual_close: 'YES'
+                  dependencies:
+                    -
+                      name: '{HOST.NAME}  {#RADIO_NAME} Channel Interference > {$UNIFI_CHANNEL_INTERFERENCE_AVERAGE_THRESHOLD:"{#RADIO_NAME}"}%'
+                      expression: 'avg(/Unifi AP/cint[{#RADIO_NAME}],{$UNIFI_ALERT_PERIOD})>{$UNIFI_CHANNEL_INTERFERENCE_AVERAGE_THRESHOLD:"{#RADIO_NAME}"}'
+            -
+              uuid: 60ae3f2aea144c1bb42780bc424d7184
+              name: 'Channel Reception Utilization {#RADIO_NAME}'
+              type: DEPENDENT
+              key: 'cu_rx[{#RADIO_NAME}]'
+              delay: '0'
+              units: '%'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.radio_table[?(@.radio == ''{#RADIO_NAME}'')].athstats.cu_self_rx.first()'
+              master_item:
+                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP"]'
+              tags:
+                -
+                  tag: Application
+                  value: Radio
+            -
+              uuid: 466eee19400040749764a086133c4342
+              name: 'Channel Total Utilization {#RADIO_NAME}'
+              type: DEPENDENT
+              key: 'cu_total[{#RADIO_NAME}]'
+              delay: '0'
+              units: '%'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.radio_table[?(@.radio == ''{#RADIO_NAME}'')].athstats.cu_total.first()'
+              master_item:
+                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP"]'
+              tags:
+                -
+                  tag: Application
+                  value: Radio
+              trigger_prototypes:
+                -
+                  uuid: 9047af0eb978454aab5768341986f29b
+                  expression: 'avg(/Unifi AP/cu_total[{#RADIO_NAME}],{$UNIFI_ALERT_PERIOD})>{$UNIFI_CHANNEL_USAGE_AVERAGE_THRESHOLD:"{#RADIO_NAME"}'
+                  name: '{HOST.NAME}  {#RADIO_NAME} Channel Utilization > {$UNIFI_CHANNEL_USAGE_AVERAGE_THRESHOLD:"{#RADIO_NAME}"}%'
+                  opdata: '{$UNIFI_CHANNEL_USAGE_INFO_THRESHOLD:"{#RADIO_NAME}"'
+                  priority: AVERAGE
+                  manual_close: 'YES'
+                -
+                  uuid: 69372713ad284b79a905f5942c321b55
+                  expression: 'avg(/Unifi AP/cu_total[{#RADIO_NAME}],{$UNIFI_ALERT_PERIOD})>{$UNIFI_CHANNEL_USAGE_INFO_THRESHOLD:"{#RADIO_NAME}"}'
+                  name: '{HOST.NAME}  {#RADIO_NAME} Channel Utilization > {$UNIFI_CHANNEL_USAGE_INFO_THRESHOLD:"{#RADIO_NAME}"}%'
+                  opdata: '{$UNIFI_CHANNEL_USAGE_INFO_THRESHOLD:"{#RADIO_NAME}"'
+                  priority: INFO
+                  manual_close: 'YES'
+                  dependencies:
+                    -
+                      name: '{HOST.NAME}  {#RADIO_NAME} Channel Utilization > {$UNIFI_CHANNEL_USAGE_AVERAGE_THRESHOLD:"{#RADIO_NAME}"}%'
+                      expression: 'avg(/Unifi AP/cu_total[{#RADIO_NAME}],{$UNIFI_ALERT_PERIOD})>{$UNIFI_CHANNEL_USAGE_AVERAGE_THRESHOLD:"{#RADIO_NAME"}'
+            -
+              uuid: 11b74b119dea413ea1152b15a8e3eacb
+              name: 'Channel Transmission Utilization {#RADIO_NAME}'
+              type: DEPENDENT
+              key: 'cu_tx[{#RADIO_NAME}]'
+              delay: '0'
+              units: '%'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.radio_table[?(@.radio == ''{#RADIO_NAME}'')].athstats.cu_self_tx.first()'
+              master_item:
+                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP"]'
+              tags:
+                -
+                  tag: Application
+                  value: Radio
+            -
+              uuid: 13bbc5518393491eb303198385799fbf
+              name: 'Channel Retries {#RADIO_NAME}'
+              type: DEPENDENT
+              key: 'retries[{#RADIO_NAME}]'
+              delay: '0'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.radio_table[?(@.radio == ''{#RADIO_NAME}'')].athstats.n_tx_xretries.first()'
+                -
+                  type: SIMPLE_CHANGE
+                  parameters:
+                    - ''
+              master_item:
+                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP"]'
+              tags:
+                -
+                  tag: Application
+                  value: Radio
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP"]'
+          lld_macro_paths:
+            -
+              lld_macro: '{#RADIO_NAME}'
+              path: $.radio
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.radio_table[?(@.athstats.cu_total >0)]'
+        -
           uuid: 90e43b647faa4a6fa7af643960bcf0a5
           name: 'Wifi Network Discovery'
           type: DEPENDENT
@@ -1286,16 +1451,16 @@ zabbix_export:
           item_prototypes:
             -
               uuid: 99af4e53516341b1b4e40d814fe7a258
-              name: '{#ESSID} Rx Bandwidth'
+              name: '{#ESSID}-{#RADIO_NAME} Rx Bandwidth'
               type: DEPENDENT
-              key: 'rx_bandwidth[{#ESSID}]'
+              key: 'rx_bandwidth[{#ESSID}-{#RADIO_NAME}]'
               delay: '0'
               units: bps
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.vap_table.[ ?(@.essid == ''{#ESSID}'' ) ].rx_bytes.sum()'
+                    - '$.vap_table.[ ?(@.essid == ''{#ESSID}'' && @.radio == ''{#RADIO_NAME}'' ) ].rx_bytes.sum()'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -1312,28 +1477,28 @@ zabbix_export:
                   value: Radio
             -
               uuid: 3748f96463d74affa9340b398c34f1a0
-              name: '{#ESSID} Reception Bandwidth Smooth'
+              name: '{#ESSID}-{#RADIO_NAME} Reception Bandwidth Smooth'
               type: CALCULATED
-              key: 'rx_bandwidth_smooth[{#ESSID}]'
+              key: 'rx_bandwidth_smooth[{#ESSID}-{#RADIO_NAME}]'
               value_type: FLOAT
               units: bps
-              params: 'avg(//rx_bandwidth[{#ESSID}],{$UNIFI_SMOOTHING_PERIOD})'
+              params: 'avg(//rx_bandwidth[{#ESSID}-{#RADIO_NAME}],{$UNIFI_SMOOTHING_PERIOD})'
               tags:
                 -
                   tag: Application
                   value: Radio
             -
               uuid: b18528ee504149118ecc6aac93c51135
-              name: '{#ESSID} Tx Bandwidth'
+              name: '{#ESSID}-{#RADIO_NAME} Tx Bandwidth'
               type: DEPENDENT
-              key: 'tx_bandwidth[{#ESSID}]'
+              key: 'tx_bandwidth[{#ESSID}-{#RADIO_NAME}]'
               delay: '0'
               units: bps
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.vap_table.[ ?(@.essid == "{#ESSID}") ].tx_bytes.sum()'
+                    - '$.vap_table.[ ?(@.essid == "{#ESSID}"  && @.radio == "{#RADIO_NAME}") ].tx_bytes.sum()'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -1350,12 +1515,12 @@ zabbix_export:
                   value: Radio
             -
               uuid: ec606cedd02f45518d7a0c030b25849e
-              name: '{#ESSID} Transmission Bandwidth Smooth'
+              name: '{#ESSID}-{#RADIO_NAME} Transmission Bandwidth Smooth'
               type: CALCULATED
-              key: 'tx_bandwidth_smooth[{#ESSID}]'
+              key: 'tx_bandwidth_smooth[{#ESSID}-{#RADIO_NAME}]'
               value_type: FLOAT
               units: bps
-              params: 'avg(//tx_bandwidth[{#ESSID}],{$UNIFI_SMOOTHING_PERIOD})'
+              params: 'avg(//tx_bandwidth[{#ESSID}-{#RADIO_NAME}],{$UNIFI_SMOOTHING_PERIOD})'
               tags:
                 -
                   tag: Application
@@ -1363,26 +1528,29 @@ zabbix_export:
           graph_prototypes:
             -
               uuid: 27c2c173f4d24b48b7341f0762c727a4
-              name: '{#ESSID} Bandwidth'
+              name: '{#ESSID}-{#RADIO_NAME} Bandwidth'
               graph_items:
                 -
                   sortorder: '1'
                   color: 1A7C11
                   item:
                     host: 'Unifi AP'
-                    key: 'rx_bandwidth[{#ESSID}]'
+                    key: 'rx_bandwidth[{#ESSID}-{#RADIO_NAME}]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
                     host: 'Unifi AP'
-                    key: 'tx_bandwidth[{#ESSID}]'
+                    key: 'tx_bandwidth[{#ESSID}-{#RADIO_NAME}]'
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP"]'
           lld_macro_paths:
             -
               lld_macro: '{#ESSID}'
               path: $.essid
+            -
+              lld_macro: '{#RADIO_NAME}'
+              path: $.radio
           preprocessing:
             -
               type: JSONPATH
@@ -4648,24 +4816,24 @@ zabbix_export:
           item_prototypes:
             -
               uuid: 460c978a4cfb40b1930c4a47dac748e9
-              name: '{#ESSID} Total Reception Bandwidth'
+              name: '{#ESSID}-{#RADIO_NAME} Total Reception Bandwidth'
               type: CALCULATED
-              key: 'grpsum["{$AP_GROUP}", "rx_bandwidth[{#ESSID}]", avg, {$UNIFI_SMOOTHING_PERIOD}]'
+              key: 'grpsum["{$AP_GROUP}", "rx_bandwidth[{#ESSID}-{#RADIO_NAME}]", avg, {$UNIFI_SMOOTHING_PERIOD}]'
               value_type: FLOAT
               units: bps
-              params: 'sum(avg_foreach(/*/rx_bandwidth[{#ESSID}]?[group="{$AP_GROUP}"],{$UNIFI_SMOOTHING_PERIOD}))'
+              params: 'sum(avg_foreach(/*/rx_bandwidth[{#ESSID}-{#RADIO_NAME}]?[group="{$AP_GROUP}"],{$UNIFI_SMOOTHING_PERIOD}))'
               tags:
                 -
                   tag: Application
                   value: Radio
             -
               uuid: c91e55731b9d4dae8fb3d5d1ab8e1cb0
-              name: '{#ESSID} Total Transmission Bandwidth'
+              name: '{#ESSID}-{#RADIO_NAME} Total Transmission Bandwidth'
               type: CALCULATED
-              key: 'grpsum["{$AP_GROUP}", "tx_bandwidth[{#ESSID}]", avg, "{$UNIFI_SMOOTHING_PERIOD}"]'
+              key: 'grpsum["{$AP_GROUP}", "tx_bandwidth[{#ESSID}-{#RADIO_NAME}]", avg, "{$UNIFI_SMOOTHING_PERIOD}"]'
               value_type: FLOAT
               units: bps
-              params: 'sum(avg_foreach(/*/tx_bandwidth[{#ESSID}]?[group="{$AP_GROUP}"],{$UNIFI_SMOOTHING_PERIOD}))'
+              params: 'sum(avg_foreach(/*/tx_bandwidth[{#ESSID}-{#RADIO_NAME}]?[group="{$AP_GROUP}"],{$UNIFI_SMOOTHING_PERIOD}))'
               tags:
                 -
                   tag: Application
@@ -4680,19 +4848,22 @@ zabbix_export:
                   color: 1A7C11
                   item:
                     host: 'Unifi WiFi Site'
-                    key: 'grpsum["{$AP_GROUP}", "rx_bandwidth[{#ESSID}]", avg, {$UNIFI_SMOOTHING_PERIOD}]'
+                    key: 'grpsum["{$AP_GROUP}", "rx_bandwidth[{#ESSID}-{#RADIO_NAME}]", avg, {$UNIFI_SMOOTHING_PERIOD}]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
                     host: 'Unifi WiFi Site'
-                    key: 'grpsum["{$AP_GROUP}", "tx_bandwidth[{#ESSID}]", avg, "{$UNIFI_SMOOTHING_PERIOD}"]'
+                    key: 'grpsum["{$AP_GROUP}", "tx_bandwidth[{#ESSID}-{#RADIO_NAME}]", avg, "{$UNIFI_SMOOTHING_PERIOD}"]'
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}"]'
           lld_macro_paths:
             -
               lld_macro: '{#ESSID}'
               path: $.essid
+            -
+              lld_macro: '{#RADIO_NAME}'
+              path: $.radio
           preprocessing:
             -
               type: JSONPATH

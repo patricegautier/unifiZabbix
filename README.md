@@ -179,6 +179,19 @@ The load average value above which to issue a info.  The consensus is 1 for this
 ### {$UNIFI_LOAD_AVERAGE_HIGH}
 The load average value above which to issue a warning.  I have this set to 2.  Note that for switches and APs this value has less meaning since they process packets with specialized HW and this macro is overridden in the template to avoid too many warnings
 
+### {$UNIFI_CHANNEL_INTERFERENCE_INFO_THRESHOLD}
+### {$UNIFI_CHANNEL_INTERFERENCE_INFO_THRESHOLD}
+The percentages above which to issue and info/average event for channel interferences.  I have this set to 30 and 50 respectively
+You can customize this for 2G/5G with {$UNIFI_CHANNEL_INTERFERENCE_INFO_THRESHOLD:"ng"} or {$UNIFI_CHANNEL_INTERFERENCE_INFO_THRESHOLD:"na"} values
+
+
+### {$UNIFI_CHANNEL_USAGE_INFO_THRESHOLD}
+### {$UNIFI_CHANNEL_USAGE_AVERAGE_THRESHOLD}
+The percentages above which to issue and info/average event for Channel usage.  I have this set to 30 and 50 respectively
+You can customize this for 2G/5G with {$UNIFI_CHANNEL_USAGE_INFO_THRESHOLD:"ng"} or {$UNIFI_USAGE_INTERFERENCE_INFO_THRESHOLD:"na"} values
+
+
+
 
 # SUCCESS!
 
