@@ -87,7 +87,7 @@ This is what I end up with:
 
 2/ You will need to specifically enable SSH access on the unifi devices.  
 
-For most devices,  there is one setting in the Unifi controller UI in Settings > Site and one for the UDMP in the UDMP advanced settings which is separate.  
+For most devices,  there is one setting in the Unifi controller UI in Settings > Site and one for the UDMP in the UDMP advanced settings which is separate.  This is where you specify the username and password that you will use to log in via SSH
 
 3/ You then need to send your public key to all the devices you want to monitor
  
