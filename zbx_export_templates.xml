@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.4</version>
-    <date>2021-10-08T01:11:51Z</date>
+    <date>2021-11-03T05:51:22Z</date>
     <groups>
         <group>
             <uuid>15155c95a3d048f4856272ae12fd42c5</uuid>
@@ -2356,6 +2356,15 @@ last(//tx_bandwidth_smooth,#1:now-7d)
                     <params>uname -a</params>
                     <username>ubnt</username>
                     <password>{$PROTECT_CAMERA_PASSWORD}</password>
+                    <preprocessing>
+                        <step>
+                            <type>NOT_MATCHES_REGEX</type>
+                            <parameters>
+                                <parameter>.*No route to host.*</parameter>
+                            </parameters>
+                            <error_handler>DISCARD_VALUE</error_handler>
+                        </step>
+                    </preprocessing>
                     <tags>
                         <tag>
                             <tag>Application</tag>
@@ -3453,6 +3462,15 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                     <history>0</history>
                     <trends>0</trends>
                     <value_type>CHAR</value_type>
+                    <preprocessing>
+                        <step>
+                            <type>NOT_MATCHES_REGEX</type>
+                            <parameters>
+                                <parameter>.*No route to host.*</parameter>
+                            </parameters>
+                            <error_handler>DISCARD_VALUE</error_handler>
+                        </step>
+                    </preprocessing>
                     <tags>
                         <tag>
                             <tag>Application</tag>
@@ -3500,6 +3518,15 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                     <trends>0</trends>
                     <value_type>CHAR</value_type>
                     <inventory_link>OS_FULL</inventory_link>
+                    <preprocessing>
+                        <step>
+                            <type>NOT_MATCHES_REGEX</type>
+                            <parameters>
+                                <parameter>.*No route to host.*</parameter>
+                            </parameters>
+                            <error_handler>DISCARD_VALUE</error_handler>
+                        </step>
+                    </preprocessing>
                     <tags>
                         <tag>
                             <tag>Application</tag>

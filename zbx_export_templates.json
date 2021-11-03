@@ -1,7 +1,7 @@
 {
     "zabbix_export": {
         "version": "5.4",
-        "date": "2021-10-08T01:11:53Z",
+        "date": "2021-11-03T05:51:24Z",
         "groups": [
             {
                 "uuid": "15155c95a3d048f4856272ae12fd42c5",
@@ -2345,6 +2345,15 @@
                         "params": "uname -a",
                         "username": "ubnt",
                         "password": "{$PROTECT_CAMERA_PASSWORD}",
+                        "preprocessing": [
+                            {
+                                "type": "NOT_MATCHES_REGEX",
+                                "parameters": [
+                                    ".*No route to host.*"
+                                ],
+                                "error_handler": "DISCARD_VALUE"
+                            }
+                        ],
                         "tags": [
                             {
                                 "tag": "Application",
@@ -3422,6 +3431,15 @@
                         "history": "0",
                         "trends": "0",
                         "value_type": "CHAR",
+                        "preprocessing": [
+                            {
+                                "type": "NOT_MATCHES_REGEX",
+                                "parameters": [
+                                    ".*No route to host.*"
+                                ],
+                                "error_handler": "DISCARD_VALUE"
+                            }
+                        ],
                         "tags": [
                             {
                                 "tag": "Application",
@@ -3469,6 +3487,15 @@
                         "trends": "0",
                         "value_type": "CHAR",
                         "inventory_link": "OS_FULL",
+                        "preprocessing": [
+                            {
+                                "type": "NOT_MATCHES_REGEX",
+                                "parameters": [
+                                    ".*No route to host.*"
+                                ],
+                                "error_handler": "DISCARD_VALUE"
+                            }
+                        ],
                         "tags": [
                             {
                                 "tag": "Application",
