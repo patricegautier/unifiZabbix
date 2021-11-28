@@ -247,8 +247,6 @@ Usage ${0} -u <username> -p <passwordFile> -g <gatewayURL> [-h] [-d] [-e int] [-
 			-c is the same as -i 'default:proxy/network/api/s/default/stat/sta:.data[]|{name, ip}'
 			-s is the same as -i 'default:proxy/network/api/self/sites:.data[].name'
 	- if none of the previous 4 options are specified, the default is to list the sites under the controller, which is the same as
-		-i :
-	
 EOF
 exit 1
 }
@@ -315,11 +313,12 @@ fi
 
 
 
+set -x
 
-LOGIN=$(curl --include --silent --cookie "${INSECURE}" ${COOKIE_JAR} ${GATEWAY_URL})
-
-if [[ $? -ne 0 ]]; then
-	echo "Could not communicate with ${GATEWAY_URL} - curl returned $?"
+LOGIN=$(curl --include --silent  "${INSECURE}" --cookie ${COOKIE_JAR} ${GATEWAY_URL})
+S=$?
+if [[ $S -ne 0 ]]; then
+	echo "Could not communicate with ${GATEWAY_URL} - curl returned $S"
 	exit 1
 fi
 
@@ -362,8 +361,6 @@ LOGIN_RESPONSE_CODE=$(curl \
 traceOff
 
 echovar2 LOGIN_RESPONSE_CODE
-
-
 
 
 ERROR=$(echo "${LOGIN_RESPONSE_CODE}" | jq -r ".errors?")
