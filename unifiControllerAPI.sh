@@ -312,9 +312,6 @@ if [[ -z "${PASSWORD_FILE}" ]]; then
 fi
 
 
-
-set -x
-
 LOGIN=$(curl --include --silent  "${INSECURE}" --cookie ${COOKIE_JAR} ${GATEWAY_URL})
 S=$?
 if [[ $S -ne 0 ]]; then
