@@ -7,7 +7,7 @@
 
 GATEWAY_URL=https://gw99.gautiers.name
 
-PID=$(date +%s)
+PID=$RANDOM
 
 #----------------------------------------------
 TMP_DIRECTORY=/tmp/unifiController-${PID}
@@ -382,4 +382,4 @@ issueAndParseControllerRequestWithJQPath "${COMMAND_SITE_NAME}" "${COMMAND_URI_P
 #	logout
 	
 
-#cleanupAndExitWithMessageAndCode
+cleanupAndExitWithMessageAndCode
