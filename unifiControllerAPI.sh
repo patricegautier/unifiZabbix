@@ -115,6 +115,7 @@ function issueControllerRequest() {
 	issueControllerRequest_RESPONSE=$(curl \
 		"${METHOD}" \
 		--silent \
+		"${INSECURE}" \
 		--cookie-jar "${COOKIE_JAR}" \
 		--cookie "${COOKIE_JAR}" \
 		--dump-header ${HEADER_FILE} \
@@ -211,6 +212,7 @@ function issueAndParseControllerRequestWithJQPath() {
 function logout() {
 	curl 	-X \
 			--silent \
+			"${INSECURE}" \
 			--cookie-jar "${COOKIE_JAR}" \
 			--cookie "${COOKIE_JAR}" \
 			--header "Content-Type: application/json" \
@@ -233,13 +235,14 @@ Usage ${0} -u <username> -p <passwordFile> -g <gatewayURL> [-h] [-d] [-e int] [-
 	-d: equivalent to -e1
 
 	-g: URL to a UnifiOS based controller, without a port, e.g: https://192.168.200.1
+	-i: allow insecure connections
 	-u: username to log into the controller (local user preferrably)
 	-p: a file containing the password to log into the controller (local user preferrably)
 
 	-s: output a list of sites maintained by the controller
 	-c: output a JSON formatted list of client names and IPs in the default site
 	-v: output a JSON formatted list of Ubiquiti devices names and IPs in the default site
-	-i: provide a URI path to query the controller with and and jq filter to process the json with
+	-r: provide a URI path to query the controller with and and jq filter to process the json with
 			-v is the same as -i 'default:proxy/network/api/s/default/stat/device:.data[]|{name, ip}'
 			-c is the same as -i 'default:proxy/network/api/s/default/stat/sta:.data[]|{name, ip}'
 			-s is the same as -i 'default:proxy/network/api/self/sites:.data[].name'
@@ -267,7 +270,7 @@ function parseSiteNamePathAndFilter() {
 	fi
 }
 
-while getopts 'dhe:cvg:u:p:si:' OPT
+while getopts 'dhe:cvg:u:p:sr:i' OPT
 do
   case $OPT in
     d) 	DEBUG=1 ;;
@@ -282,7 +285,7 @@ do
     	COMMAND_URI_PATH='proxy/network/api/s/default/stat/device'
        	COMMAND_JQ_FILTER='.data[]|{name, ip}' ;;
        	
-    i) 	parseSiteNamePathAndFilter "${OPTARG}" COMMAND_SITE_NAME COMMAND_URI_PATH COMMAND_JQ_FILTER ;;
+    r) 	parseSiteNamePathAndFilter "${OPTARG}" COMMAND_SITE_NAME COMMAND_URI_PATH COMMAND_JQ_FILTER ;;
     
 	s)  COMMAND_URI_PATH='proxy/network/api/self/sites'
 		COMMAND_JQ_FILTER='.data[].name' 
@@ -292,6 +295,7 @@ do
     g) 	GATEWAY_URL=${OPTARG} ;;
     u) 	USERNAME=${OPTARG} ;;
     p) 	PASSWORD_FILE=${OPTARG} ;;
+    i)	INSECURE="--insecure" ;;
     *) 	usage ;;
   esac
 done
@@ -312,7 +316,13 @@ fi
 
 
 
-LOGIN=$(curl --include --silent --cookie ${COOKIE_JAR} ${GATEWAY_URL})
+LOGIN=$(curl --include --silent --cookie "${INSECURE}" ${COOKIE_JAR} ${GATEWAY_URL})
+
+if [[ $? -ne 0 ]]; then
+	echo "Could not communicate with ${GATEWAY_URL} - curl returned $?"
+	exit 1
+fi
+
 echovar2 LOGIN
 
 CSRF_TOKEN=$(echo "$LOGIN" | grep -i "x-csrf-token" | tr -d '\n\r')
@@ -340,6 +350,7 @@ echovar2 DATA
 
 LOGIN_RESPONSE_CODE=$(curl \
 	--silent \
+	"${INSECURE}" \
 	--header ${CSRF_TOKEN} \
 	--cookie-jar "${COOKIE_JAR}" \
 	--cookie "${COOKIE_JAR}" \
