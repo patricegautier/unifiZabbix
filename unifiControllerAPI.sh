@@ -246,8 +246,7 @@ Usage ${0} -u <username> -p <passwordFile> -g <gatewayURL> [-h] [-d] [-e int] [-
 			-v is the same as -i 'default:proxy/network/api/s/default/stat/device:.data[]|{name, ip}'
 			-c is the same as -i 'default:proxy/network/api/s/default/stat/sta:.data[]|{name, ip}'
 			-s is the same as -i 'default:proxy/network/api/self/sites:.data[].name'
-	- if none of the previous 4 options are specified, the default is to list the sites under the controller, which is the same as
-		-i :
+	- if none of the previous 4 options are specified, the default is to list the sites under the controller, which is the same as -i
 	
 EOF
 exit 1
