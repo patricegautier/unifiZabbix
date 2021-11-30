@@ -242,6 +242,7 @@ Usage ${0} -u <username> -p <passwordFile> -g <gatewayURL> [-h] [-d] [-e int] [-
 	-s: output a list of sites maintained by the controller
 	-c: output a JSON formatted list of client names and IPs in the default site
 	-v: output a JSON formatted list of Ubiquiti devices names and IPs in the default site
+	-a: output a JSON formatted list of Ubiquiti devices and client names with IPs in the default site
 	-r: provide a URI path to query the controller with and and jq filter to process the json with
 			-v is the same as -i 'default:proxy/network/api/s/default/stat/device:.data[]|{name, ip}'
 			-c is the same as -i 'default:proxy/network/api/s/default/stat/sta:.data[]|{name, ip}'
@@ -269,7 +270,7 @@ function parseSiteNamePathAndFilter() {
 	fi
 }
 
-while getopts 'dhe:cvg:u:p:sr:i' OPT
+while getopts 'dhe:cvg:u:p:sr:ia' OPT
 do
   case $OPT in
     d) 	DEBUG=1 ;;
@@ -283,6 +284,11 @@ do
     v) 	COMMAND_SITE_NAME='default'
     	COMMAND_URI_PATH='proxy/network/api/s/default/stat/device'
        	COMMAND_JQ_FILTER='.data[]|{name, ip}' ;;
+       	
+    a)  COMMAND_SITE_NAME='default'
+    	COMMAND_URI_PATH='proxy/network/api/s/default/stat/device'
+       	COMMAND_JQ_FILTER='.data[]|{name, ip}'
+		ADD_CLIENTS=true ;; 
        	
     r) 	parseSiteNamePathAndFilter "${OPTARG}" COMMAND_SITE_NAME COMMAND_URI_PATH COMMAND_JQ_FILTER ;;
     
@@ -378,6 +384,12 @@ if [[ -z "${COMMAND_URI_PATH}" ]]; then
 fi
 
 issueAndParseControllerRequestWithJQPath "${COMMAND_SITE_NAME}" "${COMMAND_URI_PATH}" "${COMMAND_JQ_FILTER}"
+
+if [[ -n "${ADD_CLIENTS}" ]]; then
+   	COMMAND_URI_PATH='proxy/network/api/s/default/stat/sta'
+	issueAndParseControllerRequestWithJQPath "${COMMAND_SITE_NAME}" "${COMMAND_URI_PATH}" "${COMMAND_JQ_FILTER}"
+fi
+
 
 	# can't seem to find the logout path
 #	issueAndParseControllerRequestWithJQPath -p "default" "api/logout"  > /dev/null
