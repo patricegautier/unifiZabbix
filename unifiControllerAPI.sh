@@ -13,7 +13,7 @@ PID=$RANDOM
 
 #----------------------------------------------
 TMP_DIRECTORY=/tmp/unifiController-${PID}
-mkdir ${TMP_DIRECTORY}
+mkdir -p ${TMP_DIRECTORY} ||  ( echo "Could not create temp directory ${TMP_DIRECTORY}";  exit 1 )
 COOKIE_JAR=${TMP_DIRECTORY}/cookies.txt
 
 function cleanupAndExitWithMessageAndCode() {
