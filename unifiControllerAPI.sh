@@ -17,7 +17,11 @@ mkdir -p ${TMP_DIRECTORY} ||  ( echo "Could not create temp directory ${TMP_DIRE
 COOKIE_JAR=${TMP_DIRECTORY}/cookies.txt
 
 function cleanupAndExitWithMessageAndCode() {
-	if [[ -z "${DEBUG}" ]]; then  rm -fr ${TMP_DIRECTORY}; fi
+	if [[ -z "${DEBUG}" ]]; then  
+		rm -fr ${TMP_DIRECTORY}
+	else
+		mv ${TMP_DIRECTORY} ${TMP_DIRECTORY}-debug
+	fi
 	if [[ $2 -ne 0 ]]; then
 		echo "$1"
 		echo "Exiting with status $2" >2&
