@@ -128,7 +128,7 @@ function getCSRFTokenFromCookies() {
 	#if (( $? != 0 )); then cleanupAndExitWithMessageAndCode "Couldn't decode ''${CSRF_VALUE}'" 1; fi
 
 	# For reasons unscrutable, the value I get from the cookie is missing a final }, so I add it below
-	if [[ ${CSRF_DECODED_VALUE: -1} != ""  ]]; then CSRF_DECODED_VALUE+='}'; fi
+	if [[ ${CSRF_DECODED_VALUE: -1} != '}'  ]]; then CSRF_DECODED_VALUE+='}'; fi
 	echovar2 CSRF_DECODED_VALUE		
 
 	CSRF_TOKEN=$(echo "${CSRF_DECODED_VALUE}" | jq -r ".csrfToken")
