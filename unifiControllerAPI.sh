@@ -17,7 +17,7 @@ mkdir -p ${TMP_DIRECTORY} ||  ( echo "Could not create temp directory ${TMP_DIRE
 COOKIE_JAR=${TMP_DIRECTORY}/cookies.txt
 
 function cleanupAndExitWithMessageAndCode() {
-	if [[ -z "${DEBUG}" ]]; then  
+	if (( 1 - $(debugIsOn) )); then  
 		rm -fr ${TMP_DIRECTORY}
 	else
 		mv ${TMP_DIRECTORY} ${TMP_DIRECTORY}-debug
@@ -32,10 +32,19 @@ function cleanupAndExitWithMessageAndCode() {
 #---------------------------------------------
 # Debug Conveniences 
 
+function debugIsOn() {
+	L=${1:-1}
+	if [[ -n "${DEBUG}" ]] &&  (( "${DEBUG}" >= $L )); then
+		echo 1
+	else
+		echo 0
+	fi
+}
+
 function _echovar() {
 	L=$1
 	shift
-	if [[ -n "${DEBUG}" ]] && (( "${DEBUG}" >= $L )); then
+	if (( $(debugIsOn $L) )); then
 		VARNAME=$1
 		CONTEXT=$2
 		VARVAL="${!VARNAME}"
@@ -44,13 +53,13 @@ function _echovar() {
 }
 
 function echovar() {
-	if [[ -n "${DEBUG}" ]] && (( "${DEBUG}" >= 1 )); then
+	if (( $(debugIsOn 1) )); then
 		_echovar 1 $*
 	fi
 }
 
 function echovar2() {
-	if [[ -n "${DEBUG}" ]] && (( "${DEBUG}" >= 2 )); then
+	if (( $(debugIsOn 2) )); then
 		_echovar 2 $*
 	fi
 }
@@ -58,7 +67,7 @@ function echovar2() {
 function _echov() {
 	local L=$1
 	shift
-	if  [[ -n "${DEBUG}" ]] && (( "${DEBUG}" >= $L ))   ; then
+	if  (( $(debugIsOn $L) ))   ; then
 		if (( "${DEBUG}" >=2 )); then
 			echo "${BASHPID}: $@"  >&2
 		else
@@ -68,28 +77,26 @@ function _echov() {
 }
 
 function echov() {
-	if [[ -n "${DEBUG}"	]] && (( "${DEBUG}" >= 1 )); then
+	if (( $(debugIsOn 1) )); then
 		_echov 1 "$*"
 	fi
 }
 
 
 function echov2() {
-	if [[ -n "${DEBUG}"	]] && (( "${DEBUG}" >= 2 )); then
+	if (( $(debugIsOn 2) )); then
 		_echov 1 "$*"
 	fi
 }
 
 function traceOn {
-	if [[ -n "${DEBUG}" ]] && (( "${DEBUG}" >= 2 )); then
+	if (( $(debugIsOn 2) )); then
 		set -x
 	fi
 }
 
 function traceOff {
-	if [[ -n "${DEBUG}" ]] && (( "${DEBUG}" >= 2 )); then
 		set +x
-	fi
 }
 
 # ------------------------------
