@@ -124,7 +124,7 @@ function getCSRFTokenFromCookies() {
 	echovar2 CSRF_VALUE
 
 	CSRF_DECODED_VALUE=$(echo "${CSRF_VALUE}" | base64 -d)
-	if (( $? != 0 )); then cleanupAndExitWithMessageAndCode "Couldn't decode ${CSRF_VALUE}'" 1; fi
+	if (( $? != 0 )); then cleanupAndExitWithMessageAndCode "Couldn't decode ''${CSRF_VALUE}'" 1; fi
 	echovar2 CSRF_VALUE		
 
 	# For reasons unscrutable, the value I get from the cookie is missing a final }, so I add it below
@@ -178,6 +178,8 @@ function issueControllerRequest() {
 
 	if [[ -n "${METHOD}" ]]; then
 		CSRF_TOKEN=$(getCSRFTokenFromCookies)
+		if (( $? !=0 )); then 
+			cleanupAndExitWithMessageAndCode "Could retrieve CSRF from cookies: $?"
 		echov2 "New CSRF from cookies: $CSRF_TOKEN"
 	fi
 
