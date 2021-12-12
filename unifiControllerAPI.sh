@@ -124,11 +124,14 @@ function getCSRFTokenFromCookies() {
 	echovar2 CSRF_VALUE
 
 	CSRF_DECODED_VALUE=$(echo "${CSRF_VALUE}" | base64 -d)
-	if (( $? != 0 )); then cleanupAndExitWithMessageAndCode "Couldn't decode ''${CSRF_VALUE}'" 1; fi
+	#There seems to be inconsistent handling here for base64 so ignoring error codes
+	#if (( $? != 0 )); then cleanupAndExitWithMessageAndCode "Couldn't decode ''${CSRF_VALUE}'" 1; fi
 	echovar2 CSRF_VALUE		
 
 	# For reasons unscrutable, the value I get from the cookie is missing a final }, so I add it below
-	CSRF_TOKEN=$(echo "${CSRF_DECODED_VALUE}}" | jq -r ".csrfToken")
+	if [[ ${CSRF_DECODED_VALUE: -1} != ""  ]]; then CSRF_DECODED_VALUE+="}"; fi
+
+	CSRF_TOKEN=$(echo "${CSRF_DECODED_VALUE}" | jq -r ".csrfToken")
 	if (( $? != 0 )); then cleanupAndExitWithMessageAndCode "Couldn't extract CSRF token  from ${CSRF_DECODED_VALUE}'" 1; fi
 	echovar2 CSRF_TOKEN
 
