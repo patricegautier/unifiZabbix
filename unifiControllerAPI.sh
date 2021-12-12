@@ -180,6 +180,7 @@ function issueControllerRequest() {
 		CSRF_TOKEN=$(getCSRFTokenFromCookies)
 		if (( $? !=0 )); then 
 			cleanupAndExitWithMessageAndCode "Could retrieve CSRF from cookies: $?"
+		fi
 		echov2 "New CSRF from cookies: $CSRF_TOKEN"
 	fi
 
