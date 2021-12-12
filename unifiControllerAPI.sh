@@ -9,10 +9,8 @@
 
 GATEWAY_URL=https://gw99.gautiers.name
 
-PID=$RANDOM
-
 #----------------------------------------------
-TMP_DIRECTORY=/tmp/unifiController-${PID}
+TMP_DIRECTORY=/tmp/unifiController-${RANDOM}
 mkdir -p ${TMP_DIRECTORY} ||  ( echo "Could not create temp directory ${TMP_DIRECTORY}";  exit 1 )
 COOKIE_JAR=${TMP_DIRECTORY}/cookies.txt
 
