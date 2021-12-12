@@ -123,7 +123,8 @@ function getCSRFTokenFromCookies() {
 	if (( $? != 0 )); then cleanupAndExitWithMessageAndCode "Couldn't get CSRF_VALUE from ${TOKEN_VALUE}'" 1; fi
 	echovar2 CSRF_VALUE
 
-	CSRF_DECODED_VALUE=$(echo "${CSRF_VALUE}" | base64 -d)
+	echovar "CSRF_VALUE"
+	CSRF_DECODED_VALUE=$(echo "${CSRF_VALUE}" | base64 -d 2> /dev/null )
 	#There seems to be inconsistent handling here for base64 so ignoring error codes
 	#if (( $? != 0 )); then cleanupAndExitWithMessageAndCode "Couldn't decode ''${CSRF_VALUE}'" 1; fi
 
