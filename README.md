@@ -144,6 +144,8 @@ from my Zabbix Server docker-compose.yml:
 		
 note that /var/lib/zabbix/ssh_keys is the default location for zabbix keys, and so the running container will find them there.
 
+Also note that I have /usr/lib/zabbix/externalscripts also mapped to a persistent volume; you can just pust mca_dump_short.sh and others in that volume
+
 2/ You can then either run all the ssh commands to setup/manage keys from within the Zabbix server container or from the outside targetting the persistent volume.  From inside you might run something like:
 
 	docker exec zabbix-server ssh-keygen -P "" -t rsa  -m pem -f /var/lib/zabbix/ssh_keys/zb_id_rsa
