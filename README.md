@@ -127,6 +127,32 @@ in my case I have:
 	
 	SSHKeyLocation=/home/pi/.ssh/zabbix
 
+## Running the Zabbix server in a container
+
+if you run your Zabbix server in a Docker container (as I do), you have to keep in mind that all these SSH accesses take place from within that container.
+
+A few things then:
+
+1/  You need to make sure your private keys are going to resist the container coming and going, and set them up in a persistent docker volume:
+
+from my Zabbix Server docker-compose.yml:
+
+    volumes:
+      - ${HOME}/Deployment/zabbixServer/sshKeys:/var/lib/zabbix/ssh_keys:ro
+      - ${HOME}/Deployment/zabbixServer/externalScripts:/usr/lib/zabbix/externalscripts:ro
+      		...
+		
+note that /var/lib/zabbix/ssh_keys is the default location for zabbix keys, and so the running container will find them there.
+
+2/ You can then either run all the ssh commands to setup/manage keys from within the Zabbix server container or from the outside targetting the persistent volume.  From inside you might run something like:
+
+	docker exec zabbix-server ssh-keygen -P "" -t rsa  -m pem -f /var/lib/zabbix/ssh_keys/zb_id_rsa
+
+to create the public/private key pair.  Similarly to explicitly check the container can get to a particular device:
+
+	docker exec zabbix-server  /usr/lib/zabbix/externalscripts/mca-dump-short.sh -d <ip> -u <userName> -i /var/lib/zabbix/ssh_keys/zb_id_rsa -t <UDMP|AP|SWITCH|CK>
+
+
 
 ## Macros
 
