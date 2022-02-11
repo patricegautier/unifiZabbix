@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.4</version>
-    <date>2021-11-03T05:51:22Z</date>
+    <date>2022-02-11T06:03:13Z</date>
     <groups>
         <group>
             <uuid>15155c95a3d048f4856272ae12fd42c5</uuid>
@@ -89,22 +89,10 @@
                     </tags>
                     <triggers>
                         <trigger>
-                            <uuid>483e7103e0c84bfa9c8c0ea957e61678</uuid>
-                            <expression>nodata(/SunMAX SolarPoint/batteryVoltage,{$UNIFI_ALERT_LONG_PERIOD})=1</expression>
-                            <name>{HOST.NAME} has not reported data in more than {$UNIFI_ALERT_LONG_PERIOD}</name>
-                            <priority>AVERAGE</priority>
-                        </trigger>
-                        <trigger>
                             <uuid>6ab05257f12a4e3b901a348edeba5817</uuid>
                             <expression>nodata(/SunMAX SolarPoint/batteryVoltage,{$UNIFI_ALERT_PERIOD})=1</expression>
                             <name>{HOST.NAME} has not reported data in more than {$UNIFI_ALERT_PERIOD}</name>
                             <priority>WARNING</priority>
-                            <dependencies>
-                                <dependency>
-                                    <name>{HOST.NAME} has not reported data in more than {$UNIFI_ALERT_LONG_PERIOD}</name>
-                                    <expression>nodata(/SunMAX SolarPoint/batteryVoltage,{$UNIFI_ALERT_LONG_PERIOD})=1</expression>
-                                </dependency>
-                            </dependencies>
                         </trigger>
                     </triggers>
                 </item>
@@ -454,29 +442,12 @@
                     </tags>
                     <triggers>
                         <trigger>
-                            <uuid>06da952714fd4428b21e92afb0b808d4</uuid>
-                            <expression>nodata(/UBNT Airmax/airTime,{$UNIFI_ALERT_LONG_PERIOD})=1</expression>
-                            <name>{HOST.NAME} Device has not reported statistics in more than {$UNIFI_ALERT_LONG_PERIOD}</name>
-                            <priority>AVERAGE</priority>
-                            <manual_close>YES</manual_close>
-                            <dependencies>
-                                <dependency>
-                                    <name>{HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_PERIOD}</name>
-                                    <expression>nodata(/Unifi SSH Host/load_avg_1mn,{$UNIFI_ALERT_PERIOD})=1</expression>
-                                </dependency>
-                            </dependencies>
-                        </trigger>
-                        <trigger>
                             <uuid>e4abdaf9196b4fae98d3de636ac86573</uuid>
                             <expression>nodata(/UBNT Airmax/airTime,{$UNIFI_ALERT_PERIOD})=1</expression>
                             <name>{HOST.NAME} Device has not reported statistics in more than {$UNIFI_ALERT_PERIOD}</name>
                             <priority>WARNING</priority>
                             <manual_close>YES</manual_close>
                             <dependencies>
-                                <dependency>
-                                    <name>{HOST.NAME} Device has not reported statistics in more than {$UNIFI_ALERT_LONG_PERIOD}</name>
-                                    <expression>nodata(/UBNT Airmax/airTime,{$UNIFI_ALERT_LONG_PERIOD})=1</expression>
-                                </dependency>
                                 <dependency>
                                     <name>{HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_PERIOD}</name>
                                     <expression>nodata(/Unifi SSH Host/load_avg_1mn,{$UNIFI_ALERT_PERIOD})=1</expression>
@@ -1596,23 +1567,6 @@ Assign this template to all APs in your site</description>
                     </tags>
                     <triggers>
                         <trigger>
-                            <uuid>2704aeb215474ad1bc494adfffd5d72a</uuid>
-                            <expression>nodata(/Unifi AP/uptime,{$UNIFI_ALERT_LONG_PERIOD})=1</expression>
-                            <name>{HOST.NAME} has not reported statistics in more than {$UNIFI_ALERT_LONG_PERIOD}</name>
-                            <priority>AVERAGE</priority>
-                            <manual_close>YES</manual_close>
-                            <dependencies>
-                                <dependency>
-                                    <name>{HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_LONG_PERIOD}</name>
-                                    <expression>max(/Unifi SSH Host/icmpping[],{$UNIFI_ALERT_LONG_PERIOD})=0</expression>
-                                </dependency>
-                                <dependency>
-                                    <name>{HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_LONG_PERIOD}</name>
-                                    <expression>nodata(/Unifi SSH Host/load_avg_1mn,{$UNIFI_ALERT_LONG_PERIOD})=1</expression>
-                                </dependency>
-                            </dependencies>
-                        </trigger>
-                        <trigger>
                             <uuid>b8c15f7c71934ce89958890a93893a3b</uuid>
                             <expression>nodata(/Unifi AP/uptime,{$UNIFI_ALERT_PERIOD})=1</expression>
                             <name>{HOST.NAME} has not reported statistics in more than {$UNIFI_ALERT_PERIOD}</name>
@@ -1622,10 +1576,6 @@ Assign this template to all APs in your site</description>
                                 <dependency>
                                     <name>{HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_PERIOD}</name>
                                     <expression>max(/Unifi SSH Host/icmpping[],{$UNIFI_ALERT_PERIOD})=0</expression>
-                                </dependency>
-                                <dependency>
-                                    <name>{HOST.NAME} has not reported statistics in more than {$UNIFI_ALERT_LONG_PERIOD}</name>
-                                    <expression>nodata(/Unifi AP/uptime,{$UNIFI_ALERT_LONG_PERIOD})=1</expression>
                                 </dependency>
                                 <dependency>
                                     <name>{HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_PERIOD}</name>
@@ -1749,6 +1699,38 @@ Assign this template to all APs in your site</description>
                     <delay>0</delay>
                     <description>List all active radios to create channel items</description>
                     <item_prototypes>
+                        <item_prototype>
+                            <uuid>b2ad8503bd71430d93959a6aeb338ed3</uuid>
+                            <name>Channel Number {#RADIO_NAME}</name>
+                            <type>DEPENDENT</type>
+                            <key>channel[{#RADIO_NAME}]</key>
+                            <delay>0</delay>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <parameters>
+                                        <parameter>$.vap_table[?(@.radio == '{#RADIO_NAME}')].channel.first()</parameter>
+                                    </parameters>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>mca-dump-short.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-t&quot;, &quot;AP&quot;]</key>
+                            </master_item>
+                            <tags>
+                                <tag>
+                                    <tag>Application</tag>
+                                    <value>Radio</value>
+                                </tag>
+                            </tags>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <uuid>35674d206a224a61b05c3f570c8c0095</uuid>
+                                    <expression>change(/Unifi AP/channel[{#RADIO_NAME}])&lt;&gt;0</expression>
+                                    <name>{HOST.NAME}  {#RADIO_NAME} Channel Change</name>
+                                    <priority>INFO</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
                         <item_prototype>
                             <uuid>f35732598f6f4aed84477b0932b496cb</uuid>
                             <name>Channel Interference {#RADIO_NAME}</name>
@@ -2159,24 +2141,17 @@ Assign this template to all APs in your site</description>
                     </tags>
                     <triggers>
                         <trigger>
-                            <uuid>6341d1bd42534d449d016021290e11cb</uuid>
-                            <expression>max(/Unifi Protect Camera/icmpping[],{$UNIFI_ALERT_LONG_PERIOD})=0</expression>
-                            <name>Camera {HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_LONG_PERIOD}</name>
-                            <priority>AVERAGE</priority>
-                            <manual_close>YES</manual_close>
-                        </trigger>
-                        <trigger>
                             <uuid>c92b0647b8284e2fa9bf10a16821b431</uuid>
                             <expression>max(/Unifi Protect Camera/icmpping[],{$UNIFI_ALERT_PERIOD})=0</expression>
                             <name>Camera {HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_PERIOD}</name>
                             <priority>WARNING</priority>
                             <manual_close>YES</manual_close>
-                            <dependencies>
-                                <dependency>
-                                    <name>Camera {HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_LONG_PERIOD}</name>
-                                    <expression>max(/Unifi Protect Camera/icmpping[],{$UNIFI_ALERT_LONG_PERIOD})=0</expression>
-                                </dependency>
-                            </dependencies>
+                            <tags>
+                                <tag>
+                                    <tag>Application</tag>
+                                    <value>Protect</value>
+                                </tag>
+                            </tags>
                         </trigger>
                     </triggers>
                 </item>
@@ -2245,7 +2220,7 @@ last(//tx_bandwidth_smooth,#1:now-5d) +
 last(//tx_bandwidth_smooth,#1:now-6d) +
 last(//tx_bandwidth_smooth,#1:now-7d) 
 
-) /7 * 0.5</params>
+) /7 * 0.45</params>
                     <tags>
                         <tag>
                             <tag>Application</tag>
@@ -2310,19 +2285,6 @@ last(//tx_bandwidth_smooth,#1:now-7d)
                     </tags>
                     <triggers>
                         <trigger>
-                            <uuid>f418ff4886b64345bf884ef541904a2f</uuid>
-                            <expression>nodata(/Unifi Protect Camera/ssh.run[ifconfig],{$UNIFI_ALERT_LONG_PERIOD})=1</expression>
-                            <name>Camera {HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_LONG_PERIOD}</name>
-                            <priority>AVERAGE</priority>
-                            <manual_close>YES</manual_close>
-                            <dependencies>
-                                <dependency>
-                                    <name>Camera {HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_LONG_PERIOD}</name>
-                                    <expression>max(/Unifi Protect Camera/icmpping[],{$UNIFI_ALERT_LONG_PERIOD})=0</expression>
-                                </dependency>
-                            </dependencies>
-                        </trigger>
-                        <trigger>
                             <uuid>2117be829d9e4e34a1307d14cd387cc0</uuid>
                             <expression>nodata(/Unifi Protect Camera/ssh.run[ifconfig],{$UNIFI_ALERT_PERIOD})=1</expression>
                             <name>Camera {HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_PERIOD}</name>
@@ -2330,18 +2292,16 @@ last(//tx_bandwidth_smooth,#1:now-7d)
                             <manual_close>YES</manual_close>
                             <dependencies>
                                 <dependency>
-                                    <name>Camera {HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_LONG_PERIOD}</name>
-                                    <expression>max(/Unifi Protect Camera/icmpping[],{$UNIFI_ALERT_LONG_PERIOD})=0</expression>
-                                </dependency>
-                                <dependency>
                                     <name>Camera {HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_PERIOD}</name>
                                     <expression>max(/Unifi Protect Camera/icmpping[],{$UNIFI_ALERT_PERIOD})=0</expression>
                                 </dependency>
-                                <dependency>
-                                    <name>Camera {HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_LONG_PERIOD}</name>
-                                    <expression>nodata(/Unifi Protect Camera/ssh.run[ifconfig],{$UNIFI_ALERT_LONG_PERIOD})=1</expression>
-                                </dependency>
                             </dependencies>
+                            <tags>
+                                <tag>
+                                    <tag>Application</tag>
+                                    <value>Protect</value>
+                                </tag>
+                            </tags>
                         </trigger>
                     </triggers>
                 </item>
@@ -2425,6 +2385,12 @@ last(//tx_bandwidth_smooth,#1:now-7d)
                                     <expression>nodata(/Unifi Protect Camera/ssh.run[ifconfig],{$UNIFI_ALERT_PERIOD})=1</expression>
                                 </dependency>
                             </dependencies>
+                            <tags>
+                                <tag>
+                                    <tag>Application</tag>
+                                    <value>Protect</value>
+                                </tag>
+                            </tags>
                         </trigger>
                     </triggers>
                 </item>
@@ -2521,13 +2487,6 @@ avg(//IpExtInOctets,1h:now-7d)
                     </tags>
                     <triggers>
                         <trigger>
-                            <uuid>2fdd63693e6e444dbd76464a5ff19619</uuid>
-                            <expression>nodata(/Unifi Protect Cloud Key/IpExtInOctets,{$UNIFI_ALERT_LONG_PERIOD})=1</expression>
-                            <name>{HOST.NAME} hasn't reported statistics in more than {$UNIFI_ALERT_LONG_PERIOD}</name>
-                            <priority>AVERAGE</priority>
-                            <manual_close>YES</manual_close>
-                        </trigger>
-                        <trigger>
                             <uuid>1e88147fdc28426f9b8d227993f6045e</uuid>
                             <expression>nodata(/Unifi Protect Cloud Key/IpExtInOctets,{$UNIFI_ALERT_PERIOD})=1</expression>
                             <name>{HOST.NAME} hasn't reported statistics in more than {$UNIFI_ALERT_PERIOD}</name>
@@ -2535,8 +2494,8 @@ avg(//IpExtInOctets,1h:now-7d)
                             <manual_close>YES</manual_close>
                             <dependencies>
                                 <dependency>
-                                    <name>{HOST.NAME} hasn't reported statistics in more than {$UNIFI_ALERT_LONG_PERIOD}</name>
-                                    <expression>nodata(/Unifi Protect Cloud Key/IpExtInOctets,{$UNIFI_ALERT_LONG_PERIOD})=1</expression>
+                                    <name>{HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_PERIOD}</name>
+                                    <expression>nodata(/Unifi SSH Host/load_avg_1mn,{$UNIFI_ALERT_PERIOD})=1</expression>
                                 </dependency>
                             </dependencies>
                         </trigger>
@@ -2710,19 +2669,6 @@ avg(//IpExtInOctets,1h:now-7d)
                     </tags>
                     <triggers>
                         <trigger>
-                            <uuid>15608e1d1a9f45348dabb63eaf4c91b4</uuid>
-                            <expression>nodata(/Unifi Protect NVR4/IpExtInOctets,{$UNIFI_ALERT_LONG_PERIOD})=1</expression>
-                            <name>{HOST.NAME} hasn't reported statistics for more than {$UNIFI_ALERT_LONG_PERIOD}</name>
-                            <priority>AVERAGE</priority>
-                            <manual_close>YES</manual_close>
-                            <dependencies>
-                                <dependency>
-                                    <name>{HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_LONG_PERIOD}</name>
-                                    <expression>nodata(/Unifi SSH High Priority Host/load_avg_1mn,{$UNIFI_ALERT_LONG_PERIOD})=1</expression>
-                                </dependency>
-                            </dependencies>
-                        </trigger>
-                        <trigger>
                             <uuid>e4308a68f1df4a8e9ff7b3692a51355e</uuid>
                             <expression>nodata(/Unifi Protect NVR4/IpExtInOctets,{$UNIFI_ALERT_PERIOD})=1</expression>
                             <name>{HOST.NAME} hasn't reported statistics for more than {$UNIFI_ALERT_PERIOD}</name>
@@ -2730,8 +2676,8 @@ avg(//IpExtInOctets,1h:now-7d)
                             <manual_close>YES</manual_close>
                             <dependencies>
                                 <dependency>
-                                    <name>{HOST.NAME} hasn't reported statistics for more than {$UNIFI_ALERT_LONG_PERIOD}</name>
-                                    <expression>nodata(/Unifi Protect NVR4/IpExtInOctets,{$UNIFI_ALERT_LONG_PERIOD})=1</expression>
+                                    <name>{HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_PERIOD}</name>
+                                    <expression>max(/Unifi SSH High Priority Host/icmpping[],{$UNIFI_ALERT_PERIOD})=0</expression>
                                 </dependency>
                                 <dependency>
                                     <name>{HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_PERIOD}</name>
@@ -2901,7 +2847,7 @@ avg(//IpExtInOctets,1h:now-7d)
                     <history>0</history>
                     <trends>0</trends>
                     <value_type>TEXT</value_type>
-                    <url>https://{HOST.NAME}</url>
+                    <url>https://{HOST.CONN}</url>
                     <retrieve_mode>HEADERS</retrieve_mode>
                 </item>
             </items>
@@ -2930,24 +2876,11 @@ avg(//IpExtInOctets,1h:now-7d)
                     </tags>
                     <triggers>
                         <trigger>
-                            <uuid>76db203cada54bdfa8fce55197989ca0</uuid>
-                            <expression>max(/Unifi SSH High Priority Host/icmpping[],{$UNIFI_ALERT_LONG_PERIOD})=0</expression>
-                            <name>{HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_LONG_PERIOD}</name>
-                            <priority>HIGH</priority>
-                            <manual_close>YES</manual_close>
-                        </trigger>
-                        <trigger>
                             <uuid>d392f22278464ef1bd4936d174f5b0cd</uuid>
                             <expression>max(/Unifi SSH High Priority Host/icmpping[],{$UNIFI_ALERT_PERIOD})=0</expression>
                             <name>{HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_PERIOD}</name>
                             <priority>AVERAGE</priority>
                             <manual_close>YES</manual_close>
-                            <dependencies>
-                                <dependency>
-                                    <name>{HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_LONG_PERIOD}</name>
-                                    <expression>max(/Unifi SSH High Priority Host/icmpping[],{$UNIFI_ALERT_LONG_PERIOD})=0</expression>
-                                </dependency>
-                            </dependencies>
                         </trigger>
                     </triggers>
                 </item>
@@ -2982,19 +2915,6 @@ avg(//IpExtInOctets,1h:now-7d)
                     </tags>
                     <triggers>
                         <trigger>
-                            <uuid>ee22be5cdc6a43019eeced4ab9505127</uuid>
-                            <expression>nodata(/Unifi SSH High Priority Host/load_avg_1mn,{$UNIFI_ALERT_LONG_PERIOD})=1</expression>
-                            <name>{HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_LONG_PERIOD}</name>
-                            <priority>HIGH</priority>
-                            <manual_close>YES</manual_close>
-                            <dependencies>
-                                <dependency>
-                                    <name>{HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_PERIOD}</name>
-                                    <expression>max(/Unifi SSH High Priority Host/icmpping[],{$UNIFI_ALERT_PERIOD})=0</expression>
-                                </dependency>
-                            </dependencies>
-                        </trigger>
-                        <trigger>
                             <uuid>08593d21fb5441518507f2470a0acf5e</uuid>
                             <expression>nodata(/Unifi SSH High Priority Host/load_avg_1mn,{$UNIFI_ALERT_PERIOD})=1</expression>
                             <name>{HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_PERIOD}</name>
@@ -3004,10 +2924,6 @@ avg(//IpExtInOctets,1h:now-7d)
                                 <dependency>
                                     <name>{HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_PERIOD}</name>
                                     <expression>max(/Unifi SSH High Priority Host/icmpping[],{$UNIFI_ALERT_PERIOD})=0</expression>
-                                </dependency>
-                                <dependency>
-                                    <name>{HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_LONG_PERIOD}</name>
-                                    <expression>nodata(/Unifi SSH High Priority Host/load_avg_1mn,{$UNIFI_ALERT_LONG_PERIOD})=1</expression>
                                 </dependency>
                             </dependencies>
                         </trigger>
@@ -3187,6 +3103,22 @@ avg(//IpExtInOctets,1h:now-7d)
                     <trends>0</trends>
                     <value_type>CHAR</value_type>
                     <inventory_link>OS_FULL</inventory_link>
+                    <preprocessing>
+                        <step>
+                            <type>NOT_MATCHES_REGEX</type>
+                            <parameters>
+                                <parameter>.*No route to host.*</parameter>
+                            </parameters>
+                            <error_handler>DISCARD_VALUE</error_handler>
+                        </step>
+                        <step>
+                            <type>NOT_MATCHES_REGEX</type>
+                            <parameters>
+                                <parameter>*ssh: command not found*</parameter>
+                            </parameters>
+                            <error_handler>DISCARD_VALUE</error_handler>
+                        </step>
+                    </preprocessing>
                     <tags>
                         <tag>
                             <tag>Application</tag>
@@ -3252,24 +3184,11 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                     </tags>
                     <triggers>
                         <trigger>
-                            <uuid>2da72f8c38414846adab387f563819f3</uuid>
-                            <expression>max(/Unifi SSH Host/icmpping[],{$UNIFI_ALERT_LONG_PERIOD})=0</expression>
-                            <name>{HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_LONG_PERIOD}</name>
-                            <priority>AVERAGE</priority>
-                            <manual_close>YES</manual_close>
-                        </trigger>
-                        <trigger>
                             <uuid>08a60db01cd24b47bb1802c30c71359c</uuid>
                             <expression>max(/Unifi SSH Host/icmpping[],{$UNIFI_ALERT_PERIOD})=0</expression>
                             <name>{HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_PERIOD}</name>
                             <priority>WARNING</priority>
                             <manual_close>YES</manual_close>
-                            <dependencies>
-                                <dependency>
-                                    <name>{HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_LONG_PERIOD}</name>
-                                    <expression>max(/Unifi SSH Host/icmpping[],{$UNIFI_ALERT_LONG_PERIOD})=0</expression>
-                                </dependency>
-                            </dependencies>
                         </trigger>
                     </triggers>
                 </item>
@@ -3304,19 +3223,6 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                     </tags>
                     <triggers>
                         <trigger>
-                            <uuid>7cb4add2c2e44798a23f9a937872f322</uuid>
-                            <expression>nodata(/Unifi SSH Host/load_avg_1mn,{$UNIFI_ALERT_LONG_PERIOD})=1</expression>
-                            <name>{HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_LONG_PERIOD}</name>
-                            <priority>AVERAGE</priority>
-                            <manual_close>YES</manual_close>
-                            <dependencies>
-                                <dependency>
-                                    <name>{HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_PERIOD}</name>
-                                    <expression>max(/Unifi SSH Host/icmpping[],{$UNIFI_ALERT_PERIOD})=0</expression>
-                                </dependency>
-                            </dependencies>
-                        </trigger>
-                        <trigger>
                             <uuid>301ff9308c3e4c2f9938a92226b443a5</uuid>
                             <expression>nodata(/Unifi SSH Host/load_avg_1mn,{$UNIFI_ALERT_PERIOD})=1</expression>
                             <name>{HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_PERIOD}</name>
@@ -3326,10 +3232,6 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                                 <dependency>
                                     <name>{HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_PERIOD}</name>
                                     <expression>max(/Unifi SSH Host/icmpping[],{$UNIFI_ALERT_PERIOD})=0</expression>
-                                </dependency>
-                                <dependency>
-                                    <name>{HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_LONG_PERIOD}</name>
-                                    <expression>nodata(/Unifi SSH Host/load_avg_1mn,{$UNIFI_ALERT_LONG_PERIOD})=1</expression>
                                 </dependency>
                             </dependencies>
                         </trigger>
@@ -3523,6 +3425,13 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                             <type>NOT_MATCHES_REGEX</type>
                             <parameters>
                                 <parameter>.*No route to host.*</parameter>
+                            </parameters>
+                            <error_handler>DISCARD_VALUE</error_handler>
+                        </step>
+                        <step>
+                            <type>NOT_MATCHES_REGEX</type>
+                            <parameters>
+                                <parameter>*ssh: command not found*</parameter>
                             </parameters>
                             <error_handler>DISCARD_VALUE</error_handler>
                         </step>
@@ -3875,23 +3784,6 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         </tag>
                     </tags>
                     <triggers>
-                        <trigger>
-                            <uuid>83076110193e43139bc680e85132d099</uuid>
-                            <expression>nodata(/Unifi Switch/uptime,{$UNIFI_ALERT_LONG_PERIOD})=1</expression>
-                            <name>{HOST.NAME} has not reported statistics for more than {$UNIFI_ALERT_LONG_PERIOD}</name>
-                            <priority>AVERAGE</priority>
-                            <manual_close>YES</manual_close>
-                            <dependencies>
-                                <dependency>
-                                    <name>{HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_LONG_PERIOD}</name>
-                                    <expression>max(/Unifi SSH Host/icmpping[],{$UNIFI_ALERT_LONG_PERIOD})=0</expression>
-                                </dependency>
-                                <dependency>
-                                    <name>{HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_LONG_PERIOD}</name>
-                                    <expression>nodata(/Unifi SSH Host/load_avg_1mn,{$UNIFI_ALERT_LONG_PERIOD})=1</expression>
-                                </dependency>
-                            </dependencies>
-                        </trigger>
                         <trigger>
                             <uuid>61975534a4404efa8df675da2609c5f2</uuid>
                             <expression>nodata(/Unifi Switch/uptime,{$UNIFI_ALERT_PERIOD})=1</expression>
@@ -5122,13 +5014,6 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                     </tags>
                     <triggers>
                         <trigger>
-                            <uuid>fc389a5acbc440af96c4e7ee27765feb</uuid>
-                            <expression>nodata(/Unifi UDMP/uptime,{$UNIFI_ALERT_LONG_PERIOD})=1</expression>
-                            <name>{HOST.NAME} has not reported statistics for more than {$UNIFI_ALERT_LONG_PERIOD}</name>
-                            <priority>AVERAGE</priority>
-                            <manual_close>YES</manual_close>
-                        </trigger>
-                        <trigger>
                             <uuid>b592d4299ef9482496c585caa936112c</uuid>
                             <expression>nodata(/Unifi UDMP/uptime,{$UNIFI_ALERT_PERIOD})=1</expression>
                             <name>{HOST.NAME} has not report statistics for more than {$UNIFI_ALERT_PERIOD}</name>
@@ -5136,12 +5021,8 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                             <manual_close>YES</manual_close>
                             <dependencies>
                                 <dependency>
-                                    <name>{HOST.NAME} has not reported statistics for more than {$UNIFI_ALERT_LONG_PERIOD}</name>
-                                    <expression>nodata(/Unifi UDMP/uptime,{$UNIFI_ALERT_LONG_PERIOD})=1</expression>
-                                </dependency>
-                                <dependency>
                                     <name>{HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_PERIOD}</name>
-                                    <expression>nodata(/Unifi SSH Host/load_avg_1mn,{$UNIFI_ALERT_PERIOD})=1</expression>
+                                    <expression>nodata(/Unifi SSH High Priority Host/load_avg_1mn,{$UNIFI_ALERT_PERIOD})=1</expression>
                                 </dependency>
                             </dependencies>
                         </trigger>
@@ -6259,13 +6140,6 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                     </tags>
                     <triggers>
                         <trigger>
-                            <uuid>d3885f1a41b64c6c811997ecb8f324f5</uuid>
-                            <expression>nodata(/Unifi USG/uptime,{$UNIFI_ALERT_LONG_PERIOD})=1</expression>
-                            <name>{HOST.NAME} has not reported statistics for {$UNIFI_ALERT_LONG_PERIOD}</name>
-                            <priority>WARNING</priority>
-                            <manual_close>YES</manual_close>
-                        </trigger>
-                        <trigger>
                             <uuid>4da4bf931fc3455a9c92a4ff2153518f</uuid>
                             <expression>nodata(/Unifi USG/uptime,{$UNIFI_ALERT_PERIOD})=1</expression>
                             <name>{HOST.NAME} has not reported statistics for {$UNIFI_ALERT_PERIOD}</name>
@@ -6273,12 +6147,8 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                             <manual_close>YES</manual_close>
                             <dependencies>
                                 <dependency>
-                                    <name>{HOST.NAME} has not reported statistics for {$UNIFI_ALERT_LONG_PERIOD}</name>
-                                    <expression>nodata(/Unifi USG/uptime,{$UNIFI_ALERT_LONG_PERIOD})=1</expression>
-                                </dependency>
-                                <dependency>
                                     <name>{HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_PERIOD}</name>
-                                    <expression>nodata(/Unifi SSH Host/load_avg_1mn,{$UNIFI_ALERT_PERIOD})=1</expression>
+                                    <expression>nodata(/Unifi SSH High Priority Host/load_avg_1mn,{$UNIFI_ALERT_PERIOD})=1</expression>
                                 </dependency>
                             </dependencies>
                         </trigger>
@@ -6629,6 +6499,12 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                     <expression>nodata(/Unifi Protect Camera/ssh.run[ifconfig],{$UNIFI_ALERT_PERIOD})=1</expression>
                 </dependency>
             </dependencies>
+            <tags>
+                <tag>
+                    <tag>Application</tag>
+                    <value>Protect</value>
+                </tag>
+            </tags>
         </trigger>
         <trigger>
             <uuid>986b14fb36e8416ca24d2af88b06b613</uuid>

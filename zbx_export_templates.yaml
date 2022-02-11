@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-11-03T05:51:20Z'
+  date: '2022-02-11T06:03:17Z'
   groups:
     -
       uuid: 15155c95a3d048f4856272ae12fd42c5
@@ -66,19 +66,10 @@ zabbix_export:
               value: Battery
           triggers:
             -
-              uuid: 483e7103e0c84bfa9c8c0ea957e61678
-              expression: 'nodata(/SunMAX SolarPoint/batteryVoltage,{$UNIFI_ALERT_LONG_PERIOD})=1'
-              name: '{HOST.NAME} has not reported data in more than {$UNIFI_ALERT_LONG_PERIOD}'
-              priority: AVERAGE
-            -
               uuid: 6ab05257f12a4e3b901a348edeba5817
               expression: 'nodata(/SunMAX SolarPoint/batteryVoltage,{$UNIFI_ALERT_PERIOD})=1'
               name: '{HOST.NAME} has not reported data in more than {$UNIFI_ALERT_PERIOD}'
               priority: WARNING
-              dependencies:
-                -
-                  name: '{HOST.NAME} has not reported data in more than {$UNIFI_ALERT_LONG_PERIOD}'
-                  expression: 'nodata(/SunMAX SolarPoint/batteryVoltage,{$UNIFI_ALERT_LONG_PERIOD})=1'
         -
           uuid: bfda151539714084bd37e8d04c3f544c
           name: 'Net Power Consumption'
@@ -332,25 +323,12 @@ zabbix_export:
               value: Radio
           triggers:
             -
-              uuid: 06da952714fd4428b21e92afb0b808d4
-              expression: 'nodata(/UBNT Airmax/airTime,{$UNIFI_ALERT_LONG_PERIOD})=1'
-              name: '{HOST.NAME} Device has not reported statistics in more than {$UNIFI_ALERT_LONG_PERIOD}'
-              priority: AVERAGE
-              manual_close: 'YES'
-              dependencies:
-                -
-                  name: '{HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_PERIOD}'
-                  expression: 'nodata(/Unifi SSH Host/load_avg_1mn,{$UNIFI_ALERT_PERIOD})=1'
-            -
               uuid: e4abdaf9196b4fae98d3de636ac86573
               expression: 'nodata(/UBNT Airmax/airTime,{$UNIFI_ALERT_PERIOD})=1'
               name: '{HOST.NAME} Device has not reported statistics in more than {$UNIFI_ALERT_PERIOD}'
               priority: WARNING
               manual_close: 'YES'
               dependencies:
-                -
-                  name: '{HOST.NAME} Device has not reported statistics in more than {$UNIFI_ALERT_LONG_PERIOD}'
-                  expression: 'nodata(/UBNT Airmax/airTime,{$UNIFI_ALERT_LONG_PERIOD})=1'
                 -
                   name: '{HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_PERIOD}'
                   expression: 'nodata(/Unifi SSH Host/load_avg_1mn,{$UNIFI_ALERT_PERIOD})=1'
@@ -1193,19 +1171,6 @@ zabbix_export:
               value: Host
           triggers:
             -
-              uuid: 2704aeb215474ad1bc494adfffd5d72a
-              expression: 'nodata(/Unifi AP/uptime,{$UNIFI_ALERT_LONG_PERIOD})=1'
-              name: '{HOST.NAME} has not reported statistics in more than {$UNIFI_ALERT_LONG_PERIOD}'
-              priority: AVERAGE
-              manual_close: 'YES'
-              dependencies:
-                -
-                  name: '{HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_LONG_PERIOD}'
-                  expression: 'max(/Unifi SSH Host/icmpping[],{$UNIFI_ALERT_LONG_PERIOD})=0'
-                -
-                  name: '{HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_LONG_PERIOD}'
-                  expression: 'nodata(/Unifi SSH Host/load_avg_1mn,{$UNIFI_ALERT_LONG_PERIOD})=1'
-            -
               uuid: b8c15f7c71934ce89958890a93893a3b
               expression: 'nodata(/Unifi AP/uptime,{$UNIFI_ALERT_PERIOD})=1'
               name: '{HOST.NAME} has not reported statistics in more than {$UNIFI_ALERT_PERIOD}'
@@ -1215,9 +1180,6 @@ zabbix_export:
                 -
                   name: '{HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_PERIOD}'
                   expression: 'max(/Unifi SSH Host/icmpping[],{$UNIFI_ALERT_PERIOD})=0'
-                -
-                  name: '{HOST.NAME} has not reported statistics in more than {$UNIFI_ALERT_LONG_PERIOD}'
-                  expression: 'nodata(/Unifi AP/uptime,{$UNIFI_ALERT_LONG_PERIOD})=1'
                 -
                   name: '{HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_PERIOD}'
                   expression: 'nodata(/Unifi SSH Host/load_avg_1mn,{$UNIFI_ALERT_PERIOD})=1'
@@ -1306,6 +1268,29 @@ zabbix_export:
           delay: '0'
           description: 'List all active radios to create channel items'
           item_prototypes:
+            -
+              uuid: b2ad8503bd71430d93959a6aeb338ed3
+              name: 'Channel Number {#RADIO_NAME}'
+              type: DEPENDENT
+              key: 'channel[{#RADIO_NAME}]'
+              delay: '0'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.vap_table[?(@.radio == ''{#RADIO_NAME}'')].channel.first()'
+              master_item:
+                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP"]'
+              tags:
+                -
+                  tag: Application
+                  value: Radio
+              trigger_prototypes:
+                -
+                  uuid: 35674d206a224a61b05c3f570c8c0095
+                  expression: 'change(/Unifi AP/channel[{#RADIO_NAME}])<>0'
+                  name: '{HOST.NAME}  {#RADIO_NAME} Channel Change'
+                  priority: INFO
             -
               uuid: f35732598f6f4aed84477b0932b496cb
               name: 'Channel Interference {#RADIO_NAME}'
@@ -1605,21 +1590,15 @@ zabbix_export:
               value: Availability
           triggers:
             -
-              uuid: 6341d1bd42534d449d016021290e11cb
-              expression: 'max(/Unifi Protect Camera/icmpping[],{$UNIFI_ALERT_LONG_PERIOD})=0'
-              name: 'Camera {HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_LONG_PERIOD}'
-              priority: AVERAGE
-              manual_close: 'YES'
-            -
               uuid: c92b0647b8284e2fa9bf10a16821b431
               expression: 'max(/Unifi Protect Camera/icmpping[],{$UNIFI_ALERT_PERIOD})=0'
               name: 'Camera {HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_PERIOD}'
               priority: WARNING
               manual_close: 'YES'
-              dependencies:
+              tags:
                 -
-                  name: 'Camera {HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_LONG_PERIOD}'
-                  expression: 'max(/Unifi Protect Camera/icmpping[],{$UNIFI_ALERT_LONG_PERIOD})=0'
+                  tag: Application
+                  value: Protect
         -
           uuid: 15a568e6472548a99053c4a8ca9ed924
           name: 'MAC Address'
@@ -1674,7 +1653,7 @@ zabbix_export:
             last(//tx_bandwidth_smooth,#1:now-6d) +
             last(//tx_bandwidth_smooth,#1:now-7d) 
             
-            ) /7 * 0.5
+            ) /7 * 0.45
           tags:
             -
               tag: Application
@@ -1723,16 +1702,6 @@ zabbix_export:
               value: Network
           triggers:
             -
-              uuid: f418ff4886b64345bf884ef541904a2f
-              expression: 'nodata(/Unifi Protect Camera/ssh.run[ifconfig],{$UNIFI_ALERT_LONG_PERIOD})=1'
-              name: 'Camera {HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_LONG_PERIOD}'
-              priority: AVERAGE
-              manual_close: 'YES'
-              dependencies:
-                -
-                  name: 'Camera {HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_LONG_PERIOD}'
-                  expression: 'max(/Unifi Protect Camera/icmpping[],{$UNIFI_ALERT_LONG_PERIOD})=0'
-            -
               uuid: 2117be829d9e4e34a1307d14cd387cc0
               expression: 'nodata(/Unifi Protect Camera/ssh.run[ifconfig],{$UNIFI_ALERT_PERIOD})=1'
               name: 'Camera {HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_PERIOD}'
@@ -1740,14 +1709,12 @@ zabbix_export:
               manual_close: 'YES'
               dependencies:
                 -
-                  name: 'Camera {HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_LONG_PERIOD}'
-                  expression: 'max(/Unifi Protect Camera/icmpping[],{$UNIFI_ALERT_LONG_PERIOD})=0'
-                -
                   name: 'Camera {HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_PERIOD}'
                   expression: 'max(/Unifi Protect Camera/icmpping[],{$UNIFI_ALERT_PERIOD})=0'
+              tags:
                 -
-                  name: 'Camera {HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_LONG_PERIOD}'
-                  expression: 'nodata(/Unifi Protect Camera/ssh.run[ifconfig],{$UNIFI_ALERT_LONG_PERIOD})=1'
+                  tag: Application
+                  value: Protect
         -
           uuid: accb9d8274d84bb8857c7d67eb934f21
           name: uname
@@ -1809,6 +1776,10 @@ zabbix_export:
                 -
                   name: 'Camera {HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_PERIOD}'
                   expression: 'nodata(/Unifi Protect Camera/ssh.run[ifconfig],{$UNIFI_ALERT_PERIOD})=1'
+              tags:
+                -
+                  tag: Application
+                  value: Protect
         -
           uuid: d3577f5041954f47aba9bb8d5c71668e
           name: 'Transmission Bandwidth Smooth'
@@ -1881,12 +1852,6 @@ zabbix_export:
               value: Network
           triggers:
             -
-              uuid: 2fdd63693e6e444dbd76464a5ff19619
-              expression: 'nodata(/Unifi Protect Cloud Key/IpExtInOctets,{$UNIFI_ALERT_LONG_PERIOD})=1'
-              name: '{HOST.NAME} hasn''t reported statistics in more than {$UNIFI_ALERT_LONG_PERIOD}'
-              priority: AVERAGE
-              manual_close: 'YES'
-            -
               uuid: 1e88147fdc28426f9b8d227993f6045e
               expression: 'nodata(/Unifi Protect Cloud Key/IpExtInOctets,{$UNIFI_ALERT_PERIOD})=1'
               name: '{HOST.NAME} hasn''t reported statistics in more than {$UNIFI_ALERT_PERIOD}'
@@ -1894,8 +1859,8 @@ zabbix_export:
               manual_close: 'YES'
               dependencies:
                 -
-                  name: '{HOST.NAME} hasn''t reported statistics in more than {$UNIFI_ALERT_LONG_PERIOD}'
-                  expression: 'nodata(/Unifi Protect Cloud Key/IpExtInOctets,{$UNIFI_ALERT_LONG_PERIOD})=1'
+                  name: '{HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_PERIOD}'
+                  expression: 'nodata(/Unifi SSH Host/load_avg_1mn,{$UNIFI_ALERT_PERIOD})=1'
         -
           uuid: 017f3db264db4c1c801661a46f465e46
           name: nstat
@@ -2029,16 +1994,6 @@ zabbix_export:
               value: Network
           triggers:
             -
-              uuid: 15608e1d1a9f45348dabb63eaf4c91b4
-              expression: 'nodata(/Unifi Protect NVR4/IpExtInOctets,{$UNIFI_ALERT_LONG_PERIOD})=1'
-              name: '{HOST.NAME} hasn''t reported statistics for more than {$UNIFI_ALERT_LONG_PERIOD}'
-              priority: AVERAGE
-              manual_close: 'YES'
-              dependencies:
-                -
-                  name: '{HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_LONG_PERIOD}'
-                  expression: 'nodata(/Unifi SSH High Priority Host/load_avg_1mn,{$UNIFI_ALERT_LONG_PERIOD})=1'
-            -
               uuid: e4308a68f1df4a8e9ff7b3692a51355e
               expression: 'nodata(/Unifi Protect NVR4/IpExtInOctets,{$UNIFI_ALERT_PERIOD})=1'
               name: '{HOST.NAME} hasn''t reported statistics for more than {$UNIFI_ALERT_PERIOD}'
@@ -2046,8 +2001,8 @@ zabbix_export:
               manual_close: 'YES'
               dependencies:
                 -
-                  name: '{HOST.NAME} hasn''t reported statistics for more than {$UNIFI_ALERT_LONG_PERIOD}'
-                  expression: 'nodata(/Unifi Protect NVR4/IpExtInOctets,{$UNIFI_ALERT_LONG_PERIOD})=1'
+                  name: '{HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_PERIOD}'
+                  expression: 'max(/Unifi SSH High Priority Host/icmpping[],{$UNIFI_ALERT_PERIOD})=0'
                 -
                   name: '{HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_PERIOD}'
                   expression: 'nodata(/Unifi SSH High Priority Host/load_avg_1mn,{$UNIFI_ALERT_PERIOD})=1'
@@ -2180,7 +2135,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          url: 'https://{HOST.NAME}'
+          url: 'https://{HOST.CONN}'
           retrieve_mode: HEADERS
     -
       uuid: 0dbc328172e34d8c8b7f3cdfd554d08d
@@ -2202,21 +2157,11 @@ zabbix_export:
               value: Availability
           triggers:
             -
-              uuid: 76db203cada54bdfa8fce55197989ca0
-              expression: 'max(/Unifi SSH High Priority Host/icmpping[],{$UNIFI_ALERT_LONG_PERIOD})=0'
-              name: '{HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_LONG_PERIOD}'
-              priority: HIGH
-              manual_close: 'YES'
-            -
               uuid: d392f22278464ef1bd4936d174f5b0cd
               expression: 'max(/Unifi SSH High Priority Host/icmpping[],{$UNIFI_ALERT_PERIOD})=0'
               name: '{HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_PERIOD}'
               priority: AVERAGE
               manual_close: 'YES'
-              dependencies:
-                -
-                  name: '{HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_LONG_PERIOD}'
-                  expression: 'max(/Unifi SSH High Priority Host/icmpping[],{$UNIFI_ALERT_LONG_PERIOD})=0'
         -
           uuid: 18d5b7b413a74fdeb09d1be567c80399
           name: 'Load Average (1mn)'
@@ -2241,16 +2186,6 @@ zabbix_export:
               value: Performance
           triggers:
             -
-              uuid: ee22be5cdc6a43019eeced4ab9505127
-              expression: 'nodata(/Unifi SSH High Priority Host/load_avg_1mn,{$UNIFI_ALERT_LONG_PERIOD})=1'
-              name: '{HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_LONG_PERIOD}'
-              priority: HIGH
-              manual_close: 'YES'
-              dependencies:
-                -
-                  name: '{HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_PERIOD}'
-                  expression: 'max(/Unifi SSH High Priority Host/icmpping[],{$UNIFI_ALERT_PERIOD})=0'
-            -
               uuid: 08593d21fb5441518507f2470a0acf5e
               expression: 'nodata(/Unifi SSH High Priority Host/load_avg_1mn,{$UNIFI_ALERT_PERIOD})=1'
               name: '{HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_PERIOD}'
@@ -2260,9 +2195,6 @@ zabbix_export:
                 -
                   name: '{HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_PERIOD}'
                   expression: 'max(/Unifi SSH High Priority Host/icmpping[],{$UNIFI_ALERT_PERIOD})=0'
-                -
-                  name: '{HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_LONG_PERIOD}'
-                  expression: 'nodata(/Unifi SSH High Priority Host/load_avg_1mn,{$UNIFI_ALERT_LONG_PERIOD})=1'
         -
           uuid: aa7dcd5b4f1a4331a603b3780f31be20
           name: 'Load Average (5mn)'
@@ -2397,6 +2329,17 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           inventory_link: OS_FULL
+          preprocessing:
+            -
+              type: NOT_MATCHES_REGEX
+              parameters:
+                - '.*No route to host.*'
+              error_handler: DISCARD_VALUE
+            -
+              type: NOT_MATCHES_REGEX
+              parameters:
+                - '*ssh: command not found*'
+              error_handler: DISCARD_VALUE
           tags:
             -
               tag: Application
@@ -2448,21 +2391,11 @@ zabbix_export:
               value: Availability
           triggers:
             -
-              uuid: 2da72f8c38414846adab387f563819f3
-              expression: 'max(/Unifi SSH Host/icmpping[],{$UNIFI_ALERT_LONG_PERIOD})=0'
-              name: '{HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_LONG_PERIOD}'
-              priority: AVERAGE
-              manual_close: 'YES'
-            -
               uuid: 08a60db01cd24b47bb1802c30c71359c
               expression: 'max(/Unifi SSH Host/icmpping[],{$UNIFI_ALERT_PERIOD})=0'
               name: '{HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_PERIOD}'
               priority: WARNING
               manual_close: 'YES'
-              dependencies:
-                -
-                  name: '{HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_LONG_PERIOD}'
-                  expression: 'max(/Unifi SSH Host/icmpping[],{$UNIFI_ALERT_LONG_PERIOD})=0'
         -
           uuid: fa6026d048bb4efaba7e8b1caa187e82
           name: 'Load Average (1mn)'
@@ -2487,16 +2420,6 @@ zabbix_export:
               value: Performance
           triggers:
             -
-              uuid: 7cb4add2c2e44798a23f9a937872f322
-              expression: 'nodata(/Unifi SSH Host/load_avg_1mn,{$UNIFI_ALERT_LONG_PERIOD})=1'
-              name: '{HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_LONG_PERIOD}'
-              priority: AVERAGE
-              manual_close: 'YES'
-              dependencies:
-                -
-                  name: '{HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_PERIOD}'
-                  expression: 'max(/Unifi SSH Host/icmpping[],{$UNIFI_ALERT_PERIOD})=0'
-            -
               uuid: 301ff9308c3e4c2f9938a92226b443a5
               expression: 'nodata(/Unifi SSH Host/load_avg_1mn,{$UNIFI_ALERT_PERIOD})=1'
               name: '{HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_PERIOD}'
@@ -2506,9 +2429,6 @@ zabbix_export:
                 -
                   name: '{HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_PERIOD}'
                   expression: 'max(/Unifi SSH Host/icmpping[],{$UNIFI_ALERT_PERIOD})=0'
-                -
-                  name: '{HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_LONG_PERIOD}'
-                  expression: 'nodata(/Unifi SSH Host/load_avg_1mn,{$UNIFI_ALERT_LONG_PERIOD})=1'
         -
           uuid: 763b62c5ec40413d97b4e9c127e65f61
           name: 'Load Average (5mn)'
@@ -2654,6 +2574,11 @@ zabbix_export:
               type: NOT_MATCHES_REGEX
               parameters:
                 - '.*No route to host.*'
+              error_handler: DISCARD_VALUE
+            -
+              type: NOT_MATCHES_REGEX
+              parameters:
+                - '*ssh: command not found*'
               error_handler: DISCARD_VALUE
           tags:
             -
@@ -2912,19 +2837,6 @@ zabbix_export:
               tag: Application
               value: Host
           triggers:
-            -
-              uuid: 83076110193e43139bc680e85132d099
-              expression: 'nodata(/Unifi Switch/uptime,{$UNIFI_ALERT_LONG_PERIOD})=1'
-              name: '{HOST.NAME} has not reported statistics for more than {$UNIFI_ALERT_LONG_PERIOD}'
-              priority: AVERAGE
-              manual_close: 'YES'
-              dependencies:
-                -
-                  name: '{HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_LONG_PERIOD}'
-                  expression: 'max(/Unifi SSH Host/icmpping[],{$UNIFI_ALERT_LONG_PERIOD})=0'
-                -
-                  name: '{HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_LONG_PERIOD}'
-                  expression: 'nodata(/Unifi SSH Host/load_avg_1mn,{$UNIFI_ALERT_LONG_PERIOD})=1'
             -
               uuid: 61975534a4404efa8df675da2609c5f2
               expression: 'nodata(/Unifi Switch/uptime,{$UNIFI_ALERT_PERIOD})=1'
@@ -3816,12 +3728,6 @@ zabbix_export:
               value: Host
           triggers:
             -
-              uuid: fc389a5acbc440af96c4e7ee27765feb
-              expression: 'nodata(/Unifi UDMP/uptime,{$UNIFI_ALERT_LONG_PERIOD})=1'
-              name: '{HOST.NAME} has not reported statistics for more than {$UNIFI_ALERT_LONG_PERIOD}'
-              priority: AVERAGE
-              manual_close: 'YES'
-            -
               uuid: b592d4299ef9482496c585caa936112c
               expression: 'nodata(/Unifi UDMP/uptime,{$UNIFI_ALERT_PERIOD})=1'
               name: '{HOST.NAME} has not report statistics for more than {$UNIFI_ALERT_PERIOD}'
@@ -3829,11 +3735,8 @@ zabbix_export:
               manual_close: 'YES'
               dependencies:
                 -
-                  name: '{HOST.NAME} has not reported statistics for more than {$UNIFI_ALERT_LONG_PERIOD}'
-                  expression: 'nodata(/Unifi UDMP/uptime,{$UNIFI_ALERT_LONG_PERIOD})=1'
-                -
                   name: '{HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_PERIOD}'
-                  expression: 'nodata(/Unifi SSH Host/load_avg_1mn,{$UNIFI_ALERT_PERIOD})=1'
+                  expression: 'nodata(/Unifi SSH High Priority Host/load_avg_1mn,{$UNIFI_ALERT_PERIOD})=1'
         -
           uuid: 8d57c1175b0b4f74b2d0add7c66a4e22
           name: 'WAN Latency'
@@ -4640,12 +4543,6 @@ zabbix_export:
               value: Host
           triggers:
             -
-              uuid: d3885f1a41b64c6c811997ecb8f324f5
-              expression: 'nodata(/Unifi USG/uptime,{$UNIFI_ALERT_LONG_PERIOD})=1'
-              name: '{HOST.NAME} has not reported statistics for {$UNIFI_ALERT_LONG_PERIOD}'
-              priority: WARNING
-              manual_close: 'YES'
-            -
               uuid: 4da4bf931fc3455a9c92a4ff2153518f
               expression: 'nodata(/Unifi USG/uptime,{$UNIFI_ALERT_PERIOD})=1'
               name: '{HOST.NAME} has not reported statistics for {$UNIFI_ALERT_PERIOD}'
@@ -4653,11 +4550,8 @@ zabbix_export:
               manual_close: 'YES'
               dependencies:
                 -
-                  name: '{HOST.NAME} has not reported statistics for {$UNIFI_ALERT_LONG_PERIOD}'
-                  expression: 'nodata(/Unifi USG/uptime,{$UNIFI_ALERT_LONG_PERIOD})=1'
-                -
                   name: '{HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_PERIOD}'
-                  expression: 'nodata(/Unifi SSH Host/load_avg_1mn,{$UNIFI_ALERT_PERIOD})=1'
+                  expression: 'nodata(/Unifi SSH High Priority Host/load_avg_1mn,{$UNIFI_ALERT_PERIOD})=1'
         -
           uuid: 8ea02a18a7b34d388b8189e7182aa386
           name: 'WAN Latency'
@@ -4908,6 +4802,10 @@ zabbix_export:
         -
           name: 'Camera {HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_PERIOD}'
           expression: 'nodata(/Unifi Protect Camera/ssh.run[ifconfig],{$UNIFI_ALERT_PERIOD})=1'
+      tags:
+        -
+          tag: Application
+          value: Protect
     -
       uuid: 986b14fb36e8416ca24d2af88b06b613
       expression: 'avg(/Unifi Protect Cloud Key/IpExtInOctets,3600s) < last(/Unifi Protect Cloud Key/incoming_bandwidth_moving_average_threshold,#1)'
