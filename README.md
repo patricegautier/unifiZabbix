@@ -319,6 +319,10 @@ This is my set of values
 
 On Raspbian Bullseye you can find libssl at https://packages.debian.org/bullseye/amd64/libssh-4/download
 
+I am just downloading sources from https://www.libssh.org and recompiling.
+
+Incidentally, this is still a problem with Zabbix 6.0.0 containers, which are still packaged with libssh 0.9.3
+
 • if you import fails with <i>'Invalid parameter "/interfaceid": cannot be empty.'</i>, it might be caused by the presence of an older version of the templates.  Remove them before re-importing.. 
  
 • SSH to Unifi devices is invoked with the SSH option "-o StrictHostKeyChecking=accept-new" which means it will automatically accept their SSH host key on first connection to that IP or Host Name.  The default SSH setting is to ask for the user's confirmation on first connection but I deemed the extra convenience of not having to do this to be worth it in the context of a Home/Small Business Unifi setup
