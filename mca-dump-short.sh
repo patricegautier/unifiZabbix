@@ -1,7 +1,7 @@
 #!/bin/bash
 #set -xv
 set -uo pipefail
-set -e
+#set -e
 
 function usage() {
 
@@ -98,17 +98,17 @@ fi
 INDENT_OPTION="--indent 0"
 
 
-if [[ -n ${VERBOSE:-} ]]; then
+if [[ -n "${VERBOSE:-}" ]]; then
 	INDENT_OPTION=
-    	echo ${SSHPASS_COMMAND} 'ssh -o LogLevel=Error -o StrictHostKeyChecking=accept-new '${PRIVKEY_OPTION} ${USER}@${TARGET_DEVICE}' "mca-dump | gzip" | gunzip | jq '${INDENT_OPTION} ${JQ_OPTIONS:-}
+    echo  'ssh -o LogLevel=Error -o StrictHostKeyChecking=accept-new '${PRIVKEY_OPTION} ${USER}@${TARGET_DEVICE}' "mca-dump" | jq '${INDENT_OPTION} ${JQ_OPTIONS:-}
 fi
 
 
 declare OUTPUT
-if [[ -n ${SSHPASS_OPTIONS} ]]; then
+if [[ -n "${SSHPASS_OPTIONS:-}" ]]; then
 	OUTPUT=$(sshpass ${SSHPASS_OPTIONS} ssh -o LogLevel=Error -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} ${USER}@${TARGET_DEVICE} mca-dump)
 else
-	OUTPUT=$(ssh -o LogLevel=Error -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} ${USER}@${TARGET_DEVICE} mca-dump)
+	OUTPUT=$(ssh -o LogLevel=Error -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} ${USER} @${TARGET_DEVICE} mca-dump)
 fi
 
 if (( $? != 0 )); then
