@@ -4523,9 +4523,9 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                 </item>
                 <item>
                     <uuid>3f6a016441704b88bf6e46b8e7197978</uuid>
-                    <name>Dropped Dowload Packets</name>
+                    <name>Dropped Download Packets</name>
                     <type>DEPENDENT</type>
-                    <key>dropped_dowload_packets</key>
+                    <key>dropped_download_packets</key>
                     <delay>0</delay>
                     <units>packet</units>
                     <preprocessing>
