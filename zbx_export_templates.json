@@ -1,7 +1,7 @@
 {
     "zabbix_export": {
-        "version": "5.4",
-        "date": "2022-02-11T06:03:19Z",
+        "version": "6.0",
+        "date": "2022-03-09T04:26:55Z",
         "groups": [
             {
                 "uuid": "15155c95a3d048f4856272ae12fd42c5",
@@ -1333,7 +1333,16 @@
                         "delay": "{$UNIFI_CHECK_FREQUENCY}",
                         "history": "0",
                         "trends": "0",
-                        "value_type": "TEXT"
+                        "value_type": "TEXT",
+                        "preprocessing": [
+                            {
+                                "type": "CHECK_JSON_ERROR",
+                                "parameters": [
+                                    "$.mcaDumpError"
+                                ],
+                                "error_handler": "DISCARD_VALUE"
+                            }
+                        ]
                     },
                     {
                         "uuid": "f07faffa28cc416483cf089bb94ec20a",
@@ -3286,7 +3295,7 @@
                             }
                         ],
                         "master_item": {
-                            "key": "ssh-run.sh[\"-d\",\"{HOST.CONN}\", \"-u\", \"{$UNIFI_USER}\", \"-i\", \"{$UNIFI_SSH_PRIV_KEY_PATH}\", \"-p\", \"{$UNIFI_SSHPASS_PASSWORD_PATH}\", \"ifconfig\" ]"
+                            "key": "ssh-run.sh[\"-d\",\"{HOST.CONN}\", \"-u\", \"{$UNIFI_USER}\", \"-i\", \"{$UNIFI_SSH_PRIV_KEY_PATH}\", \"-p\", \"{$UNIFI_SSHPASS_PASSWORD_PATH}\", \"/sbin/ifconfig | grep -A5 {HOST.IP}\" ]"
                         },
                         "tags": [
                             {
@@ -3315,7 +3324,7 @@
                             }
                         ],
                         "master_item": {
-                            "key": "ssh-run.sh[\"-d\",\"{HOST.CONN}\", \"-u\", \"{$UNIFI_USER}\", \"-i\", \"{$UNIFI_SSH_PRIV_KEY_PATH}\", \"-p\", \"{$UNIFI_SSHPASS_PASSWORD_PATH}\", \"ifconfig\" ]"
+                            "key": "ssh-run.sh[\"-d\",\"{HOST.CONN}\", \"-u\", \"{$UNIFI_USER}\", \"-i\", \"{$UNIFI_SSH_PRIV_KEY_PATH}\", \"-p\", \"{$UNIFI_SSHPASS_PASSWORD_PATH}\", \"/sbin/ifconfig | grep -A5 {HOST.IP}\" ]"
                         },
                         "tags": [
                             {
@@ -3328,7 +3337,7 @@
                         "uuid": "2877b47ec7514bb392b4a4ba99c5af18",
                         "name": "ifconfig",
                         "type": "EXTERNAL",
-                        "key": "ssh-run.sh[\"-d\",\"{HOST.CONN}\", \"-u\", \"{$UNIFI_USER}\", \"-i\", \"{$UNIFI_SSH_PRIV_KEY_PATH}\", \"-p\", \"{$UNIFI_SSHPASS_PASSWORD_PATH}\", \"ifconfig\" ]",
+                        "key": "ssh-run.sh[\"-d\",\"{HOST.CONN}\", \"-u\", \"{$UNIFI_USER}\", \"-i\", \"{$UNIFI_SSH_PRIV_KEY_PATH}\", \"-p\", \"{$UNIFI_SSHPASS_PASSWORD_PATH}\", \"/sbin/ifconfig | grep -A5 {HOST.IP}\" ]",
                         "delay": "1h",
                         "history": "0",
                         "trends": "0",
@@ -3539,6 +3548,15 @@
                         "history": "0",
                         "trends": "0",
                         "value_type": "TEXT",
+                        "preprocessing": [
+                            {
+                                "type": "CHECK_JSON_ERROR",
+                                "parameters": [
+                                    "$.mcaDumpError"
+                                ],
+                                "error_handler": "DISCARD_VALUE"
+                            }
+                        ],
                         "tags": [
                             {
                                 "tag": "Application",
@@ -3820,7 +3838,7 @@
                             {
                                 "type": "JSONPATH",
                                 "parameters": [
-                                    "$[?(@.has_fan==\"true\")]"
+                                    "$[?(@.has_fan) && ?(@.has_fan==\"true\")]"
                                 ]
                             }
                         ]
@@ -4660,6 +4678,15 @@
                         "history": "0",
                         "trends": "0",
                         "value_type": "TEXT",
+                        "preprocessing": [
+                            {
+                                "type": "CHECK_JSON_ERROR",
+                                "parameters": [
+                                    "$.mcaDumpError"
+                                ],
+                                "error_handler": "DISCARD_VALUE"
+                            }
+                        ],
                         "tags": [
                             {
                                 "tag": "Application",
@@ -5868,6 +5895,14 @@
                         "history": "0",
                         "trends": "0",
                         "value_type": "TEXT",
+                        "preprocessing": [
+                            {
+                                "type": "CHECK_JSON_ERROR",
+                                "parameters": [
+                                    "$.mcaDumpError"
+                                ]
+                            }
+                        ],
                         "tags": [
                             {
                                 "tag": "Application",
@@ -6345,6 +6380,14 @@
                         "history": "0",
                         "trends": "0",
                         "value_type": "TEXT",
+                        "preprocessing": [
+                            {
+                                "type": "CHECK_JSON_ERROR",
+                                "parameters": [
+                                    "$.mcaDumpError"
+                                ]
+                            }
+                        ],
                         "tags": [
                             {
                                 "tag": "Application",

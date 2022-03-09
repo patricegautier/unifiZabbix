@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2022-02-11T06:03:17Z'
+  version: '6.0'
+  date: '2022-03-09T04:26:50Z'
   groups:
     -
       uuid: 15155c95a3d048f4856272ae12fd42c5
@@ -1001,6 +1001,12 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
+          preprocessing:
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
+              error_handler: DISCARD_VALUE
         -
           uuid: f07faffa28cc416483cf089bb94ec20a
           name: 'Memory Utilization'
@@ -2490,7 +2496,7 @@ zabbix_export:
                 - \1
               error_handler: DISCARD_VALUE
           master_item:
-            key: 'ssh-run.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "ifconfig" ]'
+            key: 'ssh-run.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "/sbin/ifconfig | grep -A5 {HOST.IP}" ]'
           tags:
             -
               tag: Application
@@ -2512,7 +2518,7 @@ zabbix_export:
               error_handler: CUSTOM_VALUE
               error_handler_params: N/A
           master_item:
-            key: 'ssh-run.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "ifconfig" ]'
+            key: 'ssh-run.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "/sbin/ifconfig | grep -A5 {HOST.IP}" ]'
           tags:
             -
               tag: Application
@@ -2521,7 +2527,7 @@ zabbix_export:
           uuid: 2877b47ec7514bb392b4a4ba99c5af18
           name: ifconfig
           type: EXTERNAL
-          key: 'ssh-run.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "ifconfig" ]'
+          key: 'ssh-run.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "/sbin/ifconfig | grep -A5 {HOST.IP}" ]'
           delay: 1h
           history: '0'
           trends: '0'
@@ -2681,6 +2687,12 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
+          preprocessing:
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
+              error_handler: DISCARD_VALUE
           tags:
             -
               tag: Application
@@ -2886,7 +2898,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.has_fan=="true")]'
+                - '$[?(@.has_fan) && ?(@.has_fan=="true")]'
         -
           uuid: 3440ec98490a4b40bcc1dddca0955cb8
           name: 'POE Discovery'
@@ -3492,6 +3504,12 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
+          preprocessing:
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
+              error_handler: DISCARD_VALUE
           tags:
             -
               tag: Application
@@ -4367,6 +4385,11 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
+          preprocessing:
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
           tags:
             -
               tag: Application
@@ -4714,6 +4737,11 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
+          preprocessing:
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
           tags:
             -
               tag: Application

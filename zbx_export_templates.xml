@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-    <version>5.4</version>
-    <date>2022-02-11T06:03:13Z</date>
+    <version>6.0</version>
+    <date>2022-03-09T04:26:53Z</date>
     <groups>
         <group>
             <uuid>15155c95a3d048f4856272ae12fd42c5</uuid>
@@ -1336,6 +1336,15 @@ Assign this template to all APs in your site</description>
                     <history>0</history>
                     <trends>0</trends>
                     <value_type>TEXT</value_type>
+                    <preprocessing>
+                        <step>
+                            <type>CHECK_JSON_ERROR</type>
+                            <parameters>
+                                <parameter>$.mcaDumpError</parameter>
+                            </parameters>
+                            <error_handler>DISCARD_VALUE</error_handler>
+                        </step>
+                    </preprocessing>
                 </item>
                 <item>
                     <uuid>f07faffa28cc416483cf089bb94ec20a</uuid>
@@ -3317,7 +3326,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>ssh-run.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;, &quot;ifconfig&quot; ]</key>
+                        <key>ssh-run.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;, &quot;/sbin/ifconfig | grep -A5 {HOST.IP}&quot; ]</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -3346,7 +3355,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>ssh-run.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;, &quot;ifconfig&quot; ]</key>
+                        <key>ssh-run.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;, &quot;/sbin/ifconfig | grep -A5 {HOST.IP}&quot; ]</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -3359,7 +3368,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                     <uuid>2877b47ec7514bb392b4a4ba99c5af18</uuid>
                     <name>ifconfig</name>
                     <type>EXTERNAL</type>
-                    <key>ssh-run.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;, &quot;ifconfig&quot; ]</key>
+                    <key>ssh-run.sh[&quot;-d&quot;,&quot;{HOST.CONN}&quot;, &quot;-u&quot;, &quot;{$UNIFI_USER}&quot;, &quot;-i&quot;, &quot;{$UNIFI_SSH_PRIV_KEY_PATH}&quot;, &quot;-p&quot;, &quot;{$UNIFI_SSHPASS_PASSWORD_PATH}&quot;, &quot;/sbin/ifconfig | grep -A5 {HOST.IP}&quot; ]</key>
                     <delay>1h</delay>
                     <history>0</history>
                     <trends>0</trends>
@@ -3570,6 +3579,15 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                     <history>0</history>
                     <trends>0</trends>
                     <value_type>TEXT</value_type>
+                    <preprocessing>
+                        <step>
+                            <type>CHECK_JSON_ERROR</type>
+                            <parameters>
+                                <parameter>$.mcaDumpError</parameter>
+                            </parameters>
+                            <error_handler>DISCARD_VALUE</error_handler>
+                        </step>
+                    </preprocessing>
                     <tags>
                         <tag>
                             <tag>Application</tag>
@@ -3851,7 +3869,7 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                         <step>
                             <type>JSONPATH</type>
                             <parameters>
-                                <parameter>$[?(@.has_fan==&quot;true&quot;)]</parameter>
+                                <parameter>$[?(@.has_fan) &amp;&amp; ?(@.has_fan==&quot;true&quot;)]</parameter>
                             </parameters>
                         </step>
                     </preprocessing>
@@ -4691,6 +4709,15 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                     <history>0</history>
                     <trends>0</trends>
                     <value_type>TEXT</value_type>
+                    <preprocessing>
+                        <step>
+                            <type>CHECK_JSON_ERROR</type>
+                            <parameters>
+                                <parameter>$.mcaDumpError</parameter>
+                            </parameters>
+                            <error_handler>DISCARD_VALUE</error_handler>
+                        </step>
+                    </preprocessing>
                     <tags>
                         <tag>
                             <tag>Application</tag>
@@ -5899,6 +5926,14 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                     <history>0</history>
                     <trends>0</trends>
                     <value_type>TEXT</value_type>
+                    <preprocessing>
+                        <step>
+                            <type>CHECK_JSON_ERROR</type>
+                            <parameters>
+                                <parameter>$.mcaDumpError</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
                     <tags>
                         <tag>
                             <tag>Application</tag>
@@ -6376,6 +6411,14 @@ Additionally,. this will fill the OS version and the MAC address in the inventor
                     <history>0</history>
                     <trends>0</trends>
                     <value_type>TEXT</value_type>
+                    <preprocessing>
+                        <step>
+                            <type>CHECK_JSON_ERROR</type>
+                            <parameters>
+                                <parameter>$.mcaDumpError</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
                     <tags>
                         <tag>
                             <tag>Application</tag>
