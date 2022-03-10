@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-03-10T17:09:38Z'
+  date: '2022-03-10T23:04:49Z'
   groups:
     -
       uuid: 15155c95a3d048f4856272ae12fd42c5
@@ -773,6 +773,10 @@ zabbix_export:
           units: '%'
           preprocessing:
             -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
+            -
               type: JSONPATH
               parameters:
                 - '$.[''system-stats''].cpu'
@@ -830,6 +834,10 @@ zabbix_export:
           units: '%'
           preprocessing:
             -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
+            -
               type: JSONPATH
               parameters:
                 - '$.radio_table.[?(@.is_11ac != ''true'')].athstats.cu_self_rx.first()'
@@ -848,6 +856,10 @@ zabbix_export:
           status: DISABLED
           units: '%'
           preprocessing:
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
             -
               type: JSONPATH
               parameters:
@@ -868,6 +880,10 @@ zabbix_export:
           units: '%'
           preprocessing:
             -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
+            -
               type: JSONPATH
               parameters:
                 - '$.radio_table.[?(@.is_11ac != ''true'')].athstats.cu_self_tx.first()'
@@ -887,6 +903,10 @@ zabbix_export:
           units: '%'
           preprocessing:
             -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
+            -
               type: JSONPATH
               parameters:
                 - '$.radio_table.[?(@.is_11ac == ''true'')].athstats.cu_self_tx.first()'
@@ -905,6 +925,10 @@ zabbix_export:
           status: DISABLED
           units: '%'
           preprocessing:
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
             -
               type: JSONPATH
               parameters:
@@ -943,6 +967,10 @@ zabbix_export:
           status: DISABLED
           units: '%'
           preprocessing:
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
             -
               type: JSONPATH
               parameters:
@@ -983,6 +1011,10 @@ zabbix_export:
           inventory_link: NAME
           preprocessing:
             -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
+            -
               type: JSONPATH
               parameters:
                 - $.hostname
@@ -1006,7 +1038,8 @@ zabbix_export:
               type: CHECK_JSON_ERROR
               parameters:
                 - $.mcaDumpError
-              error_handler: DISCARD_VALUE
+              error_handler: CUSTOM_ERROR
+              error_handler_params: mcaDumpError
         -
           uuid: f07faffa28cc416483cf089bb94ec20a
           name: 'Memory Utilization'
@@ -1028,6 +1061,10 @@ zabbix_export:
           units: bytes
           preprocessing:
             -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
+            -
               type: JSONPATH
               parameters:
                 - $.sys_stats.mem_total
@@ -1045,6 +1082,10 @@ zabbix_export:
           delay: '0'
           units: bytes
           preprocessing:
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
             -
               type: JSONPATH
               parameters:
@@ -1066,6 +1107,10 @@ zabbix_export:
           inventory_link: MODEL
           preprocessing:
             -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
+            -
               type: JSONPATH
               parameters:
                 - $.model_display
@@ -1083,6 +1128,10 @@ zabbix_export:
           delay: '0'
           status: DISABLED
           preprocessing:
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
             -
               type: JSONPATH
               parameters:
@@ -1106,6 +1155,10 @@ zabbix_export:
           status: DISABLED
           preprocessing:
             -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
+            -
               type: JSONPATH
               parameters:
                 - '$.radio_table.[?(@.is_11ac == ''true'')].athstats.n_tx_xretries.first()'
@@ -1127,6 +1180,10 @@ zabbix_export:
           delay: '0'
           units: '%'
           preprocessing:
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
             -
               type: JSONPATH
               parameters:
@@ -1166,6 +1223,10 @@ zabbix_export:
           units: S
           preprocessing:
             -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
+            -
               type: JSONPATH
               parameters:
                 - $.uptime
@@ -1197,6 +1258,10 @@ zabbix_export:
           delay: '0'
           units: bps
           preprocessing:
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
             -
               type: JSONPATH
               parameters:
@@ -1235,6 +1300,10 @@ zabbix_export:
           delay: '0'
           units: bps
           preprocessing:
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
             -
               type: JSONPATH
               parameters:
@@ -1281,6 +1350,10 @@ zabbix_export:
               key: 'channel[{#RADIO_NAME}]'
               delay: '0'
               preprocessing:
+                -
+                  type: CHECK_JSON_ERROR
+                  parameters:
+                    - $.mcaDumpError
                 -
                   type: JSONPATH
                   parameters:
@@ -1336,6 +1409,10 @@ zabbix_export:
               units: '%'
               preprocessing:
                 -
+                  type: CHECK_JSON_ERROR
+                  parameters:
+                    - $.mcaDumpError
+                -
                   type: JSONPATH
                   parameters:
                     - '$.radio_table[?(@.radio == ''{#RADIO_NAME}'')].athstats.cu_self_rx.first()'
@@ -1353,6 +1430,10 @@ zabbix_export:
               delay: '0'
               units: '%'
               preprocessing:
+                -
+                  type: CHECK_JSON_ERROR
+                  parameters:
+                    - $.mcaDumpError
                 -
                   type: JSONPATH
                   parameters:
@@ -1391,6 +1472,10 @@ zabbix_export:
               units: '%'
               preprocessing:
                 -
+                  type: CHECK_JSON_ERROR
+                  parameters:
+                    - $.mcaDumpError
+                -
                   type: JSONPATH
                   parameters:
                     - '$.radio_table[?(@.radio == ''{#RADIO_NAME}'')].athstats.cu_self_tx.first()'
@@ -1407,6 +1492,11 @@ zabbix_export:
               key: 'retries[{#RADIO_NAME}]'
               delay: '0'
               preprocessing:
+                -
+                  type: CHECK_JSON_ERROR
+                  parameters:
+                    - $.mcaDumpError
+                  error_handler: DISCARD_VALUE
                 -
                   type: JSONPATH
                   parameters:
@@ -1428,6 +1518,10 @@ zabbix_export:
               lld_macro: '{#RADIO_NAME}'
               path: $.radio
           preprocessing:
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
             -
               type: JSONPATH
               parameters:
@@ -1544,10 +1638,13 @@ zabbix_export:
               path: $.radio
           preprocessing:
             -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
+            -
               type: JSONPATH
               parameters:
                 - $.vap_table
-              error_handler: DISCARD_VALUE
       macros:
         -
           macro: '{$UNIFI_LOAD_AVERAGE_HIGH}'
@@ -2637,6 +2734,10 @@ zabbix_export:
           units: '%'
           preprocessing:
             -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
+            -
               type: JSONPATH
               parameters:
                 - '$.[''system-stats''].cpu'
@@ -2668,6 +2769,10 @@ zabbix_export:
           value_type: TEXT
           inventory_link: NAME
           preprocessing:
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
             -
               type: JSONPATH
               parameters:
@@ -2737,6 +2842,10 @@ zabbix_export:
           units: bytes
           preprocessing:
             -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
+            -
               type: JSONPATH
               parameters:
                 - $.sys_stats.mem_total
@@ -2754,6 +2863,10 @@ zabbix_export:
           delay: '0'
           units: bytes
           preprocessing:
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
             -
               type: JSONPATH
               parameters:
@@ -2775,6 +2888,10 @@ zabbix_export:
           inventory_link: MODEL
           preprocessing:
             -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
+            -
               type: JSONPATH
               parameters:
                 - $.model_display
@@ -2792,6 +2909,10 @@ zabbix_export:
           delay: '0'
           units: bps
           preprocessing:
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
             -
               type: JSONPATH
               parameters:
@@ -2845,6 +2966,10 @@ zabbix_export:
           units: S
           preprocessing:
             -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
+            -
               type: JSONPATH
               parameters:
                 - $.uptime
@@ -2885,6 +3010,10 @@ zabbix_export:
               units: '%'
               preprocessing:
                 -
+                  type: CHECK_JSON_ERROR
+                  parameters:
+                    - $.mcaDumpError
+                -
                   type: JSONPATH
                   parameters:
                     - $.fan_level
@@ -2901,6 +3030,10 @@ zabbix_export:
               lld_macro: '{#FAN_LEVEL_KEY_NAME}'
               path: $.fan_level_key_name
           preprocessing:
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
             -
               type: JSONPATH
               parameters:
@@ -2920,6 +3053,10 @@ zabbix_export:
               delay: '0'
               units: W
               preprocessing:
+                -
+                  type: CHECK_JSON_ERROR
+                  parameters:
+                    - $.mcaDumpError
                 -
                   type: JSONPATH
                   parameters:
@@ -2950,6 +3087,10 @@ zabbix_export:
               units: W
               preprocessing:
                 -
+                  type: CHECK_JSON_ERROR
+                  parameters:
+                    - $.mcaDumpError
+                -
                   type: JSONPATH
                   parameters:
                     - '$.port_table[*].poe_power.sum()'
@@ -2973,6 +3114,10 @@ zabbix_export:
               path: $.total_power_consumed_key_name
           preprocessing:
             -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
+            -
               type: JSONPATH
               parameters:
                 - '$[?(@.power=="true")]'
@@ -2992,6 +3137,10 @@ zabbix_export:
               value_type: FLOAT
               units: W
               preprocessing:
+                -
+                  type: CHECK_JSON_ERROR
+                  parameters:
+                    - $.mcaDumpError
                 -
                   type: JSONPATH
                   parameters:
@@ -3021,6 +3170,10 @@ zabbix_export:
               path: $.port_idx
           preprocessing:
             -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
+            -
               type: JSONPATH
               parameters:
                 - '$.port_table[?(@.poe_power>=0)]'
@@ -3039,6 +3192,10 @@ zabbix_export:
               delay: '0'
               units: bps
               preprocessing:
+                -
+                  type: CHECK_JSON_ERROR
+                  parameters:
+                    - $.mcaDumpError
                 -
                   type: JSONPATH
                   parameters:
@@ -3063,6 +3220,10 @@ zabbix_export:
               value_type: CHAR
               preprocessing:
                 -
+                  type: CHECK_JSON_ERROR
+                  parameters:
+                    - $.mcaDumpError
+                -
                   type: JSONPATH
                   parameters:
                     - '$.port_table[ ?(@.port_idx==''{#PORT_IDX}'')].is_uplink.first()'
@@ -3080,6 +3241,10 @@ zabbix_export:
               delay: '0'
               units: bps
               preprocessing:
+                -
+                  type: CHECK_JSON_ERROR
+                  parameters:
+                    - $.mcaDumpError
                 -
                   type: JSONPATH
                   parameters:
@@ -3108,6 +3273,10 @@ zabbix_export:
               value_type: CHAR
               preprocessing:
                 -
+                  type: CHECK_JSON_ERROR
+                  parameters:
+                    - $.mcaDumpError
+                -
                   type: JSONPATH
                   parameters:
                     - '$.port_table[ ?(@.port_idx==''{#PORT_IDX}'')].stp_state.first()'
@@ -3125,6 +3294,10 @@ zabbix_export:
               delay: '0'
               units: bps
               preprocessing:
+                -
+                  type: CHECK_JSON_ERROR
+                  parameters:
+                    - $.mcaDumpError
                 -
                   type: JSONPATH
                   parameters:
@@ -3152,6 +3325,10 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               preprocessing:
+                -
+                  type: CHECK_JSON_ERROR
+                  parameters:
+                    - $.mcaDumpError
                 -
                   type: JSONPATH
                   parameters:
@@ -3220,6 +3397,10 @@ zabbix_export:
               path: $.media
           preprocessing:
             -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
+            -
               type: JSONPATH
               parameters:
                 - $.port_table
@@ -3240,6 +3421,10 @@ zabbix_export:
               value_type: CHAR
               preprocessing:
                 -
+                  type: CHECK_JSON_ERROR
+                  parameters:
+                    - $.mcaDumpError
+                -
                   type: JSONPATH
                   parameters:
                     - $.overheating
@@ -3258,6 +3443,10 @@ zabbix_export:
               value_type: FLOAT
               units: ºC
               preprocessing:
+                -
+                  type: CHECK_JSON_ERROR
+                  parameters:
+                    - $.mcaDumpError
                 -
                   type: JSONPATH
                   parameters:
@@ -3278,6 +3467,10 @@ zabbix_export:
               lld_macro: '{#TEMPERATURE_KEY_NAME}'
               path: $.temperature_key_name
           preprocessing:
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
             -
               type: JSONPATH
               parameters:
@@ -3312,6 +3505,10 @@ zabbix_export:
           units: '%'
           preprocessing:
             -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
+            -
               type: JSONPATH
               parameters:
                 - '$.[''system-stats''].cpu'
@@ -3341,6 +3538,10 @@ zabbix_export:
           delay: '0'
           units: bps
           preprocessing:
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
             -
               type: JSONPATH
               parameters:
@@ -3380,6 +3581,10 @@ zabbix_export:
           units: packet
           preprocessing:
             -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
+            -
               type: JSONPATH
               parameters:
                 - '$.if_table.[?(@.latency > 0)].rx_dropped.first()'
@@ -3401,6 +3606,10 @@ zabbix_export:
           delay: '0'
           units: packet
           preprocessing:
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
             -
               type: JSONPATH
               parameters:
@@ -3468,6 +3677,10 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           preprocessing:
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
             -
               type: JSONPATH
               parameters:
@@ -3541,6 +3754,10 @@ zabbix_export:
           units: bytes
           preprocessing:
             -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
+            -
               type: JSONPATH
               parameters:
                 - $.sys_stats.mem_total
@@ -3612,6 +3829,10 @@ zabbix_export:
           units: ºC
           preprocessing:
             -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
+            -
               type: JSONPATH
               parameters:
                 - '$.temperatures.[?(@.name == ''CPU'')].value.first()'
@@ -3631,6 +3852,10 @@ zabbix_export:
           units: ºC
           preprocessing:
             -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
+            -
               type: JSONPATH
               parameters:
                 - '$.temperatures.[?(@.name == ''PHY'')].value.first()'
@@ -3649,6 +3874,10 @@ zabbix_export:
           units: bps
           description: 'Total Bandwidth Received by the 8 port switch embedded in the UDMP (ports 1-8)'
           preprocessing:
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
             -
               type: JSONPATH
               parameters:
@@ -3677,6 +3906,10 @@ zabbix_export:
           description: 'Total Bandwidth Sent by the 8 port switch embedded in the UDMP (ports 1-8)'
           preprocessing:
             -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
+            -
               type: JSONPATH
               parameters:
                 - '$.port_table[?(@.port_idx < 9)].tx_bytes.sum()'
@@ -3702,6 +3935,10 @@ zabbix_export:
           delay: '0'
           units: bps
           preprocessing:
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
             -
               type: JSONPATH
               parameters:
@@ -3741,6 +3978,10 @@ zabbix_export:
           units: S
           preprocessing:
             -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
+            -
               type: JSONPATH
               parameters:
                 - $.uptime
@@ -3769,6 +4010,10 @@ zabbix_export:
           delay: '0'
           units: ms
           preprocessing:
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
             -
               type: JSONPATH
               parameters:
@@ -3809,6 +4054,10 @@ zabbix_export:
               units: bps
               preprocessing:
                 -
+                  type: CHECK_JSON_ERROR
+                  parameters:
+                    - $.mcaDumpError
+                -
                   type: JSONPATH
                   parameters:
                     - '$.network_table[ ?(@.address == ''{#NETWORK_NAME}'' ) ].stats.rx_bytes.first()'
@@ -3834,6 +4083,10 @@ zabbix_export:
               delay: '0'
               units: bps
               preprocessing:
+                -
+                  type: CHECK_JSON_ERROR
+                  parameters:
+                    - $.mcaDumpError
                 -
                   type: JSONPATH
                   parameters:
@@ -3876,6 +4129,10 @@ zabbix_export:
               lld_macro: '{#NETWORK_NAME}'
               path: $.address
           preprocessing:
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
             -
               type: JSONPATH
               parameters:
@@ -3952,6 +4209,10 @@ zabbix_export:
               units: bps
               preprocessing:
                 -
+                  type: CHECK_JSON_ERROR
+                  parameters:
+                    - $.mcaDumpError
+                -
                   type: JSONPATH
                   parameters:
                     - '$.vpn[*].remotes[?(@.ip  == ''{#REMOTE_SITE_IP}'')].rxRate.first()'
@@ -3969,6 +4230,10 @@ zabbix_export:
               delay: '0'
               units: bps
               preprocessing:
+                -
+                  type: CHECK_JSON_ERROR
+                  parameters:
+                    - $.mcaDumpError
                 -
                   type: JSONPATH
                   parameters:
@@ -4004,6 +4269,10 @@ zabbix_export:
               path: $.ip
           preprocessing:
             -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
+            -
               type: JSONPATH
               parameters:
                 - '$.vpn[*].remotes[0]'
@@ -4022,6 +4291,10 @@ zabbix_export:
               delay: '0'
               units: bps
               preprocessing:
+                -
+                  type: CHECK_JSON_ERROR
+                  parameters:
+                    - $.mcaDumpError
                 -
                   type: JSONPATH
                   parameters:
@@ -4046,6 +4319,10 @@ zabbix_export:
               value_type: CHAR
               preprocessing:
                 -
+                  type: CHECK_JSON_ERROR
+                  parameters:
+                    - $.mcaDumpError
+                -
                   type: JSONPATH
                   parameters:
                     - '$.port_table[ ?(@.port_idx==''{#PORT_IDX}'')].is_uplink.first()'
@@ -4063,6 +4340,10 @@ zabbix_export:
               delay: '0'
               units: bps
               preprocessing:
+                -
+                  type: CHECK_JSON_ERROR
+                  parameters:
+                    - $.mcaDumpError
                 -
                   type: JSONPATH
                   parameters:
@@ -4090,6 +4371,10 @@ zabbix_export:
               units: bps
               preprocessing:
                 -
+                  type: CHECK_JSON_ERROR
+                  parameters:
+                    - $.mcaDumpError
+                -
                   type: JSONPATH
                   parameters:
                     - '$.port_table[ ?(@.port_idx==''{#PORT_IDX}'')].tx_bytes.first()'
@@ -4097,10 +4382,6 @@ zabbix_export:
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
-                -
-                  type: MULTIPLIER
-                  parameters:
-                    - '8'
               master_item:
                 key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}"]'
               tags:
@@ -4116,6 +4397,10 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               preprocessing:
+                -
+                  type: CHECK_JSON_ERROR
+                  parameters:
+                    - $.mcaDumpError
                 -
                   type: JSONPATH
                   parameters:
@@ -4184,6 +4469,10 @@ zabbix_export:
               path: $.media
           preprocessing:
             -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
+            -
               type: JSONPATH
               parameters:
                 - $.port_table
@@ -4215,6 +4504,10 @@ zabbix_export:
           units: '%'
           preprocessing:
             -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
+            -
               type: JSONPATH
               parameters:
                 - '$.[''system-stats''].cpu'
@@ -4244,6 +4537,10 @@ zabbix_export:
           delay: '0'
           units: bps
           preprocessing:
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
             -
               type: JSONPATH
               parameters:
@@ -4283,6 +4580,10 @@ zabbix_export:
           units: packet
           preprocessing:
             -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
+            -
               type: JSONPATH
               parameters:
                 - '$.if_table.[?(@.latency > 0)].rx_dropped.first()'
@@ -4304,6 +4605,10 @@ zabbix_export:
           delay: '0'
           units: packet
           preprocessing:
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
             -
               type: JSONPATH
               parameters:
@@ -4327,6 +4632,10 @@ zabbix_export:
           units: packet
           preprocessing:
             -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
+            -
               type: JSONPATH
               parameters:
                 - '$.if_table.[?(@.latency > 0)].rx_errors.first()'
@@ -4348,6 +4657,10 @@ zabbix_export:
           delay: '0'
           units: packet
           preprocessing:
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
             -
               type: JSONPATH
               parameters:
@@ -4372,6 +4685,10 @@ zabbix_export:
           value_type: TEXT
           inventory_link: NAME
           preprocessing:
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
             -
               type: JSONPATH
               parameters:
@@ -4422,6 +4739,10 @@ zabbix_export:
           units: bytes
           preprocessing:
             -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
+            -
               type: JSONPATH
               parameters:
                 - $.sys_stats.mem_total
@@ -4439,6 +4760,10 @@ zabbix_export:
           delay: '0'
           units: bytes
           preprocessing:
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
             -
               type: JSONPATH
               parameters:
@@ -4460,6 +4785,10 @@ zabbix_export:
           inventory_link: MODEL
           preprocessing:
             -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
+            -
               type: JSONPATH
               parameters:
                 - $.model_display
@@ -4477,6 +4806,10 @@ zabbix_export:
           delay: '0'
           units: ºC
           preprocessing:
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
             -
               type: JSONPATH
               parameters:
@@ -4501,6 +4834,10 @@ zabbix_export:
           units: ºC
           preprocessing:
             -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
+            -
               type: JSONPATH
               parameters:
                 - $..temps.PHY.first()
@@ -4523,6 +4860,10 @@ zabbix_export:
           delay: '0'
           units: bps
           preprocessing:
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
             -
               type: JSONPATH
               parameters:
@@ -4562,6 +4903,10 @@ zabbix_export:
           units: S
           preprocessing:
             -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
+            -
               type: JSONPATH
               parameters:
                 - $.uptime
@@ -4590,6 +4935,10 @@ zabbix_export:
           delay: '0'
           units: ms
           preprocessing:
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
             -
               type: JSONPATH
               parameters:
@@ -4629,6 +4978,10 @@ zabbix_export:
               units: bps
               preprocessing:
                 -
+                  type: CHECK_JSON_ERROR
+                  parameters:
+                    - $.mcaDumpError
+                -
                   type: JSONPATH
                   parameters:
                     - '$.network_table[ ?(@.name == ''{#NETWORK_NAME}'' ) ].stats.rx_bytes.first()'
@@ -4654,6 +5007,10 @@ zabbix_export:
               delay: '0'
               units: bps
               preprocessing:
+                -
+                  type: CHECK_JSON_ERROR
+                  parameters:
+                    - $.mcaDumpError
                 -
                   type: JSONPATH
                   parameters:
@@ -4696,6 +5053,10 @@ zabbix_export:
               lld_macro: '{#NETWORK_NAME}'
               path: $.name
           preprocessing:
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
             -
               type: JSONPATH
               parameters:
@@ -4813,6 +5174,10 @@ zabbix_export:
               lld_macro: '{#RADIO_NAME}'
               path: $.radio
           preprocessing:
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
             -
               type: JSONPATH
               parameters:
