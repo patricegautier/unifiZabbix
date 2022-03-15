@@ -108,7 +108,7 @@ declare OUTPUT
 if [[ -n "${SSHPASS_OPTIONS:-}" ]]; then
 	OUTPUT=$(sshpass ${SSHPASS_OPTIONS} ssh -o LogLevel=Error -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} ${USER}@${TARGET_DEVICE} mca-dump)
 else
-	OUTPUT=$(ssh -o LogLevel=Error -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} ${USER} @${TARGET_DEVICE} mca-dump)
+	OUTPUT=$(ssh -o LogLevel=Error -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} ${USER}@${TARGET_DEVICE} mca-dump)
 fi
 
 if (( $? != 0 )); then
