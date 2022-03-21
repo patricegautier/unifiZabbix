@@ -4382,6 +4382,10 @@ zabbix_export:
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
               master_item:
                 key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}"]'
               tags:
