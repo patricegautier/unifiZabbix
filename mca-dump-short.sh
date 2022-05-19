@@ -3,7 +3,6 @@
 set -uo pipefail
 
 
-declare ERROR_JSON='{"mcaDumpError":"Error"}'
 
 # thanks @zpolisensky for this contribution
 #shellcheck disable=SC2016
@@ -42,6 +41,55 @@ match($0, "^interface [A-z0-9]+$") {
 # for i in 51 52 53 54 55 56 58; do  echo "-------- 192.168.217.$i"; time mca-dump-short.sh -t SWITCH_DISCOVERY -u patrice -d 192.168.217.$i  | jq | grep -E "model|port_desc"; done
 # for i in 50 51 52 53 54 56 59; do  echo "-------- 192.168.207.$i"; time mca-dump-short.sh -t SWITCH_DISCOVERY -u patrice -d 192.168.207.$i  | jq | grep -E "model|port_desc"; done
 
+declare SLEEP_INTERVAL=1
+
+runWithTimeout () { 
+    local timeout=$1
+	shift 
+	
+    ( "$@" &
+      local child=$!
+      # Avoid default notification in non-interactive shell for SIGTERM
+      trap -- "" SIGTERM
+      	( 	
+			#echo "Starting Watchdog with ${timeout}s time out"
+      		local elapsed=0
+      		local childGone=
+      		while (( elapsed < timeout )) && [[ -z "${childGone}" ]]; do
+	      		sleep $SLEEP_INTERVAL
+	      		elapsed=$(( elapsed + SLEEP_INTERVAL ))
+	      		#echo "Waiting for child #${child}:  Elapsed $elapsed"
+	      		local childPresent; 
+	      		#shellcheck disable=SC2009
+	      		childPresent=$(ps -o pid -p ${child} | grep -v PID)
+   		  		if [[ -z "${childPresent}" ]]; then
+   		  			# the child has either completed or died, either way no time out
+   		  			childGone=true
+   		  			#echo "Child #${child} left"
+   		  		fi
+	      	done
+			if [[ -z "${childGone}" ]]; then #it's a timeout
+	  			#echo "Child #${child} timed out"				
+				kill -KILL $child
+				#local killResult=$?
+				#if (( killResult != 0 )); then
+					#echo "Could not kill child still running, pid $child"
+				#fi
+			fi
+			#echo Exiting Watchdog
+    	) &
+      wait $child 2>/dev/null
+      exit $?
+    )
+}
+
+declare ERROR_JSON='{"mcaDumpError":"Error"}'
+declare TIMEOUT_JSON='{"mcaDumpError":"Error", "reason":"timeout" }'
+
+function errorJsonWithReason() {
+	local reason=$1
+	echo '{"mcaDumpError":"Error", "reason":"'"${reason}"'" }'
+}
 
 function retrievePortNamesInto() {
 	local LOG_FILE=$1
@@ -202,17 +250,23 @@ function usage() {
 	  -t Unifi device type
 	  -v verbose and non compressed output
 	  -w verbose output for port discovery
+	  -m <filepath> echo debug and timing info to file
+	  -o <timeout> max timeout (3s minimum)
+	  -O echoes the result to the file specified with -m
+	  -V <jqExpression> Provide a JQ expression that must return a non empty output to validate the results. A json error is returned otherwiswe
 	EOF
 	exit 2
 }
+
+#------------------------------------------------------------------------------------------------
 
 declare SSHPASS_OPTIONS=
 declare PRIVKEY_OPTION=
 declare PASSWORD_FILE_PATH=
 declare VERBOSE_OPTION=
+declare TIMEOUT=4
 
-
-while getopts 'i:u:t:hd:vp:w' OPT
+while getopts 'i:u:t:hd:vp:wm:o:OV:' OPT
 do
   case $OPT in
     i) PRIVKEY_OPTION="-i "${OPTARG} ;;
@@ -222,11 +276,18 @@ do
     v) VERBOSE=true ;;
     p) PASSWORD_FILE_PATH=${OPTARG} ;;
     w) VERBOSE_PORT_DISCOVERY=true ;;
+    m) TIMING_FILE=${OPTARG} ;;
+    o) TIMEOUT=$(( OPTARG-1 )) ;;
+    O) ECHO_OUTPUT=true ;;
+    V) JQ_VALIDATOR=${OPTARG} ;;
     *) usage ;;
   esac
 done
 
-
+if [[ -n "${TIMING_FILE:-}" ]]; then
+	START_TIME=$(date +%s)
+	#echo "$(date): ${TARGET_DEVICE} ${DEVICE_TYPE}" >> "${TIMING_FILE}" 
+fi
 
 if [[ -n "${VERBOSE:-}" ]]; then
         VERBOSE_OPTION="-v"
@@ -279,7 +340,7 @@ elif [[ ${DEVICE_TYPE:-} == 'UDMP' ]]; then
 elif [[ ${DEVICE_TYPE:-} == 'USG' ]]; then
 	JQ_OPTIONS='del (.dpi_stats) | del(.fingerprints)'
 elif [[ ${DEVICE_TYPE:-} == 'CK' ]]; then
-	JQ_OPTIONS= 
+	JQ_OPTIONS='del (.dpi_stats)'
 elif [[ ${DEVICE_TYPE:-} == 'SWITCH_DISCOVERY' ]]; then
 	JQ_OPTIONS='del (.port_table[].mac_table)'
 elif [[ -n "${DEVICE_TYPE:-}" ]]; then
@@ -298,37 +359,67 @@ if [[ -n "${VERBOSE:-}" ]]; then
 fi
 
 declare EXIT_CODE=0
-declare OUTPUT
+declare OUTPUT=
+declare ERROR_FILE=/tmp/mca-$RANDOM.err
 if [[ -n "${SSHPASS_OPTIONS:-}" ]]; then
 	#shellcheck disable=SC2086
-	OUTPUT=$(sshpass ${SSHPASS_OPTIONS} ssh -o LogLevel=Error -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} "${USER}@${TARGET_DEVICE}" mca-dump)
+	OUTPUT=$(runWithTimeout "${TIMEOUT}" sshpass ${SSHPASS_OPTIONS} ssh -o ConnectTimeout=5 -o LogLevel=Error -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} "${USER}@${TARGET_DEVICE}" mca-dump 2> "${ERROR_FILE}")
 	EXIT_CODE=$?
 else 
 	#shellcheck disable=SC2086
-	OUTPUT=$(ssh -o LogLevel=Error -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} "${USER}@${TARGET_DEVICE}" mca-dump)
+	OUTPUT=$(runWithTimeout "${TIMEOUT}" ssh -o ConnectTimeout=5 -o LogLevel=Error -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} "${USER}@${TARGET_DEVICE}" mca-dump  2> "${ERROR_FILE}")
 	EXIT_CODE=$?
 fi
 
-if (( EXIT_CODE != 0 )) || [[ -z "${OUTPUT}" ]]; then
-	OUTPUT="${ERROR_JSON}"
+
+if (( EXIT_CODE >=127 )); then
+	OUTPUT="${TIMEOUT_JSON}"
+elif (( EXIT_CODE != 0 )) || [[ -z "${OUTPUT}" ]]; then
+	OUTPUT=$(errorJsonWithReason "$(cat "${ERROR_FILE}"; echo "${OUTPUT}" )")
 	EXIT_CODE=1
 else
-	#shellcheck disable=SC2086
-	OUTPUT=$(echo  "${OUTPUT}" | jq ${INDENT_OPTION} "${JQ_OPTIONS:-}")
-	EXIT_CODE=$?
-	if (( EXIT_CODE != 0 )) || [[ -z "${OUTPUT}" ]]; then
+	if [[ -n "${JQ_VALIDATOR:-}" ]]; then
+		VALIDATION=$(echo  "${OUTPUT}" | jq "${JQ_VALIDATOR}")
+		EXIT_CODE=$?
+		if [[ -z "${VALIDATION}" ]] || [[ "${VALIDATION}" == "false" ]] || (( EXIT_CODE != 0 )); then
+			OUTPUT=$(errorJsonWithReason "validationError")
+			EXIT_CODE=1
+		fi
+	fi
+	if (( EXIT_CODE == 0 )); then
+		#shellcheck disable=SC2086
+		OUTPUT=$(echo  "${OUTPUT}" | jq ${INDENT_OPTION} "${JQ_OPTIONS}")
+		EXIT_CODE=$?
+		if (( EXIT_CODE != 0 )) || [[ -z "${OUTPUT}" ]]; then
+			OUTPUT="${ERROR_JSON}"
+			EXIT_CODE=1
+		fi
+	fi
+fi
+rm -f  "${ERROR_FILE}" 2>/dev/null
+
+if (( EXIT_CODE == 0 )) && [[ ${DEVICE_TYPE:-} == 'SWITCH_DISCOVERY' ]]; then
+	wait
+	OUTPUT=$(insertPortNamesIntoJson "$JQ_PROGRAM.jq" "${OUTPUT}")
+	CODE=$?
+	if (( CODE != 0 )) || [[ -z "${OUTPUT}" ]]; then
 		OUTPUT="${ERROR_JSON}"
 		EXIT_CODE=1
 	fi
 fi
 
+echo -n "${OUTPUT}"
 
-if [[ ${DEVICE_TYPE:-} == 'SWITCH_DISCOVERY' ]]; then
-	wait
-	OUTPUT=$(insertPortNamesIntoJson "$JQ_PROGRAM.jq" "${OUTPUT}")
+if [[ -n "${TIMING_FILE:-}" ]]; then
+	END_TIME=$(date +%s)
+	DURATION=$((  END_TIME - START_TIME   ))
+	echo "$(date): ${TARGET_DEVICE} ${DEVICE_TYPE} ${JQ_VALIDATOR:-} : ${DURATION}s - $EXIT_CODE" >> "${TIMING_FILE}" 
+	if [[ -n "${ECHO_OUTPUT:-}" ]]; then
+		echo -n "${OUTPUT}" >> "${TIMING_FILE}" 
+		echo >> "${TIMING_FILE}"
+	fi
 fi
 
-echo -n "${OUTPUT}"
 exit $EXIT_CODE
 
 
