@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-05-19T21:32:11Z'
+  date: '2022-05-31T18:21:44Z'
   groups:
     -
       uuid: 15155c95a3d048f4856272ae12fd42c5
@@ -2664,6 +2664,17 @@ zabbix_export:
                 -
                   tag: Application
                   value: Power
+          graph_prototypes:
+            -
+              uuid: d1e7161d8eb141b293eacfe4f5305c09
+              name: 'Fan Level'
+              graph_items:
+                -
+                  color: 1A7C11
+                  calc_fnc: ALL
+                  item:
+                    host: 'Unifi Switch'
+                    key: '_[{#FAN_LEVEL_KEY_NAME}]'
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "SWITCH_FEATURE_DISCOVERY", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}"  ]'
           lld_macro_paths:
@@ -3046,6 +3057,17 @@ zabbix_export:
                 -
                   tag: Application
                   value: Power
+          graph_prototypes:
+            -
+              uuid: b6431556a31941d29b7b592c57342e4d
+              name: Temperature
+              graph_items:
+                -
+                  color: 1A7C11
+                  calc_fnc: ALL
+                  item:
+                    host: 'Unifi Switch'
+                    key: '_[{#TEMPERATURE_KEY_NAME}]'
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "SWITCH_FEATURE_DISCOVERY", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}"  ]'
           lld_macro_paths:
@@ -4917,34 +4939,6 @@ zabbix_export:
             host: 'UBNT Airmax'
             key: airTimeSmooth
     -
-      uuid: fad2952510f34a4897c8194393d3e6e3
-      name: Bandwidth
-      graph_items:
-        -
-          sortorder: '1'
-          color: 1A7C11
-          item:
-            host: 'Unifi Protect Camera'
-            key: rx_bandwidth
-        -
-          sortorder: '2'
-          color: F63100
-          item:
-            host: 'Unifi Protect Camera'
-            key: tx_bandwidth
-        -
-          sortorder: '3'
-          color: 2774A4
-          item:
-            host: 'Unifi Protect Camera'
-            key: tx_bandwidth_smooth
-        -
-          sortorder: '4'
-          color: A54F10
-          item:
-            host: 'Unifi Protect Camera'
-            key: outgoing_bandwidth_moving_average_threshold_raw
-    -
       uuid: 97ccfef4197444c69af57ca79513fd16
       name: Bandwidth
       graph_items:
@@ -4977,6 +4971,22 @@ zabbix_export:
             host: 'Unifi UDMP'
             key: upload_bandwidth
     -
+      uuid: d09d7d135dfc49d0b35e2a0ed5d2ac20
+      name: Bandwidth
+      graph_items:
+        -
+          sortorder: '1'
+          color: 1A7C11
+          item:
+            host: 'Unifi USG'
+            key: download_bandwidth_smooth
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Unifi USG'
+            key: upload_bandwidth_smooth
+    -
       uuid: 0d21337806de4d03bda1b762c0a98ee4
       name: Bandwidth
       graph_items:
@@ -4993,21 +5003,33 @@ zabbix_export:
             host: 'Unifi AP'
             key: wireless_transmission_bandwidth
     -
-      uuid: d09d7d135dfc49d0b35e2a0ed5d2ac20
+      uuid: fad2952510f34a4897c8194393d3e6e3
       name: Bandwidth
       graph_items:
         -
           sortorder: '1'
           color: 1A7C11
           item:
-            host: 'Unifi USG'
-            key: download_bandwidth_smooth
+            host: 'Unifi Protect Camera'
+            key: rx_bandwidth
         -
           sortorder: '2'
           color: F63100
           item:
-            host: 'Unifi USG'
-            key: upload_bandwidth_smooth
+            host: 'Unifi Protect Camera'
+            key: tx_bandwidth
+        -
+          sortorder: '3'
+          color: 2774A4
+          item:
+            host: 'Unifi Protect Camera'
+            key: tx_bandwidth_smooth
+        -
+          sortorder: '4'
+          color: A54F10
+          item:
+            host: 'Unifi Protect Camera'
+            key: outgoing_bandwidth_moving_average_threshold_raw
     -
       uuid: dd9c1e7a2b6a44a590a8ce1e131e75ed
       name: 'Bandwidth Used'
@@ -5042,20 +5064,20 @@ zabbix_export:
             host: 'SunMAX SolarPoint'
             key: batteryVoltage
     -
-      uuid: 347ef23ef5a94b629dabcc89b74331a0
+      uuid: f7f3c8e61e564d0d9f8057f70d9c0072
       name: 'CPU and Memory'
       graph_items:
         -
           sortorder: '1'
           color: 1A7C11
           item:
-            host: 'Unifi USG'
-            key: cpu_smooth
+            host: 'Unifi UDMP'
+            key: cpu
         -
           sortorder: '2'
           color: F63100
           item:
-            host: 'Unifi USG'
+            host: 'Unifi UDMP'
             key: memory
     -
       uuid: 77b6b90c95ee43ed89899a355d9449f0
@@ -5074,20 +5096,20 @@ zabbix_export:
             host: 'Unifi Switch'
             key: memory
     -
-      uuid: f7f3c8e61e564d0d9f8057f70d9c0072
+      uuid: 347ef23ef5a94b629dabcc89b74331a0
       name: 'CPU and Memory'
       graph_items:
         -
           sortorder: '1'
           color: 1A7C11
           item:
-            host: 'Unifi UDMP'
-            key: cpu
+            host: 'Unifi USG'
+            key: cpu_smooth
         -
           sortorder: '2'
           color: F63100
           item:
-            host: 'Unifi UDMP'
+            host: 'Unifi USG'
             key: memory
     -
       uuid: 2cec753f0a24451fb95a06fd19a0ae8d
