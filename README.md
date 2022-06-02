@@ -51,16 +51,21 @@ You should now have the following templates available, and it should be pretty s
 	Unifi Protect Cloud Key
 	Unifi Protect NVR4
 	SunMax SolarPoint
-	Unifi SSH Host
 
 
 • You will need to assign the templates with the matching type to hosts you have to create in Zabbix for your unifi devices.  Use the 'Agent' interface in Zabbix with the proper IP or DNS entry.
 
 A couple of things on top of that:
 
-• Unifi SSH Host: assign that one to all your Unifi infrastructure devices, on top of the template for that specific type.  <i>(In a perfect world, I would have had the specific templates inherit from that one and all the right items appear that way but Zabbix does not support exporting and reimporting a template hierarchy as of 5.2.  Assigning both templates is the work-around)</i>
+• <b>Unifi SSH Host</b>: You have to assign that one to all your devices, on top of the template for that specific type.  
 
-• Unifi Wifi Site is meant to aggregate WiFi traffic across your wifi networks for a Unifi site.  Just assign it to one of the APs that can see all the networks in question and assign the {$AP_GROUP} macro for that host to the name of a zabbix host group that contains all the APs for that site.
+For example a Switch should have 2 templates assigned to it:  Unifi SSH Host and Unifi Switch
+
+<i>(In a perfect world, I would have had the specific templates inherit from that one and all the right items appear that way but Zabbix does not support exporting and reimporting a template hierarchy as of 5.2.  Assigning both templates is the work-around)</i>.  
+
+• <b>Unifi SSH High Priority Host</b> is a variant of the first template with higher alert levels that can be used instead; don't assign both to the same device
+
+• <b>Unifi Wifi Site</b> is meant to aggregate WiFi traffic across your wifi networks for a Unifi site.  Just assign it to one of the APs that can see all the networks in question and assign the {$AP_GROUP} macro for that host to the name of a zabbix host group that contains all the APs for that site.
 
 ## Setup SSH from your Zabbix server to your Unifi devices via public/private keypair
 
