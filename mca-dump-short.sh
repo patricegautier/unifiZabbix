@@ -1,7 +1,8 @@
-#!/usr/local/bin/bash
+#!/bin/bash
 #set -xv
 set -uo pipefail
 
+declare HE_SSH_KEY_OPTIONS='-o PubkeyAcceptedKeyTypes=ssh-rsa -o HostKeyAlgorithms=+ssh-rsa'
 
 
 # thanks @zpolisensky for this contribution
@@ -84,7 +85,6 @@ runWithTimeout () {
 }
 
 declare ERROR_JSON='{"mcaDumpError":"Error"}'
-declare TIMEOUT_JSON='{"mcaDumpError":"Error", "reason":"timeout" }'
 
 function errorJsonWithReason() {
 	local reason=$1
@@ -96,7 +96,8 @@ function retrievePortNamesInto() {
 	local OUTSTREAM="/dev/null"
 	local OPTIONS=
  	if [[ -n "${VERBOSE:-}" ]]; then
- 		echo spawn ssh -o LogLevel=Error -o StrictHostKeyChecking=accept-new "${PRIVKEY_OPTION}" "${USER}@${TARGET_DEVICE}"  >&2
+ 		#shellcheck disable=SC2086
+ 		echo spawn ssh ${HE_SSH_KEY_OPTIONS} -o LogLevel=Error -o StrictHostKeyChecking=accept-new "${PRIVKEY_OPTION}" "${USER}@${TARGET_DEVICE}"  >&2
  	fi
  	if [[ -n "${VERBOSE_PORT_DISCOVERY:-}" ]]; then
  		OPTIONS="-d"
@@ -107,7 +108,7 @@ function retrievePortNamesInto() {
 	/usr/bin/expect ${OPTIONS} > ${OUTSTREAM} <<EOD
       set timeout 10
 
-      spawn ssh -o LogLevel=Error -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} ${USER}@${TARGET_DEVICE}
+      spawn ssh ${HE_SSH_KEY_OPTIONS} -o LogLevel=Error -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} ${USER}@${TARGET_DEVICE}
 	  send -- "\r"
 
       expect ".*#"
@@ -264,7 +265,7 @@ declare SSHPASS_OPTIONS=
 declare PRIVKEY_OPTION=
 declare PASSWORD_FILE_PATH=
 declare VERBOSE_OPTION=
-declare TIMEOUT=4
+declare TIMEOUT=30
 
 while getopts 'i:u:t:hd:vp:wm:o:OV:' OPT
 do
@@ -355,7 +356,7 @@ INDENT_OPTION="--indent 0"
 
 if [[ -n "${VERBOSE:-}" ]]; then
 	INDENT_OPTION=
-    echo  'ssh -o LogLevel=Error -o StrictHostKeyChecking=accept-new '"${PRIVKEY_OPTION}" "${USER}@${TARGET_DEVICE}"' "mca-dump" | jq '"${INDENT_OPTION}" "${JQ_OPTIONS:-}"
+    echo  "ssh ${HE_SSH_KEY_OPTIONS} -o LogLevel=Error -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} ${USER}@${TARGET_DEVICE} mca-dump | jq ${INDENT_OPTION} ${JQ_OPTIONS:-}"
 fi
 
 declare EXIT_CODE=0
@@ -363,17 +364,17 @@ declare OUTPUT=
 declare ERROR_FILE=/tmp/mca-$RANDOM.err
 if [[ -n "${SSHPASS_OPTIONS:-}" ]]; then
 	#shellcheck disable=SC2086
-	OUTPUT=$(runWithTimeout "${TIMEOUT}" sshpass ${SSHPASS_OPTIONS} ssh -o ConnectTimeout=5 -o LogLevel=Error -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} "${USER}@${TARGET_DEVICE}" mca-dump 2> "${ERROR_FILE}")
+	OUTPUT=$(runWithTimeout "${TIMEOUT}" sshpass ${SSHPASS_OPTIONS} ssh ${HE_SSH_KEY_OPTIONS} -o ConnectTimeout=5 -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} "${USER}@${TARGET_DEVICE}" mca-dump 2> "${ERROR_FILE}")
 	EXIT_CODE=$?
 else 
 	#shellcheck disable=SC2086
-	OUTPUT=$(runWithTimeout "${TIMEOUT}" ssh -o ConnectTimeout=5 -o LogLevel=Error -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} "${USER}@${TARGET_DEVICE}" mca-dump  2> "${ERROR_FILE}")
+	OUTPUT=$(runWithTimeout "${TIMEOUT}" ssh ${HE_SSH_KEY_OPTIONS} -o ConnectTimeout=5 -o HostKeyAlgorithms=+ssh-rsa  -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} "${USER}@${TARGET_DEVICE}" mca-dump  2> "${ERROR_FILE}")
 	EXIT_CODE=$?
 fi
 
 
-if (( EXIT_CODE >=127 )); then
-	OUTPUT="${TIMEOUT_JSON}"
+if (( EXIT_CODE >=127 && EXIT_CODE != 255 )); then
+	OUTPUT=$(errorJsonWithReason "time out with exit code $EXIT_CODE")
 elif (( EXIT_CODE != 0 )) || [[ -z "${OUTPUT}" ]]; then
 	OUTPUT=$(errorJsonWithReason "$(cat "${ERROR_FILE}"; echo "${OUTPUT}" )")
 	EXIT_CODE=1
