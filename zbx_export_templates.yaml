@@ -689,6 +689,10 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - '$.[''system-stats''].cpu'
+            -
+              type: JAVASCRIPT
+              parameters:
+                - 'return Math.round(value)'            
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}"  ]'
           tags:
@@ -749,6 +753,11 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           params: '100* last(//mem_used) / last(//mem_total)'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - 'return Math.round(value)'
           tags:
             -
               tag: Application
@@ -853,7 +862,7 @@ zabbix_export:
           type: DEPENDENT
           key: uptime
           delay: '0'
-          units: S
+          units: uptime
           preprocessing:
             -
               type: JSONPATH
@@ -2396,6 +2405,10 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - '$.[''system-stats''].cpu'
+            -
+              type: JAVASCRIPT
+              parameters:
+                - 'return Math.round(value)'                
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "SWITCH", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}"]'
           tags:
@@ -2498,6 +2511,11 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           params: '100* last(//mem_used) / last(//mem_total)'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - 'return Math.round(value)'
           tags:
             -
               tag: Application
@@ -2616,7 +2634,7 @@ zabbix_export:
           type: DEPENDENT
           key: uptime
           delay: '0'
-          units: S
+          units: uptime
           preprocessing:
             -
               type: JSONPATH
@@ -3123,6 +3141,10 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - '$.[''system-stats''].cpu'
+            -
+              type: JAVASCRIPT
+              parameters:
+                - 'return Math.round(value)'
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}"  ]'
           tags:
@@ -3367,6 +3389,11 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           params: '100* last(//mem_used) / last(//mem_total)'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - 'return Math.round(value)'
           tags:
             -
               tag: Application
@@ -3635,7 +3662,7 @@ zabbix_export:
           type: DEPENDENT
           key: uptime
           delay: '0'
-          units: S
+          units: uptime
           preprocessing:
             -
               type: CHECK_JSON_ERROR
@@ -4163,6 +4190,10 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - '$.[''system-stats''].cpu'
+            -
+              type: JAVASCRIPT
+              parameters:
+                - 'return Math.round(value)'
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}","-o", "{$UNIFI_CHECK_TIMEOUT}", "-O"]'
           tags:
@@ -4397,6 +4428,11 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           params: '100* last(//mem_used) / last(//mem_total)'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - 'return Math.round(value)'
           tags:
             -
               tag: Application
@@ -4571,7 +4607,7 @@ zabbix_export:
           type: DEPENDENT
           key: uptime
           delay: '0'
-          units: S
+          units: uptime
           preprocessing:
             -
               type: CHECK_JSON_ERROR
