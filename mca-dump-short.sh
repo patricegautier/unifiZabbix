@@ -287,7 +287,7 @@ do
     o) TIMEOUT=$(( OPTARG-1 )) ;;
     O) ECHO_OUTPUT=true ;;
     V) JQ_VALIDATOR=${OPTARG} ;;
-    U)  if [[ -n "${OPTARG}" ]] &&  [[ "${OPTARG}" != "{$UNIFI_VERBOSE_SSH}" ]]; then
+    U)  if [[ -n "${OPTARG}" ]] &&  [[ "${OPTARG}" != "{\$UNIFI_VERBOSE_SSH}" ]]; then
     		VERBOSE_SSH=-vvv
     	fi ;;
     *) usage ;;
