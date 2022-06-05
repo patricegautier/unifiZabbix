@@ -44,44 +44,48 @@ match($0, "^interface [A-z0-9]+$") {
 
 declare SLEEP_INTERVAL=1
 
-runWithTimeout () { 
+runWithTimeout() { 
     local timeout=$1
-	shift 
+    if [[ -n "${timeout}" ]]; then
+		shift 
 	
-    ( "$@" &
-      local child=$!
-      # Avoid default notification in non-interactive shell for SIGTERM
-      trap -- "" SIGTERM
-      	( 	
-			#echo "Starting Watchdog with ${timeout}s time out"
-      		local elapsed=0
-      		local childGone=
-      		while (( elapsed < timeout )) && [[ -z "${childGone}" ]]; do
-	      		sleep $SLEEP_INTERVAL
-	      		elapsed=$(( elapsed + SLEEP_INTERVAL ))
-	      		#echo "Waiting for child #${child}:  Elapsed $elapsed"
-	      		local childPresent; 
-	      		#shellcheck disable=SC2009
-	      		childPresent=$(ps -o pid -p ${child} | grep -v PID)
-   		  		if [[ -z "${childPresent}" ]]; then
-   		  			# the child has either completed or died, either way no time out
-   		  			childGone=true
-   		  			#echo "Child #${child} left"
-   		  		fi
-	      	done
-			if [[ -z "${childGone}" ]]; then #it's a timeout
-	  			#echo "Child #${child} timed out"				
-				kill -KILL $child
-				#local killResult=$?
-				#if (( killResult != 0 )); then
-					#echo "Could not kill child still running, pid $child"
-				#fi
-			fi
-			#echo Exiting Watchdog
-    	) &
-      wait $child 2>/dev/null
-      exit $?
-    )
+		( "$@" &
+		  local child=$!
+		  # Avoid default notification in non-interactive shell for SIGTERM
+		  trap -- "" SIGTERM
+			( 	
+				#echo "Starting Watchdog with ${timeout}s time out"
+				local elapsed=0
+				local childGone=
+				while (( elapsed < timeout )) && [[ -z "${childGone}" ]]; do
+					sleep $SLEEP_INTERVAL
+					elapsed=$(( elapsed + SLEEP_INTERVAL ))
+					#echo "Waiting for child #${child}:  Elapsed $elapsed"
+					local childPresent; 
+					#shellcheck disable=SC2009
+					childPresent=$(ps -o pid -p ${child} | grep -v PID)
+					if [[ -z "${childPresent}" ]]; then
+						# the child has either completed or died, either way no time out
+						childGone=true
+						#echo "Child #${child} left"
+					fi
+				done
+				if [[ -z "${childGone}" ]]; then #it's a timeout
+					#echo "Child #${child} timed out"				
+					kill -KILL $child
+					#local killResult=$?
+					#if (( killResult != 0 )); then
+						#echo "Could not kill child still running, pid $child"
+					#fi
+				fi
+				#echo Exiting Watchdog
+			) &
+		  wait $child 2>/dev/null
+		  exit $?
+		)
+	else
+		"$@"
+	fi
 }
 
 declare ERROR_JSON='{"mcaDumpError":"Error"}'
