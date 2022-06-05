@@ -368,11 +368,11 @@ declare OUTPUT=
 declare ERROR_FILE=/tmp/mca-$RANDOM.err
 if [[ -n "${SSHPASS_OPTIONS:-}" ]]; then
 	#shellcheck disable=SC2086
-	OUTPUT=$(runWithTimeout "${TIMEOUT}" sshpass ${SSHPASS_OPTIONS} ssh ${HE_SSH_KEY_OPTIONS} -o ConnectTimeout=5 -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} "${USER}@${TARGET_DEVICE}" mca-dump 2> "${ERROR_FILE}")
+	OUTPUT=$(runWithTimeout "${TIMEOUT}" sshpass ${SSHPASS_OPTIONS} ssh ${VERBOSE_OPTION} ${HE_SSH_KEY_OPTIONS} -o ConnectTimeout=5 -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} "${USER}@${TARGET_DEVICE}" mca-dump 2> "${ERROR_FILE}")
 	EXIT_CODE=$?
 else 
 	#shellcheck disable=SC2086
-	OUTPUT=$(runWithTimeout "${TIMEOUT}" ssh ${HE_SSH_KEY_OPTIONS} -o ConnectTimeout=5 -o HostKeyAlgorithms=+ssh-rsa  -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} "${USER}@${TARGET_DEVICE}" mca-dump  2> "${ERROR_FILE}")
+	OUTPUT=$(runWithTimeout "${TIMEOUT}" ssh ${VERBOSE_OPTION} ${HE_SSH_KEY_OPTIONS} -o ConnectTimeout=5 -o HostKeyAlgorithms=+ssh-rsa  -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} "${USER}@${TARGET_DEVICE}" mca-dump  2> "${ERROR_FILE}")
 	EXIT_CODE=$?
 fi
 
