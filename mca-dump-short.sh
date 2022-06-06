@@ -2,7 +2,7 @@
 #set -xv
 set -uo pipefail
 
-declare HE_SSH_KEY_OPTIONS='-o PubkeyAcceptedKeyTypes=ssh-rsa -o HostKeyAlgorithms=+ssh-rsa'
+declare HE_RSA_SSH_KEY_OPTIONS='-o PubkeyAcceptedKeyTypes=ssh-rsa -o HostKeyAlgorithms=+ssh-rsa'
 
 
 # thanks @zpolisensky for this contribution
@@ -101,7 +101,7 @@ function retrievePortNamesInto() {
 	local OPTIONS=
  	if [[ -n "${VERBOSE:-}" ]]; then
  		#shellcheck disable=SC2086
- 		echo spawn ssh ${VERBOSE_SSH} ${HE_SSH_KEY_OPTIONS} -o LogLevel=Error -o StrictHostKeyChecking=accept-new "${PRIVKEY_OPTION}" "${USER}@${TARGET_DEVICE}"  >&2
+ 		echo spawn ssh ${VERBOSE_SSH} ${HE_RSA_SSH_KEY_OPTIONS} -o LogLevel=Error -o StrictHostKeyChecking=accept-new "${PRIVKEY_OPTION}" "${USER}@${TARGET_DEVICE}"  >&2
  	fi
  	if [[ -n "${VERBOSE_PORT_DISCOVERY:-}" ]]; then
  		OPTIONS="-d"
@@ -112,7 +112,7 @@ function retrievePortNamesInto() {
 	/usr/bin/expect ${OPTIONS} > ${OUTSTREAM} <<EOD
       set timeout 10
 
-      spawn ssh ${HE_SSH_KEY_OPTIONS} -o LogLevel=Error -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} ${USER}@${TARGET_DEVICE}
+      spawn ssh ${HE_RSA_SSH_KEY_OPTIONS} -o LogLevel=Error -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} ${USER}@${TARGET_DEVICE}
 	  send -- "\r"
 
       expect ".*#"
@@ -288,7 +288,7 @@ do
     O) ECHO_OUTPUT=true ;;
     V) JQ_VALIDATOR=${OPTARG} ;;
     U)  if [[ -n "${OPTARG}" ]] &&  [[ "${OPTARG}" != "{\$UNIFI_VERBOSE_SSH}" ]]; then
-    		VERBOSE_SSH=-vvv
+    		VERBOSE_SSH="${OPTARG}"
     	fi ;;
     *) usage ;;
   esac
@@ -365,7 +365,7 @@ INDENT_OPTION="--indent 0"
 
 if [[ -n "${VERBOSE:-}" ]]; then
 	INDENT_OPTION=
-    echo  "ssh ${HE_SSH_KEY_OPTIONS} -o LogLevel=Error -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} ${USER}@${TARGET_DEVICE} mca-dump | jq ${INDENT_OPTION} ${JQ_OPTIONS:-}"
+    echo  "ssh ${HE_RSA_SSH_KEY_OPTIONS} -o LogLevel=Error -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} ${USER}@${TARGET_DEVICE} mca-dump | jq ${INDENT_OPTION} ${JQ_OPTIONS:-}"
 fi
 
 declare EXIT_CODE=0
@@ -373,11 +373,11 @@ declare OUTPUT=
 declare ERROR_FILE=/tmp/mca-$RANDOM.err
 if [[ -n "${SSHPASS_OPTIONS:-}" ]]; then
 	#shellcheck disable=SC2086
-	OUTPUT=$(runWithTimeout "${TIMEOUT}" sshpass ${SSHPASS_OPTIONS} ssh ${VERBOSE_SSH} ${HE_SSH_KEY_OPTIONS} -o ConnectTimeout=5 -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} "${USER}@${TARGET_DEVICE}" mca-dump 2> "${ERROR_FILE}")
+	OUTPUT=$(runWithTimeout "${TIMEOUT}" sshpass ${SSHPASS_OPTIONS} ssh ${VERBOSE_SSH} ${HE_RSA_SSH_KEY_OPTIONS} -o ConnectTimeout=5 -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} "${USER}@${TARGET_DEVICE}" mca-dump 2> "${ERROR_FILE}")
 	EXIT_CODE=$?
 else 
 	#shellcheck disable=SC2086
-	OUTPUT=$(runWithTimeout "${TIMEOUT}" ssh ${VERBOSE_SSH} ${HE_SSH_KEY_OPTIONS} -o ConnectTimeout=5 -o HostKeyAlgorithms=+ssh-rsa  -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} "${USER}@${TARGET_DEVICE}" mca-dump  2> "${ERROR_FILE}")
+	OUTPUT=$(runWithTimeout "${TIMEOUT}" ssh ${VERBOSE_SSH} ${HE_RSA_SSH_KEY_OPTIONS} -o ConnectTimeout=5 -o HostKeyAlgorithms=+ssh-rsa  -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} "${USER}@${TARGET_DEVICE}" mca-dump  2> "${ERROR_FILE}")
 	EXIT_CODE=$?
 fi
 
