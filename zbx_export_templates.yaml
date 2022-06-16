@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-06-06T22:18:51Z'
+  date: '2022-06-16T18:14:47Z'
   groups:
     -
       uuid: 15155c95a3d048f4856272ae12fd42c5
@@ -2078,7 +2078,6 @@ zabbix_export:
           publickey: '{$UNIFI_PUB_KEY}'
           privatekey: '{$UNIFI_PRIV_KEY}'
           description: 'uname -a'
-          inventory_link: OS_FULL
           preprocessing:
             -
               type: NOT_MATCHES_REGEX
@@ -2337,7 +2336,6 @@ zabbix_export:
           username: '{$UNIFI_USER}'
           publickey: '{$UNIFI_PUB_KEY}'
           privatekey: '{$UNIFI_PRIV_KEY}'
-          inventory_link: OS_FULL
           preprocessing:
             -
               type: NOT_MATCHES_REGEX
