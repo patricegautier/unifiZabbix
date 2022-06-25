@@ -20,24 +20,24 @@ On Raspbian, this can be done with:
 
 	apt-get install jq
 
-## Install mca-dump-short and ssh-run scripts as a Zabbix external script
+## Install All the shell scripts as a Zabbix external script
 
-You need to install mca-dump-short.sh and ssh-run in Zabbix's external script directory
+You need to install mca-dump-short.sh, ssh-run.sh and solarpointBattery.sh in Zabbix's external script directory
 
 Please confirm where that directory is from the variable ExternalScripts in your zabbix server conf at /etc/zabbix/zabbix_server.conf.  On my system this is set to:
 
 	ExternalScripts=/usr/lib/zabbix/externalscripts
 
-After cp-ing the scripta to that directory, make sure you have the permissions necessary for zabbix to execute this script:
+After cp-ing the scripts to that directory, make sure you have the permissions necessary for zabbix to execute this script:
 
 	chown zabbix:zabbix /usr/lib/zabbix/externalscripts /usr/lib/zabbix/externalscripts/mca-dump-short.sh
 	chmod a+x /usr/lib/zabbix/externalscripts /usr/lib/zabbix/externalscripts/mca-dump-short.sh
 
-and the same for ssh-run
+and the same for ssh-run.sh
 
 ## Import the Unifi templates into Zabbix
 
-Import zbx_export_templates.xml into Zabbix, from Configuration > Templates > Import
+Import zbx_export_templates.yaml into Zabbix, from Configuration > Templates > Import
 
 You should now have the following templates available, and it should be pretty self explanatory what type of device you need to link them to in Zabbix.
 
@@ -310,8 +310,20 @@ That will give you access to power production and consumption, as well as set a 
 
 
 
+# Updating
 
+After a git pull, two categories of things to update, the .sh files and the templates:
 
+• For the shell scripts, it's the same procedure as installing them: copy mca-dump-short.sh, ssh-run.sh and solarpointBattery.sh to Zabbix's external script directory
+
+After cp-ing the scripts to that directory, make sure you have the permissions necessary for zabbix to execute this script:
+
+	chown zabbix:zabbix /usr/lib/zabbix/externalscripts /usr/lib/zabbix/externalscripts/mca-dump-short.sh
+	chmod a+x /usr/lib/zabbix/externalscripts /usr/lib/zabbix/externalscripts/mca-dump-short.sh
+
+• Import the updated Unifi templates into Zabbix
+
+Import zbx_export_templates.yaml into Zabbix, from Configuration > Templates > Import.
 
 
 # Troubleshooting - Notes
