@@ -1,3 +1,6 @@
+# Notes
+This is a fork of patricegautier/unifiZabbix.  It changes only a few things.
+
 # unifiZabbix
 
 This projet contains a collection of Templates to monitor Unifi and other UBNT devices with Zabbix: APs, Switches, Routers (USG and UDMP), AirMax devices, and NVRs
