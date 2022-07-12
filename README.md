@@ -7,6 +7,7 @@ The zbx_export_templates.yaml has a few changes as well:
 - Changes the uptime units to "uptime" which I have found omre reliable in display human readable uptime values.
 - Added a "Device Status" tag
 - Added a JAVASCRIPT math.round preprocessing operation to make it easier to read CPU and Memory displays
+  
 	          preprocessing:
             -
               type: JAVASCRIPT
@@ -17,14 +18,13 @@ The zbx_export_templates.yaml has a few changes as well:
 
 This projet contains a collection of Templates to monitor Unifi and other UBNT devices with Zabbix: APs, Switches, Routers (USG and UDMP), AirMax devices, and NVRs
 
-I am currently running those on the current versions of the base software as of July 2021: Zabbix 5.4.2, a mix of Unifi 4.x, 5.x and 6.x APs and switches, AirMax 8.7.1, UDMP 1.10.3, controller 6.3.x
-
+I am currently running those on the current versions of the base software as of June 2022: Zabbix 6.0.x, a mix of Unifi 4.x, 5.x and 6.x APs and switches, AirMax 8.7.1, UDMP 1.12.x, controller 7.2.x
 
 # Setup
 
-## Zabbix 5.4 
+## Zabbix 
 
-given I am exporting those templates from 5.4.2 as of now and it has a new expression syntax compared to 5.2, you will need 5.4 minimum to be able to import the templates. 
+I am exporting those templates from 6.0.x as of now. I believe they are still bw compatible with 5.4 but I am not testing that on an ongoing basis
 
 
 ## Install jq on your Zabbix server
@@ -35,24 +35,24 @@ On Raspbian, this can be done with:
 
 	apt-get install jq
 
-## Install mca-dump-short and ssh-run scripts as a Zabbix external script
+## Install All the shell scripts as a Zabbix external script
 
-You need to install mca-dump-short.sh and ssh-run in Zabbix's external script directory
+You need to install mca-dump-short.sh, ssh-run.sh and solarpointBattery.sh in Zabbix's external script directory
 
 Please confirm where that directory is from the variable ExternalScripts in your zabbix server conf at /etc/zabbix/zabbix_server.conf.  On my system this is set to:
 
 	ExternalScripts=/usr/lib/zabbix/externalscripts
 
-After cp-ing the scripta to that directory, make sure you have the permissions necessary for zabbix to execute this script:
+After cp-ing the scripts to that directory, make sure you have the permissions necessary for zabbix to execute this script:
 
 	chown zabbix:zabbix /usr/lib/zabbix/externalscripts /usr/lib/zabbix/externalscripts/mca-dump-short.sh
 	chmod a+x /usr/lib/zabbix/externalscripts /usr/lib/zabbix/externalscripts/mca-dump-short.sh
 
-and the same for ssh-run
+and the same for ssh-run.sh
 
 ## Import the Unifi templates into Zabbix
 
-Import zbx_export_templates.xml into Zabbix, from Configuration > Templates > Import
+Import zbx_export_templates.yaml into Zabbix, from Configuration > Templates > Import
 
 You should now have the following templates available, and it should be pretty self explanatory what type of device you need to link them to in Zabbix.
 
@@ -323,11 +323,20 @@ That will give you access to power production and consumption, as well as set a 
 ## Battery Voltage
 ![Wan Download](/images/voltage.png)
 
+# Updating
 
+After a git pull, two categories of things to update, the .sh files and the templates:
 
+• For the shell scripts, it's the same procedure as installing them: copy mca-dump-short.sh, ssh-run.sh and solarpointBattery.sh to Zabbix's external script directory
 
+After cp-ing the scripts to that directory, make sure you have the permissions necessary for zabbix to execute this script:
 
+	chown zabbix:zabbix /usr/lib/zabbix/externalscripts /usr/lib/zabbix/externalscripts/mca-dump-short.sh
+	chmod a+x /usr/lib/zabbix/externalscripts /usr/lib/zabbix/externalscripts/mca-dump-short.sh
 
+• Import the updated Unifi templates into Zabbix
+
+Import zbx_export_templates.yaml into Zabbix, from Configuration > Templates > Import.
 
 # Troubleshooting - Notes
 
