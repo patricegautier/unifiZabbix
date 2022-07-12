@@ -83,13 +83,23 @@ zabbix_export:
               name: '{HOST.NAME} has not reported data in more than {$UNIFI_ALERT_PERIOD}'
               priority: WARNING
         -
+          uuid: 5e9adf7c16694aac899cbd54c990952e
+          name: 'Daily Power Balance'
+          type: CALCULATED
+          key: daily_power_balance
+          value_type: FLOAT
+          units: Wh
+          params: 'sum(//net_power_consumption,24h)/60/24'
+          description: 'Change in charge for the battery for the last day'
+        -
           uuid: bfda151539714084bd37e8d04c3f544c
           name: 'Net Power Consumption'
           type: CALCULATED
           key: net_power_consumption
           value_type: FLOAT
           units: W
-          params: 'last(//pvInputPower) - last(//powerOutput)'
+          params: 'last(//pvInputPower) - last(//powerOutput)- 2'
+          description: 'Net instantaneous power consumption - assumes the SolarPoint device consumes 2W'
           tags:
             -
               tag: Application
@@ -197,6 +207,15 @@ zabbix_export:
             -
               tag: Application
               value: Battery
+        -
+          uuid: e09c367e26ff493a9afa1e26a554a32e
+          name: 'Weekly Power Balance'
+          type: CALCULATED
+          key: weekly_power_balance
+          value_type: FLOAT
+          units: Wh
+          params: 'sum(//net_power_consumption,7d)/60/24/7'
+          description: 'Change in charge for the battery for the last day'
       discovery_rules:
         -
           uuid: 64453202177f47eda7843e639609837d
@@ -2099,7 +2118,6 @@ zabbix_export:
           publickey: '{$UNIFI_PUB_KEY}'
           privatekey: '{$UNIFI_PRIV_KEY}'
           description: 'uname -a'
-          inventory_link: OS_FULL
           preprocessing:
             -
               type: NOT_MATCHES_REGEX
@@ -2358,7 +2376,6 @@ zabbix_export:
           username: '{$UNIFI_USER}'
           publickey: '{$UNIFI_PUB_KEY}'
           privatekey: '{$UNIFI_PRIV_KEY}'
-          inventory_link: OS_FULL
           preprocessing:
             -
               type: NOT_MATCHES_REGEX

@@ -1,8 +1,17 @@
 # Notes
 This is a fork of patricegautier/unifiZabbix.  It enables a little bit more verbose debugging in the mca-dump-short.sh file.
-This becomes very useful when running zabbix in a docker container since UniFi only supports ssh-rsa and newer version of openssh make it difficult to get support the legacy less secure protocol.
+This becomes very useful when running zabbix in a docker container since UniFi only supports ssh-rsa and newer versions of openssh make it difficult to support the legacy less secure kex algorithm.
 
-The zbx_export_templates.yaml also changes the uptime units to "uptime" which I have found omre reliable in display human readable uptime values.  Everything else in the original repository stays the same.
+The zbx_export_templates.yaml has a few changes as well:
+
+- Changes the uptime units to "uptime" which I have found omre reliable in display human readable uptime values.
+- Added a "Device Status" tag
+- Added a JAVASCRIPT math.round preprocessing operation to make it easier to read CPU and Memory displays
+	          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - 'return Math.round(value)'
 
 # unifiZabbix
 
