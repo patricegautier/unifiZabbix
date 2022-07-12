@@ -1,5 +1,8 @@
 # Notes
-This is a fork of patricegautier/unifiZabbix.  It changes only a few things.
+This is a fork of patricegautier/unifiZabbix.  It enables a little bit more verbose debugging in the mca-dump-short.sh file.
+This becomes very useful when running zabbix in a docker container since UniFi only supports ssh-rsa and newer version of openssh make it difficult to get support the legacy less secure protocol.
+
+The zbx_export_templates.yaml also changes the uptime units to "uptime" which I have found omre reliable in display human readable uptime values.  Everything else in the original repository stays the same.
 
 # unifiZabbix
 
