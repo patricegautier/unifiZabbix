@@ -2,7 +2,7 @@
 #set -xv
 set -uo pipefail
 
-declare HE_RSA_SSH_KEY_OPTIONS='-o PubkeyAcceptedKeyTypes=ssh-rsa -o HostKeyAlgorithms=+ssh-rsa'
+declare HE_RSA_SSH_KEY_OPTIONS='-o PubkeyAcceptedKeyTypes=+ssh-rsa -o HostKeyAlgorithms=+ssh-rsa'
 
 
 # thanks @zpolisensky for this contribution
