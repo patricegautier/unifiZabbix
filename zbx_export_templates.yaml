@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-09-24T20:23:30Z'
+  date: '2022-09-24T21:18:08Z'
   template_groups:
     -
       uuid: 15155c95a3d048f4856272ae12fd42c5
@@ -4733,7 +4733,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.network_table[ ?(@.name == ''{#NETWORK_ADDRESS}'' ) ].stats.tx_bytes.first()'
+                    - '$.network_table[ ?(@.address == ''{#NETWORK_ADDRESS}'' ) ].stats.tx_bytes.first()'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
