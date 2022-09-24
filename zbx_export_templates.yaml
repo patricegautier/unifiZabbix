@@ -1,7 +1,7 @@
 zabbix_export:
-  version: '6.0'
-  date: '2022-06-25T20:21:58Z'
-  groups:
+  version: '6.2'
+  date: '2022-09-24T20:23:30Z'
+  template_groups:
     -
       uuid: 15155c95a3d048f4856272ae12fd42c5
       name: Patrice
@@ -92,14 +92,22 @@ zabbix_export:
           params: 'sum(//net_power_consumption,24h)/60/24'
           description: 'Change in charge for the battery for the last day'
         -
+          uuid: 8c3ac7ccd317433ca8c67b3a81e5c42f
+          name: 'Daily Power Balance 30 day moving average'
+          type: CALCULATED
+          key: monthly_power_balance
+          value_type: FLOAT
+          units: Wh
+          params: 'sum(//net_power_consumption,30d)/60/24/30'
+        -
           uuid: bfda151539714084bd37e8d04c3f544c
           name: 'Net Power Consumption'
           type: CALCULATED
           key: net_power_consumption
           value_type: FLOAT
           units: W
-          params: 'last(//pvInputPower) - last(//powerOutput)- 2'
-          description: 'Net instantaneous power consumption - assumes the SolarPoint device consumes 2W'
+          params: 'last(//pvInputPower) - last(//powerOutput)- 2.2'
+          description: 'Net instantaneous power consumption - assumes the SolarPoint device and inefficiencies of the system consumes 2.2W'
           tags:
             -
               tag: Application
@@ -209,13 +217,12 @@ zabbix_export:
               value: Battery
         -
           uuid: e09c367e26ff493a9afa1e26a554a32e
-          name: 'Weekly Power Balance'
+          name: 'Daily Power Balance 7 day moving average'
           type: CALCULATED
           key: weekly_power_balance
           value_type: FLOAT
           units: Wh
           params: 'sum(//net_power_consumption,7d)/60/24/7'
-          description: 'Change in charge for the battery for the last day'
       discovery_rules:
         -
           uuid: 64453202177f47eda7843e639609837d
@@ -3756,7 +3763,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.network_table[ ?(@.address == ''{#NETWORK_NAME}'' ) ].stats.rx_bytes.first()'
+                    - '$.network_table[ ?(@.address == ''{#NETWORK_ADDRESS}'' ) ].stats.rx_bytes.first()'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -3786,7 +3793,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.network_table[ ?(@.address == ''{#NETWORK_NAME}'' ) ].stats.tx_bytes.first()'
+                    - '$.network_table[ ?(@.address == ''{#NETWORK_ADDRESS}'' ) ].stats.tx_bytes.first()'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -3822,8 +3829,11 @@ zabbix_export:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}"  ]'
           lld_macro_paths:
             -
-              lld_macro: '{#NETWORK_NAME}'
+              lld_macro: '{#NETWORK_ADDRESS}'
               path: $.address
+            -
+              lld_macro: '{#NETWORK_NAME}'
+              path: $.name
           preprocessing:
             -
               type: CHECK_JSON_ERROR
@@ -4687,11 +4697,12 @@ zabbix_export:
                 -
                   type: NOT_MATCHES_REGEX
                   parameters:
-                    - mcaDumpError
+                    - $.mcaDumpError
+                  error_handler: DISCARD_VALUE
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.network_table[ ?(@.name == ''{#NETWORK_NAME}'' ) ].stats.rx_bytes.first()'
+                    - '$.network_table[ ?(@.address == ''{#NETWORK_ADDRESS}'' ) ].stats.rx_bytes.first()'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -4717,11 +4728,12 @@ zabbix_export:
                 -
                   type: NOT_MATCHES_REGEX
                   parameters:
-                    - mcaDumpError
+                    - $.mcaDumpError
+                  error_handler: DISCARD_VALUE
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.network_table[ ?(@.name == ''{#NETWORK_NAME}'' ) ].stats.tx_bytes.first()'
+                    - '$.network_table[ ?(@.name == ''{#NETWORK_ADDRESS}'' ) ].stats.tx_bytes.first()'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -4757,6 +4769,9 @@ zabbix_export:
             key: 'mca-dump-short.sh[ "-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}" ]'
           lld_macro_paths:
             -
+              lld_macro: '{#NETWORK_ADDRESS}'
+              path: $.address
+            -
               lld_macro: '{#NETWORK_NAME}'
               path: $.name
           preprocessing:
@@ -4773,7 +4788,7 @@ zabbix_export:
       uuid: c706ce3839514b87885842955e0865bf
       template: 'Unifi WiFi Site'
       name: 'Unifi WiFi Site'
-      description: 'This template is meant to collect WiFi data across all of a site''s APs.  Assign to one of the APs and set the {$UNIFI_AP_GROUP} macro to the name of a group that contains all of the APs you want to aggregate against.'
+      description: 'This template is meant to collect WiFi data across all of a site''s APs.  Assign to one of the APs and set the {$AP_GROUP} macro to the name of a group that contains all of the APs you want to aggregate against.'
       groups:
         -
           name: Patrice
@@ -4782,28 +4797,6 @@ zabbix_export:
         -
           name: 'Unifi Zabbix Export'
       items:
-        -
-          uuid: 1c4533c25fae47e8a07189c280f8f502
-          name: 'Total Reception Wireless Bandwidth'
-          type: CALCULATED
-          key: 'grpsum["{$AP_GROUP}", "wireless_reception_bandwidth",avg, {$UNIFI_SMOOTHING_PERIOD}]'
-          units: bps
-          params: 'sum(avg_foreach(/*/wireless_reception_bandwidth?[group="{$AP_GROUP}"],{$UNIFI_SMOOTHING_PERIOD}))'
-          tags:
-            -
-              tag: Application
-              value: Radio
-        -
-          uuid: f8bc0b7fbcea4e108b9339e385ef085f
-          name: 'Total Transmission Wireless Bandwidth'
-          type: CALCULATED
-          key: 'grpsum["{$AP_GROUP}", "wireless_transmission_bandwidth",avg, {$UNIFI_SMOOTHING_PERIOD}]'
-          units: bps
-          params: 'sum(avg_foreach(/*/wireless_transmission_bandwidth?[group="{$AP_GROUP}"],{$UNIFI_SMOOTHING_PERIOD}))'
-          tags:
-            -
-              tag: Application
-              value: Radio
         -
           uuid: 24671ab8f5d44096b16f5e5b1dcb9326
           name: mca-dump
@@ -4822,6 +4815,28 @@ zabbix_export:
             -
               tag: Application
               value: Host
+        -
+          uuid: 1c4533c25fae47e8a07189c280f8f502
+          name: 'Total Reception Wireless Bandwidth'
+          type: CALCULATED
+          key: total_reception_wireless_bandwidth
+          units: bps
+          params: 'sum(avg_foreach(/*/wireless_reception_bandwidth,15m))'
+          tags:
+            -
+              tag: Application
+              value: Radio
+        -
+          uuid: f8bc0b7fbcea4e108b9339e385ef085f
+          name: 'Total Transmission Wireless Bandwidth'
+          type: CALCULATED
+          key: total_transmission_wireless_bandwidth
+          units: bps
+          params: 'sum(avg_foreach(/*/wireless_transmission_bandwidth?[group="{$AP_GROUP}"],{$UNIFI_SMOOTHING_PERIOD}))'
+          tags:
+            -
+              tag: Application
+              value: Radio
       discovery_rules:
         -
           uuid: e8e0ef9c01f0409e9a649e0f69ea50cf
@@ -4857,7 +4872,7 @@ zabbix_export:
           graph_prototypes:
             -
               uuid: 4487c510b1ad4c5a940cfad9acc63266
-              name: '{#ESSID} Bandwidth'
+              name: '{#ESSID}-{#RADIO_NAME}  Bandwidth'
               graph_items:
                 -
                   sortorder: '1'
@@ -5316,10 +5331,10 @@ zabbix_export:
           color: 1A7C11
           item:
             host: 'Unifi WiFi Site'
-            key: 'grpsum["{$AP_GROUP}", "wireless_reception_bandwidth",avg, {$UNIFI_SMOOTHING_PERIOD}]'
+            key: total_reception_wireless_bandwidth
         -
           sortorder: '2'
           color: F63100
           item:
             host: 'Unifi WiFi Site'
-            key: 'grpsum["{$AP_GROUP}", "wireless_transmission_bandwidth",avg, {$UNIFI_SMOOTHING_PERIOD}]'
+            key: total_transmission_wireless_bandwidth
