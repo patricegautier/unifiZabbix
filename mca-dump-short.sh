@@ -88,11 +88,11 @@ runWithTimeout() {
 	fi
 }
 
-declare ERROR_JSON='{"mcaDumpError":"Error"}'
+declare ERROR_JSON='{ "mcaDumpError":"Error" }'
 
 function errorJsonWithReason() {
 	local reason=$1
-	echo '{"mcaDumpError":"Error", "reason":"'"${reason}"'" }'
+	echo '{ "mcaDumpError":"Error", "reason":"'"${reason}"'" }'
 }
 
 function retrievePortNamesInto() {
@@ -377,7 +377,7 @@ if [[ -n "${SSHPASS_OPTIONS:-}" ]]; then
 	EXIT_CODE=$?
 else 
 	#shellcheck disable=SC2086
-	OUTPUT=$(runWithTimeout "${TIMEOUT}" ssh ${VERBOSE_SSH} ${HE_RSA_SSH_KEY_OPTIONS} -o ConnectTimeout=5 -o HostKeyAlgorithms=+ssh-rsa  -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} "${USER}@${TARGET_DEVICE}" mca-dump  2> "${ERROR_FILE}")
+	OUTPUT=$(runWithTimeout "${TIMEOUT}" ssh ${VERBOSE_SSH} ${HE_RSA_SSH_KEY_OPTIONS} -o ConnectTimeout=5 -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} "${USER}@${TARGET_DEVICE}" mca-dump  2> "${ERROR_FILE}")
 	EXIT_CODE=$?
 fi
 
