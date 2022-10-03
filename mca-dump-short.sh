@@ -88,11 +88,9 @@ runWithTimeout() {
 	fi
 }
 
-declare ERROR_JSON='{ "mcaDumpError":"Error" }'
-
 function errorJsonWithReason() {
 	local reason=$1
-	echo '{ "mcaDumpError":"Error", "reason":"'"${reason}"'" }'
+	echo '{ "mcaDumpError":"Error", "reason":"'"${reason}"'", "device":"'"${TARGET_DEVICE}"'" }'
 }
 
 function retrievePortNamesInto() {
@@ -101,7 +99,7 @@ function retrievePortNamesInto() {
 	local OPTIONS=
  	if [[ -n "${VERBOSE:-}" ]]; then
  		#shellcheck disable=SC2086
- 		echo spawn ssh ${VERBOSE_SSH} ${HE_RSA_SSH_KEY_OPTIONS} -o LogLevel=Error -o StrictHostKeyChecking=accept-new "${PRIVKEY_OPTION}" "${USER}@${TARGET_DEVICE}"  >&2
+ 		echo spawn ssh  ${SSH_PORT} ${VERBOSE_SSH} ${HE_RSA_SSH_KEY_OPTIONS} -o LogLevel=Error -o StrictHostKeyChecking=accept-new "${PRIVKEY_OPTION}" "${USER}@${TARGET_DEVICE}"  >&2
  	fi
  	if [[ -n "${VERBOSE_PORT_DISCOVERY:-}" ]]; then
  		OPTIONS="-d"
@@ -112,7 +110,7 @@ function retrievePortNamesInto() {
 	/usr/bin/expect ${OPTIONS} > ${OUTSTREAM} <<EOD
       set timeout 10
 
-      spawn ssh ${HE_RSA_SSH_KEY_OPTIONS} -o LogLevel=Error -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} ${USER}@${TARGET_DEVICE}
+      spawn ssh  ${SSH_PORT} ${HE_RSA_SSH_KEY_OPTIONS} -o LogLevel=Error -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} ${USER}@${TARGET_DEVICE}
 	  send -- "\r"
 
       expect ".*#"
@@ -231,7 +229,7 @@ function insertPortNamesIntoJson() {
 			cat "${JQ_PROGRAM}"
 		fi
 		echo -n "${JSON}" | jq -r "$(cat "${JQ_PROGRAM}")"
-		rm -f "$JQ_PROGRAM" 2>/dev/null
+		rm "$JQ_PROGRAM" 2>/dev/null
 	else
 		echo -n "${JSON}"
 	fi
@@ -252,12 +250,12 @@ function usage() {
 	  -p specify password file path to be passed to sshpass -f. Note if both -i and -p are provided, the password file will be used
 	  -u SSH user name for Unifi device
 	  -d IP or FQDN for Unifi device
+	  -o alternate port for SSH connection
 	  -t Unifi device type
 	  -v verbose and non compressed output
 	  -w verbose output for port discovery
-	  -m <filepath> echo debug and timing info to file
 	  -o <timeout> max timeout (3s minimum)
-	  -O echoes the result to the file specified with -m
+	  -O echoes debug and timing info to /tmp/mcaDumpShort.log; errors are alwasy echoed to /tmp/mcaDumpShort.err
 	  -V <jqExpression> Provide a JQ expression that must return a non empty output to validate the results. A json error is returned otherwiswe
 	EOF
 	exit 2
@@ -269,24 +267,31 @@ declare SSHPASS_OPTIONS=
 declare PRIVKEY_OPTION=
 declare PASSWORD_FILE_PATH=
 declare VERBOSE_OPTION=
-declare TIMEOUT=30
+declare TIMEOUT=15
 declare VERBOSE_SSH=
+declare SSH_PORT=
+declare TARGET_DEVICE_PORT=
+declare logFile="/tmp/mcaDumpShort.log"
+declare errFile="/tmp/mcaDumpShort.err"
+declare ECHO_OUTPUT=
 
 
-while getopts 'i:u:t:hd:vp:wm:o:OV:U:' OPT
+while getopts 'i:u:t:hd:vp:wm:o:OV:U:P:e' OPT
 do
   case $OPT in
     i) PRIVKEY_OPTION="-i "${OPTARG} ;;
     u) USER=${OPTARG} ;;
     t) DEVICE_TYPE=${OPTARG} ;;
     d) TARGET_DEVICE=${OPTARG} ;;
+    P) TARGET_DEVICE_PORT=${OPTARG} ;;
     v) VERBOSE=true ;;
     p) PASSWORD_FILE_PATH=${OPTARG} ;;
     w) VERBOSE_PORT_DISCOVERY=true ;;
-    m) TIMING_FILE=${OPTARG} ;;
+    m) logFile=${OPTARG} ;;
     o) TIMEOUT=$(( OPTARG-1 )) ;;
     O) ECHO_OUTPUT=true ;;
     V) JQ_VALIDATOR=${OPTARG} ;;
+    e) echo -n "$(errorJsonWithReason "simulated error")"; exit 1 ;;
     U)  if [[ -n "${OPTARG}" ]] &&  [[ "${OPTARG}" != "{\$UNIFI_VERBOSE_SSH}" ]]; then
     		VERBOSE_SSH="${OPTARG}"
     	fi ;;
@@ -294,9 +299,8 @@ do
   esac
 done
 
-if [[ -n "${TIMING_FILE:-}" ]]; then
+if [[ -n "${ECHO_OUTPUT:-}" ]]; then
 	START_TIME=$(date +%s)
-	#echo "$(date): ${TARGET_DEVICE} ${DEVICE_TYPE}" >> "${TIMING_FILE}" 
 fi
 
 if [[ -n "${VERBOSE:-}" ]]; then
@@ -307,13 +311,26 @@ if [[ -z "${TARGET_DEVICE:-}" ]]; then
 	usage "Please specify a target device with -d"
 fi
 
+if [[ "${TARGET_DEVICE_PORT}" == "{\$UNIFI_SSH_PORT}" ]]; then
+	TARGET_DEVICE_PORT=""
+fi
+if [[ -n "${TARGET_DEVICE_PORT}" ]]; then
+	if (( TARGET_DEVICE_PORT == 0 )) || (( TARGET_DEVICE_PORT < 0 )) || (( TARGET_DEVICE_PORT > 65535 )); then
+		echo "Please specify a valid port with -P ($TARGET_DEVICE_PORT was specified)" >&2
+		usage
+	fi
+	if (( TARGET_DEVICE_PORT != 10050 )); then
+		SSH_PORT="-p ${TARGET_DEVICE_PORT}"
+	fi
+fi
+
 if [[ -z "${USER:-}" ]]; then
 	echo "Please specify a username with -u" >&2
 	usage
 fi
 
 if [[ ${DEVICE_TYPE:-} == 'SWITCH_DISCOVERY' ]]; then
-	JQ_PROGRAM=/tmp/unifiSWconf-$RANDOM
+	JQ_PROGRAM="/tmp/unifiSWconf-${TARGET_DEVICE}"
 	retrievePortNamesInto "$JQ_PROGRAM" &
 fi
 
@@ -365,7 +382,7 @@ INDENT_OPTION="--indent 0"
 
 if [[ -n "${VERBOSE:-}" ]]; then
 	INDENT_OPTION=
-    echo  "ssh ${HE_RSA_SSH_KEY_OPTIONS} -o LogLevel=Error -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} ${USER}@${TARGET_DEVICE} mca-dump | jq ${INDENT_OPTION} ${JQ_OPTIONS:-}"
+    echo  "ssh ${SSH_PORT} ${HE_RSA_SSH_KEY_OPTIONS} -o LogLevel=Error -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} ${USER}@${TARGET_DEVICE} mca-dump | jq ${INDENT_OPTION} ${JQ_OPTIONS:-}"
 fi
 
 declare EXIT_CODE=0
@@ -373,11 +390,11 @@ declare OUTPUT=
 declare ERROR_FILE=/tmp/mca-$RANDOM.err
 if [[ -n "${SSHPASS_OPTIONS:-}" ]]; then
 	#shellcheck disable=SC2086
-	OUTPUT=$(runWithTimeout "${TIMEOUT}" sshpass ${SSHPASS_OPTIONS} ssh ${VERBOSE_SSH} ${HE_RSA_SSH_KEY_OPTIONS} -o ConnectTimeout=5 -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} "${USER}@${TARGET_DEVICE}" mca-dump 2> "${ERROR_FILE}")
+	OUTPUT=$(runWithTimeout "${TIMEOUT}" sshpass ${SSHPASS_OPTIONS} ssh ${SSH_PORT} ${VERBOSE_SSH} ${HE_RSA_SSH_KEY_OPTIONS} -o ConnectTimeout=5 -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} "${USER}@${TARGET_DEVICE}" mca-dump 2> "${ERROR_FILE}")
 	EXIT_CODE=$?
 else 
 	#shellcheck disable=SC2086
-	OUTPUT=$(runWithTimeout "${TIMEOUT}" ssh ${VERBOSE_SSH} ${HE_RSA_SSH_KEY_OPTIONS} -o ConnectTimeout=5 -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} "${USER}@${TARGET_DEVICE}" mca-dump  2> "${ERROR_FILE}")
+	OUTPUT=$(runWithTimeout "${TIMEOUT}" ssh  ${SSH_PORT} ${VERBOSE_SSH} ${HE_RSA_SSH_KEY_OPTIONS} -o ConnectTimeout=5 -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} "${USER}@${TARGET_DEVICE}" mca-dump  2> "${ERROR_FILE}")
 	EXIT_CODE=$?
 fi
 
@@ -385,11 +402,11 @@ fi
 if (( EXIT_CODE >=127 && EXIT_CODE != 255 )); then
 	OUTPUT=$(errorJsonWithReason "time out with exit code $EXIT_CODE")
 elif (( EXIT_CODE != 0 )) || [[ -z "${OUTPUT}" ]]; then
-	OUTPUT=$(errorJsonWithReason "$(cat "${ERROR_FILE}"; echo "${OUTPUT}" )")
+	OUTPUT=$(errorJsonWithReason "$(echo "error remote invoking mca-dump-short"; cat "${ERROR_FILE}"; echo "${OUTPUT}" )")
 	EXIT_CODE=1
 else
 	if [[ -n "${JQ_VALIDATOR:-}" ]]; then
-		VALIDATION=$(echo  "${OUTPUT}" | jq "${JQ_VALIDATOR}")
+		VALIDATION=$(echo "${OUTPUT}" | jq "${JQ_VALIDATOR}")
 		EXIT_CODE=$?
 		if [[ -z "${VALIDATION}" ]] || [[ "${VALIDATION}" == "false" ]] || (( EXIT_CODE != 0 )); then
 			OUTPUT=$(errorJsonWithReason "validationError")
@@ -397,37 +414,47 @@ else
 		fi
 	fi
 	if (( EXIT_CODE == 0 )); then
+		errorFile="/tmp/jq$RANDOM$RANDOM.err"
+		input=${OUTPUT}
 		#shellcheck disable=SC2086
-		OUTPUT=$(echo  "${OUTPUT}" | jq ${INDENT_OPTION} "${JQ_OPTIONS}")
+		OUTPUT=$(echo  "${input}" | jq ${INDENT_OPTION} "${JQ_OPTIONS}" 2> $errorFile)
 		EXIT_CODE=$?
 		if (( EXIT_CODE != 0 )) || [[ -z "${OUTPUT}" ]]; then
-			OUTPUT="${ERROR_JSON}"
+			OUTPUT=$(errorJsonWithReason "jq ${INDENT_OPTION} ${JQ_OPTIONS} returned status $EXIT_CODE; $(cat $errorFile); echo input was ${input}")
 			EXIT_CODE=1
 		fi
+		rm $errorFile 2>/dev/null
 	fi
 fi
 rm -f  "${ERROR_FILE}" 2>/dev/null
 
 if (( EXIT_CODE == 0 )) && [[ ${DEVICE_TYPE:-} == 'SWITCH_DISCOVERY' ]]; then
 	wait
-	OUTPUT=$(insertPortNamesIntoJson "$JQ_PROGRAM.jq" "${OUTPUT}")
+	errorFile="/tmp/jq$RANDOM$RANDOM.err"
+	OUTPUT=$(insertPortNamesIntoJson "$JQ_PROGRAM.jq" "${OUTPUT}"  2> $errorFile)
 	CODE=$?
 	if (( CODE != 0 )) || [[ -z "${OUTPUT}" ]]; then
-		OUTPUT="${ERROR_JSON}"
+		OUTPUT=$(errorJsonWithReason "insertPortNamesIntoJson failed; $(cat $errorFile)")
 		EXIT_CODE=1
 	fi
+	rm $errorFile 2>/dev/null
 fi
 
 echo -n "${OUTPUT}"
 
-if [[ -n "${TIMING_FILE:-}" ]]; then
+if [[ -n "${ECHO_OUTPUT:-}" ]]; then
 	END_TIME=$(date +%s)
 	DURATION=$((  END_TIME - START_TIME   ))
-	echo "$(date): ${TARGET_DEVICE} ${DEVICE_TYPE} ${JQ_VALIDATOR:-} : ${DURATION}s - $EXIT_CODE" >> "${TIMING_FILE}" 
+	echo "$(date): ${TARGET_DEVICE}:${TARGET_DEVICE_PORT:-} ${DEVICE_TYPE} ${JQ_VALIDATOR:-} : ${DURATION}s - $EXIT_CODE" >> "${logFile}" 
 	if [[ -n "${ECHO_OUTPUT:-}" ]]; then
-		echo -n "${OUTPUT}" >> "${TIMING_FILE}" 
-		echo >> "${TIMING_FILE}"
+		echo -n "${OUTPUT}" >> "${logFile}" 
+		echo >> "${logFile}"
 	fi
+fi
+
+if (( EXIT_CODE != 0 )); then
+	echo "$(date) $TARGET_DEVICE" >> "${errFile}"
+	echo "${OUTPUT}" >> "${errFile}"
 fi
 
 exit $EXIT_CODE
