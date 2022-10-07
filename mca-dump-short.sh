@@ -363,9 +363,9 @@ elif [[ ${DEVICE_TYPE:-} == 'SWITCH_FEATURE_DISCOVERY' ]]; then
 	fan_level_key_name: \"fan_level\"
 	} ]"
 elif [[ ${DEVICE_TYPE:-} == 'UDMP' ]]; then
-	JQ_OPTIONS='del (.dpi_stats) | del(.fingerprints)'
+	JQ_OPTIONS='del (.dpi_stats) | del(.fingerprints) | del( .network_table[] |  select ( .address == null ))'
 elif [[ ${DEVICE_TYPE:-} == 'USG' ]]; then
-	JQ_OPTIONS='del (.dpi_stats) | del(.fingerprints)'
+	JQ_OPTIONS='del (.dpi_stats) | del(.fingerprints) | del( .network_table[] |  select ( .address == null ))'
 elif [[ ${DEVICE_TYPE:-} == 'CK' ]]; then
 	JQ_OPTIONS='del (.dpi_stats)'
 elif [[ ${DEVICE_TYPE:-} == 'SWITCH_DISCOVERY' ]]; then
