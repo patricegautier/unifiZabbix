@@ -89,7 +89,7 @@ runWithTimeout() {
 }
 
 function errorJsonWithReason() {
-	local reason=$1
+	local reason; reason=$(echo "$1" | tr '\n' ' ')
 	echo '{ "mcaDumpError":"Error", "reason":"'"${reason}"'", "device":"'"${TARGET_DEVICE}"'" }'
 }
 
@@ -454,7 +454,7 @@ fi
 
 if (( EXIT_CODE != 0 )); then
 	echo "$(date) $TARGET_DEVICE" >> "${errFile}"
-	echo "${OUTPUT}" >> "${errFile}"
+	echo "  ${OUTPUT}" >> "${errFile}"
 fi
 
 exit $EXIT_CODE
