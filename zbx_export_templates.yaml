@@ -1109,14 +1109,14 @@ zabbix_export:
                   uuid: 3f72d760eb204eceafe82682fbda16a5
                   expression: 'avg(/Unifi AP/cint[{#RADIO_NAME}],{$UNIFI_ALERT_PERIOD})>{$UNIFI_CHANNEL_INTERFERENCE_AVERAGE_THRESHOLD:"{#RADIO_NAME}"}'
                   name: '{HOST.NAME}  {#RADIO_NAME} Channel Interference > {$UNIFI_CHANNEL_INTERFERENCE_AVERAGE_THRESHOLD:"{#RADIO_NAME}"}%'
-                  opdata: '{$UNIFI_CHANNEL_INTERFERENCE_INFO_THRESHOLD:"{#RADIO_NAME"}'
+                  opdata: '{ITEM.LASTVALUE}'
                   priority: AVERAGE
                   manual_close: 'YES'
                 -
                   uuid: e774c76335834241b15c4e203889e7e0
-                  expression: 'avg(/Unifi AP/cint[{#RADIO_NAME}],{$UNIFI_ALERT_PERIOD})>{$UNIFI_CHANNEL_INTERFERENCE_INFO_THRESHOLD:"{#RADIO_NAME"}'
+                  expression: 'avg(/Unifi AP/cint[{#RADIO_NAME}],{$UNIFI_ALERT_PERIOD})>{$UNIFI_CHANNEL_INTERFERENCE_INFO_THRESHOLD:"{#RADIO_NAME}"}'
                   name: '{HOST.NAME}  {#RADIO_NAME} Channel Interference > {$UNIFI_CHANNEL_INTERFERENCE_INFO_THRESHOLD:"{#RADIO_NAME}"}%'
-                  opdata: '{$UNIFI_CHANNEL_INTERFERENCE_INFO_THRESHOLD:"{#RADIO_NAME"}'
+                  opdata: '{ITEM.LASTVALUE}'
                   priority: INFO
                   manual_close: 'YES'
                   dependencies:
@@ -1174,22 +1174,22 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 9047af0eb978454aab5768341986f29b
-                  expression: 'avg(/Unifi AP/cu_total[{#RADIO_NAME}],{$UNIFI_ALERT_PERIOD})>{$UNIFI_CHANNEL_USAGE_AVERAGE_THRESHOLD:"{#RADIO_NAME"}'
+                  expression: 'avg(/Unifi AP/cu_total[{#RADIO_NAME}],{$UNIFI_ALERT_PERIOD})>{$UNIFI_CHANNEL_USAGE_AVERAGE_THRESHOLD:"{#RADIO_NAME}"}'
                   name: '{HOST.NAME}  {#RADIO_NAME} Channel Utilization > {$UNIFI_CHANNEL_USAGE_AVERAGE_THRESHOLD:"{#RADIO_NAME}"}%'
-                  opdata: '{$UNIFI_CHANNEL_USAGE_INFO_THRESHOLD:"{#RADIO_NAME}"'
+                  opdata: '{ITEM.LASTVALUE}'
                   priority: AVERAGE
                   manual_close: 'YES'
                 -
                   uuid: 69372713ad284b79a905f5942c321b55
                   expression: 'avg(/Unifi AP/cu_total[{#RADIO_NAME}],{$UNIFI_ALERT_PERIOD})>{$UNIFI_CHANNEL_USAGE_INFO_THRESHOLD:"{#RADIO_NAME}"}'
                   name: '{HOST.NAME}  {#RADIO_NAME} Channel Utilization > {$UNIFI_CHANNEL_USAGE_INFO_THRESHOLD:"{#RADIO_NAME}"}%'
-                  opdata: '{$UNIFI_CHANNEL_USAGE_INFO_THRESHOLD:"{#RADIO_NAME}"'
+                  opdata: '{ITEM.LASTVALUE}'
                   priority: INFO
                   manual_close: 'YES'
                   dependencies:
                     -
                       name: '{HOST.NAME}  {#RADIO_NAME} Channel Utilization > {$UNIFI_CHANNEL_USAGE_AVERAGE_THRESHOLD:"{#RADIO_NAME}"}%'
-                      expression: 'avg(/Unifi AP/cu_total[{#RADIO_NAME}],{$UNIFI_ALERT_PERIOD})>{$UNIFI_CHANNEL_USAGE_AVERAGE_THRESHOLD:"{#RADIO_NAME"}'
+                      expression: 'avg(/Unifi AP/cu_total[{#RADIO_NAME}],{$UNIFI_ALERT_PERIOD})>{$UNIFI_CHANNEL_USAGE_AVERAGE_THRESHOLD:"{#RADIO_NAME}"}'
             -
               uuid: 11b74b119dea413ea1152b15a8e3eacb
               name: 'Channel Transmission Utilization {#RADIO_NAME}'
