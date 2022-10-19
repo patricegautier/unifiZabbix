@@ -4,6 +4,13 @@ set -uo pipefail
 
 declare HE_RSA_SSH_KEY_OPTIONS='-o PubkeyAcceptedKeyTypes=+ssh-rsa -o HostKeyAlgorithms=+ssh-rsa'
 
+#AP|SWITCH|SWITCH_FEATURE_DISCOVERY|SWITCH_DISCOVERY|UDMP|USG|CK
+declare -A VALIDATOR_BY_TYPE
+VALIDATOR_BY_TYPE["AP"]=".vap_table? != null and .radio_table != null and ( .radio_table | map(select(.athstats!=null)) | length>0 ) "
+VALIDATOR_BY_TYPE["UDMP"]=".network_table? != null"
+VALIDATOR_BY_TYPE["USG"]="( .network_table? != null ) and ( .network_table | map(select(.mac!=null)) | length>0 )"
+
+
 
 # thanks @zpolisensky for this contribution
 #shellcheck disable=SC2016
@@ -42,10 +49,11 @@ match($0, "^interface [A-z0-9]+$") {
 # for i in 51 52 53 54 55 56 58; do  echo "-------- 192.168.217.$i"; time mca-dump-short.sh -t SWITCH_DISCOVERY -u patrice -d 192.168.217.$i  | jq | grep -E "model|port_desc"; done
 # for i in 50 51 52 53 54 56 59; do  echo "-------- 192.168.207.$i"; time mca-dump-short.sh -t SWITCH_DISCOVERY -u patrice -d 192.168.207.$i  | jq | grep -E "model|port_desc"; done
 
-declare SLEEP_INTERVAL=1
+declare SLEEP_INTERVAL=0.5
+declare TIMEOUT_MULTIPLIER=2   #  1/SLEEP_INTERVAL
 
-runWithTimeout() { 
-    local timeout=$1
+runWithTimeout() {
+    local timeout=$(( $1 * TIMEOUT_MULTIPLIER ))
     if [[ -n "${timeout}" ]]; then
 		shift 
 	
@@ -55,12 +63,12 @@ runWithTimeout() {
 		  trap -- "" SIGTERM
 			( 	
 				#echo "Starting Watchdog with ${timeout}s time out"
-				local elapsed=0
+				local elapsedCount=0
 				local childGone=
-				while (( elapsed < timeout )) && [[ -z "${childGone}" ]]; do
+				while (( elapsedCount < timeout )) && [[ -z "${childGone}" ]]; do
 					sleep $SLEEP_INTERVAL
-					elapsed=$(( elapsed + SLEEP_INTERVAL ))
-					#echo "Waiting for child #${child}:  Elapsed $elapsed"
+					elapsedCount=$(( elapsedCount + 1 ))
+					#echo "Waiting for child #${child}:  Elapsed $elapsedCount"
 					local childPresent; 
 					#shellcheck disable=SC2009
 					childPresent=$(ps -o pid -p ${child} | grep -v PID)
@@ -89,7 +97,7 @@ runWithTimeout() {
 }
 
 function errorJsonWithReason() {
-	local reason; reason=$(echo "$1" | tr '\n' ' ')
+	local reason; reason=$(echo "$1" | tr -d "\"'\n\r" )
 	echo '{ "mcaDumpError":"Error", "reason":"'"${reason}"'", "device":"'"${TARGET_DEVICE}"'" }'
 }
 
@@ -245,7 +253,7 @@ function usage() {
 	fi
 	
 	cat <<- EOF
-	Usage ${0}  -i privateKeyPath -p <passwordFilePath> -u user -v -d targetDevice [-t AP|SWITCH|SWITCH_FEATURE_DISCOVERY|SWITCH_DISCOVERY|UDMP|USG|CK]
+	Usage ${0}  -i privateKeyPath -p <passwordFilePath> -u user -v -d targetDevice [-t AP|SWITCH|SWITCH_FEATURE_DISCOVERY|SWITCH_DISCOVERY|UDMP|USG|CK|WIFI_SITE]
 	  -i specify private public key pair path
 	  -p specify password file path to be passed to sshpass -f. Note if both -i and -p are provided, the password file will be used
 	  -u SSH user name for Unifi device
@@ -311,6 +319,10 @@ if [[ -z "${TARGET_DEVICE:-}" ]]; then
 	usage "Please specify a target device with -d"
 fi
 
+if [[ -z "${DEVICE_TYPE:-}" ]]; then
+	usage "Please specify a device type with -t"
+fi
+
 if [[ "${TARGET_DEVICE_PORT}" == "{\$UNIFI_SSH_PORT}" ]]; then
 	TARGET_DEVICE_PORT=""
 fi
@@ -327,6 +339,10 @@ fi
 if [[ -z "${USER:-}" ]]; then
 	echo "Please specify a username with -u" >&2
 	usage
+fi
+
+if [[ -z "${JQ_VALIDATOR:-}" ]]; then
+	JQ_VALIDATOR=${VALIDATOR_BY_TYPE["${DEVICE_TYPE}"]:-}
 fi
 
 if [[ ${DEVICE_TYPE:-} == 'SWITCH_DISCOVERY' ]]; then
@@ -387,30 +403,29 @@ fi
 
 declare EXIT_CODE=0
 declare OUTPUT=
+declare JSON_OUTPUT=
 declare ERROR_FILE=/tmp/mca-$RANDOM.err
 if [[ -n "${SSHPASS_OPTIONS:-}" ]]; then
 	#shellcheck disable=SC2086
 	OUTPUT=$(runWithTimeout "${TIMEOUT}" sshpass ${SSHPASS_OPTIONS} ssh ${SSH_PORT} ${VERBOSE_SSH} ${HE_RSA_SSH_KEY_OPTIONS} -o ConnectTimeout=5 -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} "${USER}@${TARGET_DEVICE}" mca-dump 2> "${ERROR_FILE}")
-	EXIT_CODE=$?
 else 
 	#shellcheck disable=SC2086
 	OUTPUT=$(runWithTimeout "${TIMEOUT}" ssh  ${SSH_PORT} ${VERBOSE_SSH} ${HE_RSA_SSH_KEY_OPTIONS} -o ConnectTimeout=5 -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} "${USER}@${TARGET_DEVICE}" mca-dump  2> "${ERROR_FILE}")
-	EXIT_CODE=$?
 fi
+EXIT_CODE=$?
+JSON_OUTPUT="${OUTPUT}"
 
 
 if (( EXIT_CODE >=127 && EXIT_CODE != 255 )); then
 	OUTPUT=$(errorJsonWithReason "time out with exit code $EXIT_CODE")
 elif (( EXIT_CODE != 0 )) || [[ -z "${OUTPUT}" ]]; then
 	OUTPUT=$(errorJsonWithReason "$(echo "error remote invoking mca-dump-short"; cat "${ERROR_FILE}"; echo "${OUTPUT}" )")
-	EXIT_CODE=1
 else
 	if [[ -n "${JQ_VALIDATOR:-}" ]]; then
 		VALIDATION=$(echo "${OUTPUT}" | jq "${JQ_VALIDATOR}")
 		EXIT_CODE=$?
 		if [[ -z "${VALIDATION}" ]] || [[ "${VALIDATION}" == "false" ]] || (( EXIT_CODE != 0 )); then
-			OUTPUT=$(errorJsonWithReason "validationError")
-			EXIT_CODE=1
+			OUTPUT=$(errorJsonWithReason "validationError: ${JQ_VALIDATOR}")
 		fi
 	fi
 	if (( EXIT_CODE == 0 )); then
@@ -455,6 +470,9 @@ fi
 if (( EXIT_CODE != 0 )); then
 	echo "$(date) $TARGET_DEVICE" >> "${errFile}"
 	echo "  ${OUTPUT}" >> "${errFile}"
+	if [[ -n "${JSON_OUTPUT}" ]]; then
+		echo "  ${JSON_OUTPUT}" >> "${errFile}"
+	fi
 fi
 
 exit $EXIT_CODE
