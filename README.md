@@ -62,6 +62,8 @@ A couple of things on top of that:
 
 For example a Switch should have 2 templates assigned to it:  Unifi SSH Host and Unifi Switch
 
+UPDATE: It is no longer necessary to assign SSH Host to either APs or Switches;  The corresponding templates are now pulling those values directly.  The number of SSH operations and general load on devices is basically halved with this change, since AP and Switches are the most common devices
+
 <i>(In a perfect world, I would have had the specific templates inherit from that one and all the right items appear that way but Zabbix does not support exporting and reimporting a template hierarchy as of 5.2.  Assigning both templates is the work-around)</i>.  
 
 • <b>Unifi SSH High Priority Host</b> is a variant of the first template with higher alert levels that can be used instead; don't assign both to the same device
