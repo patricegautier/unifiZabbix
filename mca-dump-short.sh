@@ -8,7 +8,7 @@ declare HE_RSA_SSH_KEY_OPTIONS='-o PubkeyAcceptedKeyTypes=+ssh-rsa -o HostKeyAlg
 declare -A VALIDATOR_BY_TYPE
 VALIDATOR_BY_TYPE["AP"]=".vap_table? != null and .radio_table != null and ( .radio_table | map(select(.athstats!=null)) | length>0 ) "
 VALIDATOR_BY_TYPE["UDMP"]=".network_table? != null"
-VALIDATOR_BY_TYPE["USG"]="( .network_table? != null ) and ( .network_table | map(select(.mac!=null)) | length>0 )"
+VALIDATOR_BY_TYPE["USG"]="( .network_table? != null ) and ( .network_table | map(select(.mac!=null)) | length>0 ) and ( ( .[\"system-stats\"].temps | length ) == 4 ) "
 
 
 
