@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-10-19T04:19:21Z'
+  date: '2022-10-21T04:18:29Z'
   template_groups:
     -
       uuid: 15155c95a3d048f4856272ae12fd42c5
@@ -1066,8 +1066,7 @@ zabbix_export:
               type: CHECK_JSON_ERROR
               parameters:
                 - $.mcaDumpError
-              error_handler: CUSTOM_ERROR
-              error_handler_params: mcaDumpError
+              error_handler: DISCARD_VALUE
             -
               type: JSONPATH
               parameters:
@@ -1110,8 +1109,7 @@ zabbix_export:
               type: CHECK_JSON_ERROR
               parameters:
                 - $.mcaDumpError
-              error_handler: CUSTOM_ERROR
-              error_handler_params: mcaDumpError
+              error_handler: DISCARD_VALUE
             -
               type: JSONPATH
               parameters:
@@ -1367,12 +1365,11 @@ zabbix_export:
                   type: CHECK_JSON_ERROR
                   parameters:
                     - $.mcaDumpError
-                  error_handler: CUSTOM_ERROR
-                  error_handler_params: mcaDumpError
+                  error_handler: DISCARD_VALUE
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.vap_table.[ ?(@.essid == "{#ESSID}"  && @.radio == "{#RADIO_NAME}") ].tx_bytes.first()'
+                    - '$.vap_table.[ ?(@.essid == "{#ESSID}"  && @.radio == "{#RADIO_NAME}") ].rx_bytes.first()'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -1411,12 +1408,11 @@ zabbix_export:
                   type: CHECK_JSON_ERROR
                   parameters:
                     - $.mcaDumpError
-                  error_handler: CUSTOM_ERROR
-                  error_handler_params: mcaDumpError
+                  error_handler: DISCARD_VALUE
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.vap_table.[ ?(@.essid == "{#ESSID}"  && @.radio == "{#RADIO_NAME}") ].tx_bytes.sum()'
+                    - '$.vap_table.[ ?(@.essid == "{#ESSID}"  && @.radio == "{#RADIO_NAME}") ].tx_bytes.first()'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -1830,7 +1826,7 @@ zabbix_export:
           delay: '{$UNIFI_CHECK_FREQUENCY}'
           trends: '0'
           value_type: TEXT
-          url: 'https://{HOST.CONN}:7443'
+          url: 'https://{HOST.CONN}'
           retrieve_mode: HEADERS
           triggers:
             -
@@ -5091,7 +5087,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $..temps.CPU.first()
+                - '$.["system-stats"].temps.CPU'
             -
               type: STR_REPLACE
               parameters:
@@ -5119,7 +5115,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $..temps.PHY.first()
+                - '$.["system-stats"].temps.PHY'
             -
               type: STR_REPLACE
               parameters:
@@ -5417,7 +5413,7 @@ zabbix_export:
               uuid: 460c978a4cfb40b1930c4a47dac748e9
               name: '{#ESSID}-{#RADIO_NAME} Total Reception Bandwidth'
               type: CALCULATED
-              key: 'grpsum["{$AP_GROUP}", "rx_bandwidth[{#ESSID}-{#RADIO_NAME}]", avg, {$UNIFI_SMOOTHING_PERIOD}]'
+              key: 'rx_bandwidth[{#ESSID}-{#RADIO_NAME}]'
               value_type: FLOAT
               units: bps
               params: 'sum(avg_foreach(/*/rx_bandwidth[{#ESSID}-{#RADIO_NAME}]?[group="{$AP_GROUP}"],{$UNIFI_SMOOTHING_PERIOD}))'
@@ -5429,7 +5425,7 @@ zabbix_export:
               uuid: c91e55731b9d4dae8fb3d5d1ab8e1cb0
               name: '{#ESSID}-{#RADIO_NAME} Total Transmission Bandwidth'
               type: CALCULATED
-              key: 'grpsum["{$AP_GROUP}", "tx_bandwidth[{#ESSID}-{#RADIO_NAME}]", avg, "{$UNIFI_SMOOTHING_PERIOD}"]'
+              key: 'tx_bandwidth[{#ESSID}-{#RADIO_NAME}]'
               value_type: FLOAT
               units: bps
               params: 'sum(avg_foreach(/*/tx_bandwidth[{#ESSID}-{#RADIO_NAME}]?[group="{$AP_GROUP}"],{$UNIFI_SMOOTHING_PERIOD}))'
@@ -5447,13 +5443,13 @@ zabbix_export:
                   color: 1A7C11
                   item:
                     host: 'Unifi WiFi Site'
-                    key: 'grpsum["{$AP_GROUP}", "rx_bandwidth[{#ESSID}-{#RADIO_NAME}]", avg, {$UNIFI_SMOOTHING_PERIOD}]'
+                    key: 'rx_bandwidth[{#ESSID}-{#RADIO_NAME}]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
                     host: 'Unifi WiFi Site'
-                    key: 'grpsum["{$AP_GROUP}", "tx_bandwidth[{#ESSID}-{#RADIO_NAME}]", avg, "{$UNIFI_SMOOTHING_PERIOD}"]'
+                    key: 'tx_bandwidth[{#ESSID}-{#RADIO_NAME}]'
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}" ]'
           lld_macro_paths:
