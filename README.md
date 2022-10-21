@@ -106,7 +106,7 @@ for UDMPs and AirMax devices, you will need to do it by hand.  *ssh-copy-id* hel
 
 	sudo -u zabbix ssh-copy-id -i <path_to_your_privateKey> yourUserName@oneOfYourUnifiDevicesIP
 
-I have a more sophisticated script I use to do this at https://github.com/patricegautier/certRenewalScripts/blob/master/updatePublicKey.sh
+You can also use updatePublicKey.sh from this repository.
 
 IMPORTANT NOTE:  on some Unifi devices (APs and Switches in particular) the authorized keys are stored not in the usual ~/.ssh/authorized_keys, but in ./var/etc/dropbear/authorized_keys.  If you provision those keys from the controller UI or using the updatePublicKey script above it will hit the right spot, but ssh-copy-id will not
 
