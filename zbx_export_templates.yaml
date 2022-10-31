@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-10-21T04:18:29Z'
+  date: '2022-10-22T01:22:12Z'
   template_groups:
     -
       uuid: 15155c95a3d048f4856272ae12fd42c5
@@ -5385,7 +5385,7 @@ zabbix_export:
           type: CALCULATED
           key: total_reception_wireless_bandwidth
           units: bps
-          params: 'sum(avg_foreach(/*/wireless_reception_bandwidth,15m))'
+          params: 'sum(last_foreach(/*/wireless_reception_bandwidth))'
           tags:
             -
               tag: Application
@@ -5396,7 +5396,7 @@ zabbix_export:
           type: CALCULATED
           key: total_transmission_wireless_bandwidth
           units: bps
-          params: 'sum(avg_foreach(/*/wireless_transmission_bandwidth?[group="{$AP_GROUP}"],{$UNIFI_SMOOTHING_PERIOD}))'
+          params: 'sum(last_foreach(/*/wireless_transmission_bandwidth))'
           tags:
             -
               tag: Application
