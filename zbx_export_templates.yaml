@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-10-22T01:22:12Z'
+  date: '2022-11-04T01:31:38Z'
   template_groups:
     -
       uuid: 15155c95a3d048f4856272ae12fd42c5
@@ -387,7 +387,7 @@ zabbix_export:
       macros:
         -
           macro: '{$SOLARPOINT_CONSUMPTION}'
-          value: '3.3'
+          value: '3.29'
           description: 'how much the device itself consumes'
     -
       uuid: 0a98ef31467349b58d955569f2efc963
@@ -3566,6 +3566,14 @@ zabbix_export:
             -
               tag: Application
               value: Host
+          triggers:
+            -
+              uuid: bfac9fee93424eebbe3a3a3925f56ebc
+              expression: 'last(/Unifi UDMP/cpu,#1)>{$UNIFI_CPU_UTILIZATION_HIGH}'
+              name: '{HOST.NAME} CPU Utilization is > {$UNIFI_CPU_UTILIZATION_HIGH}'
+              opdata: 'last(/Unifi UDMP/cpu,#1)'
+              priority: AVERAGE
+              manual_close: 'YES'
         -
           uuid: 9204754ee4064cdb86e7363d0712bbd3
           name: 'CPU Smooth'
@@ -3822,6 +3830,14 @@ zabbix_export:
                 - $.sys_stats.loadavg_15
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}" ]'
+          triggers:
+            -
+              uuid: 8ba158c318ec4aee9d1351de353b6d9d
+              expression: 'last(/Unifi UDMP/load_avg_15mn,#1)>{$UNIFI_UDMP_LOAD_AVERAGE_HIGH}'
+              name: '{HOST.NAME} load average is > {$UNIFI_UDMP_LOAD_AVERAGE_HIGH}'
+              opdata: 'last(/Unifi UDMP/load_avg_15mn,#1)'
+              priority: WARNING
+              manual_close: 'YES'
         -
           uuid: 0a0bd902e984402bb28fa7e7506f4471
           name: 'Port 53 Abuser Request Raw'
@@ -3849,8 +3865,7 @@ zabbix_export:
               type: CHECK_JSON_ERROR
               parameters:
                 - $.mcaDumpError
-              error_handler: CUSTOM_ERROR
-              error_handler_params: mcaDumpError
+              error_handler: DISCARD_VALUE
           tags:
             -
               tag: Application
@@ -4152,7 +4167,7 @@ zabbix_export:
               uuid: b592d4299ef9482496c585caa936112c
               expression: 'nodata(/Unifi UDMP/uptime,{$UNIFI_ALERT_PERIOD})=1'
               name: '{HOST.NAME} has not report statistics for more than {$UNIFI_ALERT_PERIOD}'
-              priority: WARNING
+              priority: HIGH
               manual_close: 'YES'
         -
           uuid: 8d57c1175b0b4f74b2d0add7c66a4e22
@@ -4292,8 +4307,7 @@ zabbix_export:
               type: CHECK_JSON_ERROR
               parameters:
                 - $.mcaDumpError
-              error_handler: CUSTOM_ERROR
-              error_handler_params: mcaDumpError
+              error_handler: DISCARD_VALUE
             -
               type: JSONPATH
               parameters:
@@ -4435,6 +4449,7 @@ zabbix_export:
               type: CHECK_JSON_ERROR
               parameters:
                 - $.mcaDumpError
+              error_handler: DISCARD_VALUE
             -
               type: JSONPATH
               parameters:
@@ -4649,13 +4664,18 @@ zabbix_export:
               type: CHECK_JSON_ERROR
               parameters:
                 - $.mcaDumpError
-              error_handler: CUSTOM_ERROR
-              error_handler_params: mcaDumpError
+              error_handler: DISCARD_VALUE
             -
               type: JSONPATH
               parameters:
                 - $.port_table
       macros:
+        -
+          macro: '{$UNIFI_CPU_UTILIZATION_HIGH}'
+          value: '75'
+        -
+          macro: '{$UNIFI_UDMP_LOAD_AVERAGE_HIGH}'
+          value: '8'
         -
           macro: '{$UNIFI_USER}'
           value: root
@@ -4947,6 +4967,25 @@ zabbix_export:
                 - $.sys_stats.loadavg_15
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}","-o", "{$UNIFI_CHECK_TIMEOUT}"]'
+          triggers:
+            -
+              uuid: a1ada827db7a4b4cb827072f9cb82436
+              expression: 'last(/Unifi USG/load_avg_15mn,#1)>{$UNIFI_LOAD_AVERAGE_HIGH}'
+              name: '{HOST.NAME} load average is > {$UNIFI_LOAD_AVERAGE_HIGH}'
+              opdata: 'last(/Unifi USG/load_avg_15mn,#1)'
+              priority: AVERAGE
+              manual_close: 'YES'
+            -
+              uuid: 34e34199443f41fea3ba92deea88c5d0
+              expression: 'last(/Unifi USG/load_avg_15mn,#1)>{$UNIFI_LOAD_AVERAGE_MEDIUM}'
+              name: '{HOST.NAME} load average is > {$UNIFI_LOAD_AVERAGE_MEDIUM}'
+              opdata: 'last(/Unifi USG/load_avg_15mn,#1)'
+              priority: WARNING
+              manual_close: 'YES'
+              dependencies:
+                -
+                  name: '{HOST.NAME} load average is > {$UNIFI_LOAD_AVERAGE_HIGH}'
+                  expression: 'last(/Unifi USG/load_avg_15mn,#1)>{$UNIFI_LOAD_AVERAGE_HIGH}'
         -
           uuid: 4503d713fb44413ea199a63178ad08e2
           name: mca-dump-discovery
@@ -5200,7 +5239,7 @@ zabbix_export:
               uuid: 4da4bf931fc3455a9c92a4ff2153518f
               expression: 'nodata(/Unifi USG/uptime,{$UNIFI_ALERT_PERIOD})=1'
               name: '{HOST.NAME} has not reported statistics for {$UNIFI_ALERT_PERIOD}'
-              priority: AVERAGE
+              priority: HIGH
               manual_close: 'YES'
         -
           uuid: 8ea02a18a7b34d388b8189e7182aa386
@@ -5385,7 +5424,7 @@ zabbix_export:
           type: CALCULATED
           key: total_reception_wireless_bandwidth
           units: bps
-          params: 'sum(last_foreach(/*/wireless_reception_bandwidth))'
+          params: 'sum(last_foreach(/*/wireless_reception_bandwidth?[group="{$AP_GROUP}"]))'
           tags:
             -
               tag: Application
@@ -5396,7 +5435,7 @@ zabbix_export:
           type: CALCULATED
           key: total_transmission_wireless_bandwidth
           units: bps
-          params: 'sum(last_foreach(/*/wireless_transmission_bandwidth))'
+          params: 'sum(last_foreach(/*/wireless_transmission_bandwidth?[group="{$AP_GROUP}"]))'
           tags:
             -
               tag: Application
@@ -5416,7 +5455,7 @@ zabbix_export:
               key: 'rx_bandwidth[{#ESSID}-{#RADIO_NAME}]'
               value_type: FLOAT
               units: bps
-              params: 'sum(avg_foreach(/*/rx_bandwidth[{#ESSID}-{#RADIO_NAME}]?[group="{$AP_GROUP}"],{$UNIFI_SMOOTHING_PERIOD}))'
+              params: 'sum(last_foreach(/*/rx_bandwidth[{#ESSID}-{#RADIO_NAME}]?[group="{$AP_GROUP}"]))'
               tags:
                 -
                   tag: Application
@@ -5428,7 +5467,7 @@ zabbix_export:
               key: 'tx_bandwidth[{#ESSID}-{#RADIO_NAME}]'
               value_type: FLOAT
               units: bps
-              params: 'sum(avg_foreach(/*/tx_bandwidth[{#ESSID}-{#RADIO_NAME}]?[group="{$AP_GROUP}"],{$UNIFI_SMOOTHING_PERIOD}))'
+              params: 'sum(last_foreach(/*/tx_bandwidth[{#ESSID}-{#RADIO_NAME}]?[group="{$AP_GROUP}"]))'
               tags:
                 -
                   tag: Application
@@ -5464,8 +5503,7 @@ zabbix_export:
               type: CHECK_JSON_ERROR
               parameters:
                 - $.mcaDumpError
-              error_handler: CUSTOM_ERROR
-              error_handler_params: mcaDumpError
+              error_handler: DISCARD_VALUE
             -
               type: JSONPATH
               parameters:
