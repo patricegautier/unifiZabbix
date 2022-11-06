@@ -6,7 +6,7 @@ declare HE_RSA_SSH_KEY_OPTIONS='-o PubkeyAcceptedKeyTypes=+ssh-rsa -o HostKeyAlg
 
 #AP|SWITCH|SWITCH_FEATURE_DISCOVERY|SWITCH_DISCOVERY|UDMP|USG|CK
 declare -A VALIDATOR_BY_TYPE
-VALIDATOR_BY_TYPE["AP"]=".vap_table? != null and .radio_table != null and ( .radio_table | map(select(.athstats!=null)) | length>0 ) "
+VALIDATOR_BY_TYPE["AP"]=".vap_table? != null and .radio_table != null and ( .radio_table | map(select(.athstats.cu_total>0)) | length>0 ) "
 VALIDATOR_BY_TYPE["UDMP"]=".network_table? != null"
 VALIDATOR_BY_TYPE["USG"]="( .network_table? != null ) and ( .network_table | map(select(.mac!=null)) | length>0 ) and ( ( .[\"system-stats\"].temps | length ) == 4 ) "
 
@@ -52,7 +52,7 @@ match($0, "^interface [A-z0-9]+$") {
 declare SLEEP_INTERVAL=0.5
 declare TIMEOUT_MULTIPLIER=2   #  1/SLEEP_INTERVAL
 
-runWithTimeout() {
+function runWithTimeout() {
     local timeout=$(( $1 * TIMEOUT_MULTIPLIER ))
     if [[ -n "${timeout}" ]]; then
 		shift 
@@ -102,21 +102,23 @@ function errorJsonWithReason() {
 }
 
 function retrievePortNamesInto() {
-	local LOG_FILE=$1
-	local OUTSTREAM="/dev/null"
-	local OPTIONS=
+	local logFile=$1.log
+	local jqFile=$1
+	local outStream="/dev/null"
+	local options=
+	sleep $(( TIMEOUT + 1 )) # This ensures we leave the switch alone while mca-dump proper is processed;  the next invocation will find the result	
  	if [[ -n "${VERBOSE:-}" ]]; then
  		#shellcheck disable=SC2086
  		echo spawn ssh  ${SSH_PORT} ${VERBOSE_SSH} ${HE_RSA_SSH_KEY_OPTIONS} -o LogLevel=Error -o StrictHostKeyChecking=accept-new "${PRIVKEY_OPTION}" "${USER}@${TARGET_DEVICE}"  >&2
  	fi
  	if [[ -n "${VERBOSE_PORT_DISCOVERY:-}" ]]; then
- 		OPTIONS="-d"
- 		OUTSTREAM="/dev/stdout"
+ 		options="-d"
+ 		outStream="/dev/stdout"
  	fi
 
 	
-	/usr/bin/expect ${OPTIONS} > ${OUTSTREAM} <<EOD
-      set timeout 10
+	/usr/bin/expect ${options} > ${outStream} <<EOD
+      set timeout 30
 
       spawn ssh  ${SSH_PORT} ${HE_RSA_SSH_KEY_OPTIONS} -o LogLevel=Error -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} ${USER}@${TARGET_DEVICE}
 	  send -- "\r"
@@ -135,7 +137,7 @@ function retrievePortNamesInto() {
 		  expect -re ".*#"
 		  
 		  send -- "show run\r"
-		  log_file -noappend ${LOG_FILE};
+		  log_file -noappend ${logFile};
 		  expect -re ".*#"
 		  
 		  send -- "exit\r"
@@ -156,7 +158,7 @@ function retrievePortNamesInto() {
 		  expect -re ".*#"
 		  
 		  send -- "show run\r"
-		  log_file -noappend ${LOG_FILE};
+		  log_file -noappend ${logFile};
 		  expect -re ".*#"
 		  
 		  send -- "exit\r"
@@ -173,7 +175,7 @@ function retrievePortNamesInto() {
 	  	}	  	
 	  	
 	  	"USW-Flex\r\n" {
-		  log_file -noappend ${LOG_FILE};
+		  log_file -noappend ${logFile};
 		  send_log "interface 0/1\r\n"
 		  send_log "description 'Port 1'\r\n"
 		  send_log "interface 0/2\r\n"
@@ -196,7 +198,7 @@ function retrievePortNamesInto() {
 		  expect "(UBNT) #"
 		  
 		  send -- "show run\r"
-		  log_file -noappend ${LOG_FILE};
+		  log_file -noappend ${logFile};
 		  expect "(UBNT) #"
 		  
 		  send -- "exit\r"
@@ -211,15 +213,22 @@ function retrievePortNamesInto() {
 		}
 	}
 EOD
-	if [[ -f "$LOG_FILE" ]]; then 
+	local exitCode=$?
+	if (( exitCode != 0 )); then
+		echo "$(date) $TARGET_DEVICE" >> "${errFile}"
+		echo "  retrievePortNamesInto failed - log is in $logFile"
+		exit ${exitCode}
+	fi
+
+	if [[ -f "$logFile" ]]; then 
 		if [[ -n "${VERBOSE:-}" ]]; then
 			echo "Show Run Begin:-----"
-			cat "$LOG_FILE"
+			cat "$logFile"
 			echo "Show Run End:-----"
 		fi
 		#shellcheck disable=SC2002
-		cat "$LOG_FILE" | tr -d '\r' | awk "$PORT_NAMES_AWK" > "${LOG_FILE}.jq"
-		rm -f "$LOG_FILE" 2>/dev/null
+		cat "$logFile" | tr -d '\r' | awk "$PORT_NAMES_AWK" > "${jqFile}"
+		rm -f "$logFile" 2>/dev/null
 	else
 		if [[ -n "${VERBOSE:-}" ]]; then
 			echo "** No Show Run output"
@@ -229,17 +238,23 @@ EOD
 }
 
 function insertPortNamesIntoJson() {
-	local JQ_PROGRAM=$1
-	local JSON=$2
-	if [[ -f "${JQ_PROGRAM}" ]]; then	
+	local -n out=$1
+	local jqProgramFile=$2
+	local json=$3
+	if [[ -n "${VERBOSE:-}" ]]; then
+		echo "jqProgramFile: ${jqProgramFile}"
+	fi
+	if [[ -f "${jqProgramFile}" ]]; then	
 		if [[ -n "${VERBOSE:-}" ]]; then
 			echo "JQ Program:"
-			cat "${JQ_PROGRAM}"
+			cat "${jqProgramFile}"
+			echo
 		fi
-		echo -n "${JSON}" | jq -r "$(cat "${JQ_PROGRAM}")"
-		rm "$JQ_PROGRAM" 2>/dev/null
+		#shellcheck disable=SC2034
+		out=$(echo "${json}" | jq -f "${jqProgramFile}" -r)
+		#rm "$jqProgramFile" 2>/dev/null # we now leave it for the next guy
 	else
-		echo -n "${JSON}"
+		exit 2
 	fi
 }
 
@@ -282,7 +297,7 @@ declare TARGET_DEVICE_PORT=
 declare logFile="/tmp/mcaDumpShort.log"
 declare errFile="/tmp/mcaDumpShort.err"
 declare ECHO_OUTPUT=
-
+declare VERBOSE=
 
 while getopts 'i:u:t:hd:vp:wm:o:OV:U:P:e' OPT
 do
@@ -346,8 +361,14 @@ if [[ -z "${JQ_VALIDATOR:-}" ]]; then
 fi
 
 if [[ ${DEVICE_TYPE:-} == 'SWITCH_DISCOVERY' ]]; then
-	JQ_PROGRAM="/tmp/unifiSWconf-${TARGET_DEVICE}"
-	retrievePortNamesInto "$JQ_PROGRAM" &
+	declare switchDiscoveryDir="/tmp/unifiSwitchDiscovery"
+	mkdir -p "${switchDiscoveryDir}"
+	declare jqProgram="${switchDiscoveryDir}/switchPorts-${TARGET_DEVICE}.jq"
+	#shellcheck disable=SC2034 
+	# o=$(runWithTimeout 60 retrievePortNamesInto "${jqProgram}") &
+	#	nohup needs a cmd-line utility
+	#	nohup runWithTimeout 60 retrievePortNamesInto "${jqProgram}" &
+	(set -m; runWithTimeout 60 retrievePortNamesInto "${jqProgram}" &)
 fi
 
 # {$UNIFI_SSHPASS_PASSWORD_PATH} means the macro didn't resolve in Zabbix
@@ -430,29 +451,37 @@ else
 	fi
 	if (( EXIT_CODE == 0 )); then
 		errorFile="/tmp/jq$RANDOM$RANDOM.err"
-		input=${OUTPUT}
+		jqInput=${OUTPUT}
+		OUTPUT=
 		#shellcheck disable=SC2086
-		OUTPUT=$(echo  "${input}" | jq ${INDENT_OPTION} "${JQ_OPTIONS}" 2> $errorFile)
+		OUTPUT=$(echo  "${jqInput}" | jq ${INDENT_OPTION} "${JQ_OPTIONS}" 2> "${errorFile}")
 		EXIT_CODE=$?
 		if (( EXIT_CODE != 0 )) || [[ -z "${OUTPUT}" ]]; then
-			OUTPUT=$(errorJsonWithReason "jq ${INDENT_OPTION} ${JQ_OPTIONS} returned status $EXIT_CODE; $(cat $errorFile); echo input was ${input}")
+			OUTPUT=$(errorJsonWithReason "jq ${INDENT_OPTION} ${JQ_OPTIONS} returned status $EXIT_CODE; $(cat $errorFile);  JQ input was ${jqInput}")
 			EXIT_CODE=1
 		fi
-		rm $errorFile 2>/dev/null
+		rm "${errorFile}" 2>/dev/null
 	fi
 fi
 rm -f  "${ERROR_FILE}" 2>/dev/null
 
-if (( EXIT_CODE == 0 )) && [[ ${DEVICE_TYPE:-} == 'SWITCH_DISCOVERY' ]]; then
-	wait
-	errorFile="/tmp/jq$RANDOM$RANDOM.err"
-	OUTPUT=$(insertPortNamesIntoJson "$JQ_PROGRAM.jq" "${OUTPUT}"  2> $errorFile)
+if (( EXIT_CODE == 0 )) && [[ "${DEVICE_TYPE:-}" == 'SWITCH_DISCOVERY' ]]; then
+	# do not wait anymore for retrievePortNamesInto
+	# this will ensure we don't time out, but sometimes we will use an older file
+	# wait 
+	errorFile="/tmp/jq${RANDOM}${RANDOM}.err"
+	jqInput="${OUTPUT}"
+	OUTPUT=
+	if [[ -n "${VERBOSE}" ]]; then
+		echo "Port replacement Program: ${jqProgram}"
+	fi
+	insertPortNamesIntoJson OUTPUT "${jqProgram}" "${jqInput}"  2> "${errorFile}"
 	CODE=$?
 	if (( CODE != 0 )) || [[ -z "${OUTPUT}" ]]; then
-		OUTPUT=$(errorJsonWithReason "insertPortNamesIntoJson failed; $(cat $errorFile)")
+		OUTPUT=$(errorJsonWithReason "insertPortNamesIntoJson failed with error code $CODE; $(cat $errorFile)")
 		EXIT_CODE=1
 	fi
-	rm $errorFile 2>/dev/null
+	rm "${errorFile}" 2>/dev/null
 fi
 
 echo -n "${OUTPUT}"

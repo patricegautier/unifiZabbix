@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-11-04T01:31:38Z'
+  date: '2022-11-06T03:11:49Z'
   template_groups:
     -
       uuid: 15155c95a3d048f4856272ae12fd42c5
@@ -798,18 +798,6 @@ zabbix_export:
               tag: Application
               value: Host
         -
-          uuid: 0a6a8fbeb5914c408e3614700e81d6ff
-          name: 'CPU Smooth'
-          type: CALCULATED
-          key: cpu_smooth
-          value_type: FLOAT
-          units: '%'
-          params: 'avg(//cpu,{$UNIFI_SMOOTHING_PERIOD})'
-          tags:
-            -
-              tag: Application
-              value: Host
-        -
           uuid: 3dcc138706314816bb2ddc17c564ac70
           name: Hostname
           type: DEPENDENT
@@ -918,7 +906,6 @@ zabbix_export:
               type: CHECK_JSON_ERROR
               parameters:
                 - $.mcaDumpError
-              error_handler: DISCARD_VALUE
         -
           uuid: f07faffa28cc416483cf089bb94ec20a
           name: 'Memory Utilization'
@@ -1016,14 +1003,6 @@ zabbix_export:
               priority: INFO
               manual_close: 'YES'
         -
-          uuid: 3fef79609a14440e81aaf26bf796e93b
-          name: 'Satisfaction Smooth'
-          type: CALCULATED
-          key: sat_smooth
-          value_type: FLOAT
-          units: '%'
-          params: 'avg(//sat,{$UNIFI_SMOOTHING_PERIOD})'
-        -
           uuid: 1485697ffb9a4544b1b1db86704eafa9
           name: Uptime
           type: DEPENDENT
@@ -1035,8 +1014,7 @@ zabbix_export:
               type: CHECK_JSON_ERROR
               parameters:
                 - $.mcaDumpError
-              error_handler: CUSTOM_ERROR
-              error_handler_params: mcaDumpError
+              error_handler: DISCARD_VALUE
             -
               type: JSONPATH
               parameters:
@@ -1086,18 +1064,6 @@ zabbix_export:
               tag: Application
               value: Radio
         -
-          uuid: 7a4ef25185b94148bd006ddb36ab13d6
-          name: 'Wireless Reception Bandwidth Smooth'
-          type: CALCULATED
-          key: wireless_reception_bandwidth_smooth
-          value_type: FLOAT
-          units: bps
-          params: 'avg(//wireless_reception_bandwidth,{$UNIFI_SMOOTHING_PERIOD})'
-          tags:
-            -
-              tag: Application
-              value: Radio
-        -
           uuid: 7653b935e51940438db00a20e7ede1e2
           name: 'Wireless Transmission Bandwidth'
           type: DEPENDENT
@@ -1124,18 +1090,6 @@ zabbix_export:
                 - '8'
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}" ]'
-          tags:
-            -
-              tag: Application
-              value: Radio
-        -
-          uuid: 28ab515f715446e286ab7a88fe3499d8
-          name: 'Wireless Transmission Bandwidth Smooth'
-          type: CALCULATED
-          key: wireless_transmission_bandwidth_smooth
-          value_type: FLOAT
-          units: bps
-          params: 'avg(//wireless_transmission_bandwidth,{$UNIFI_SMOOTHING_PERIOD})'
           tags:
             -
               tag: Application
@@ -1385,18 +1339,6 @@ zabbix_export:
                   tag: Application
                   value: Radio
             -
-              uuid: 3748f96463d74affa9340b398c34f1a0
-              name: '{#ESSID}-{#RADIO_NAME} Reception Bandwidth Smooth'
-              type: CALCULATED
-              key: 'rx_bandwidth_smooth[{#ESSID}-{#RADIO_NAME}]'
-              value_type: FLOAT
-              units: bps
-              params: 'avg(//rx_bandwidth[{#ESSID}-{#RADIO_NAME}],{$UNIFI_SMOOTHING_PERIOD})'
-              tags:
-                -
-                  tag: Application
-                  value: Radio
-            -
               uuid: b18528ee504149118ecc6aac93c51135
               name: '{#ESSID}-{#RADIO_NAME} Tx Bandwidth'
               type: DEPENDENT
@@ -1423,18 +1365,6 @@ zabbix_export:
                     - '8'
               master_item:
                 key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}" ]'
-              tags:
-                -
-                  tag: Application
-                  value: Radio
-            -
-              uuid: ec606cedd02f45518d7a0c030b25849e
-              name: '{#ESSID}-{#RADIO_NAME} Transmission Bandwidth Smooth'
-              type: CALCULATED
-              key: 'tx_bandwidth_smooth[{#ESSID}-{#RADIO_NAME}]'
-              value_type: FLOAT
-              units: bps
-              params: 'avg(//tx_bandwidth[{#ESSID}-{#RADIO_NAME}],{$UNIFI_SMOOTHING_PERIOD})'
               tags:
                 -
                   tag: Application
@@ -1712,17 +1642,6 @@ zabbix_export:
                 -
                   tag: Application
                   value: Protect
-        -
-          uuid: d3577f5041954f47aba9bb8d5c71668e
-          name: 'Transmission Bandwidth Smooth'
-          type: CALCULATED
-          key: tx_bandwidth_smooth
-          units: bps
-          params: 'avg(//tx_bandwidth,1h)'
-          tags:
-            -
-              tag: Application
-              value: Network
     -
       uuid: cb5f1c2aac8d4779b50187acf329d2a3
       template: 'Unifi Protect Cloud Key'
@@ -2753,7 +2672,6 @@ zabbix_export:
               type: CHECK_JSON_ERROR
               parameters:
                 - $.mcaDumpError
-              error_handler: DISCARD_VALUE
           tags:
             -
               tag: Application
@@ -2772,7 +2690,6 @@ zabbix_export:
               type: CHECK_JSON_ERROR
               parameters:
                 - $.mcaDumpError
-              error_handler: DISCARD_VALUE
           tags:
             -
               tag: Application
@@ -2791,7 +2708,6 @@ zabbix_export:
               type: CHECK_JSON_ERROR
               parameters:
                 - $.mcaDumpError
-              error_handler: DISCARD_VALUE
           tags:
             -
               tag: Application
@@ -2962,8 +2878,7 @@ zabbix_export:
               type: CHECK_JSON_ERROR
               parameters:
                 - $.mcaDumpError
-              error_handler: CUSTOM_ERROR
-              error_handler_params: mcaDumpError
+              error_handler: DISCARD_VALUE
             -
               type: JSONPATH
               parameters:
@@ -3617,18 +3532,6 @@ zabbix_export:
               tag: Application
               value: wan
         -
-          uuid: afe932a0c79e417ca73a2ab03d7b7c51
-          name: 'Download Bandwidth Smooth'
-          type: CALCULATED
-          key: download_bandwidth_smooth
-          value_type: FLOAT
-          units: bps
-          params: 'avg(//download_bandwidth,{$UNIFI_SMOOTHING_PERIOD})'
-          tags:
-            -
-              tag: Application
-              value: wan
-        -
           uuid: 3f6a016441704b88bf6e46b8e7197978
           name: 'Dropped Dowmload Packets'
           type: DEPENDENT
@@ -3865,7 +3768,6 @@ zabbix_export:
               type: CHECK_JSON_ERROR
               parameters:
                 - $.mcaDumpError
-              error_handler: DISCARD_VALUE
           tags:
             -
               tag: Application
@@ -4129,18 +4031,6 @@ zabbix_export:
               tag: Application
               value: wan
         -
-          uuid: 5e6cf6da2cb44182baaba87fe67ca65b
-          name: 'Upload Bandwidth Smooth'
-          type: CALCULATED
-          key: upload_bandwidth_smooth
-          value_type: FLOAT
-          units: bps
-          params: 'avg(//upload_bandwidth,{$UNIFI_SMOOTHING_PERIOD})'
-          tags:
-            -
-              tag: Application
-              value: wan
-        -
           uuid: ba7054579a914ad4aa25941fc192c3aa
           name: Uptime
           type: DEPENDENT
@@ -4152,6 +4042,7 @@ zabbix_export:
               type: CHECK_JSON_ERROR
               parameters:
                 - $.mcaDumpError
+              error_handler: DISCARD_VALUE
             -
               type: JSONPATH
               parameters:
@@ -4187,18 +4078,6 @@ zabbix_export:
                 - '$.if_table.[?(@.latency > 0)].latency.first()'
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}" ]'
-          tags:
-            -
-              tag: Application
-              value: wan
-        -
-          uuid: 1a7dca58d5974370b682310f019b78cf
-          name: 'Wan Latency Smooth'
-          type: CALCULATED
-          key: wan_latency_smooth
-          value_type: FLOAT
-          units: ms
-          params: 'avg(//wan_latency,{$UNIFI_SMOOTHING_PERIOD})'
           tags:
             -
               tag: Application
@@ -4763,18 +4642,6 @@ zabbix_export:
               tag: Application
               value: wan
         -
-          uuid: 06f18573d1074e1ca3e8a3410718f84c
-          name: 'Download Bandwidth Smooth'
-          type: CALCULATED
-          key: download_bandwidth_smooth
-          value_type: FLOAT
-          units: bps
-          params: 'avg(//download_bandwidth,{$UNIFI_SMOOTHING_PERIOD})'
-          tags:
-            -
-              tag: Application
-              value: wan
-        -
           uuid: ecf022ac405d40df9eab71535db74efb
           name: 'Dropped Dowload Packets'
           type: DEPENDENT
@@ -5000,7 +4867,6 @@ zabbix_export:
               type: CHECK_JSON_ERROR
               parameters:
                 - $.mcaDumpError
-              error_handler: DISCARD_VALUE
           tags:
             -
               tag: Application
@@ -5019,7 +4885,6 @@ zabbix_export:
               type: CHECK_JSON_ERROR
               parameters:
                 - $.mcaDumpError
-              error_handler: DISCARD_VALUE
           tags:
             -
               tag: Application
@@ -5199,18 +5064,6 @@ zabbix_export:
               tag: Application
               value: wan
         -
-          uuid: c31da23a358c4c4b91265816b3429db6
-          name: 'Upload Bandwidth Smooth'
-          type: CALCULATED
-          key: upload_bandwidth_smooth
-          value_type: FLOAT
-          units: bps
-          params: 'avg(//upload_bandwidth,{$UNIFI_SMOOTHING_PERIOD})'
-          tags:
-            -
-              tag: Application
-              value: wan
-        -
           uuid: 4a8bde0252204cbe912780251a386e7e
           name: Uptime
           type: DEPENDENT
@@ -5222,8 +5075,7 @@ zabbix_export:
               type: CHECK_JSON_ERROR
               parameters:
                 - $.mcaDumpError
-              error_handler: CUSTOM_ERROR
-              error_handler_params: mcaDumpError
+              error_handler: DISCARD_VALUE
             -
               type: JSONPATH
               parameters:
@@ -5515,25 +5367,6 @@ zabbix_export:
           description: 'The name of the group containing the site MAPs'
   triggers:
     -
-      uuid: 10f0713611da4380a8120294fc928a08
-      expression: 'last(/Unifi Protect Camera/tx_bandwidth_smooth,#1) < last(/Unifi Protect Camera/outgoing_bandwidth_moving_average_threshold_raw,#1) and last(/Unifi Protect Camera/tx_bandwidth,#1) < last(/Unifi Protect Camera/outgoing_bandwidth_moving_average_threshold_raw,#1)'
-      name: 'Camera {HOST.NAME} Outgoing Bandwidth Low'
-      priority: INFO
-      dependencies:
-        -
-          name: 'Camera {HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_PERIOD}'
-          expression: 'max(/Unifi Protect Camera/icmpping[],{$UNIFI_ALERT_PERIOD})=0'
-        -
-          name: 'Camera {HOST.NAME} Outgoing Bandwidth Low'
-          expression: 'avg(/Unifi Protect Camera/tx_bandwidth,10m)<{$PROTECT_LOW_BANDWIDTH}'
-        -
-          name: 'Camera {HOST.NAME} SSH has not been available for more than {$UNIFI_ALERT_PERIOD}'
-          expression: 'nodata(/Unifi Protect Camera/ssh.run[ifconfig],{$UNIFI_ALERT_PERIOD})=1'
-      tags:
-        -
-          tag: Application
-          value: Protect
-    -
       uuid: 986b14fb36e8416ca24d2af88b06b613
       expression: 'avg(/Unifi Protect Cloud Key/IpExtInOctets,3600s) < last(/Unifi Protect Cloud Key/incoming_bandwidth_moving_average_threshold,#1)'
       name: '{HOST.NAME} Incoming Bandwidth Too Low'
@@ -5626,22 +5459,6 @@ zabbix_export:
             host: 'Unifi UDMP'
             key: upload_bandwidth
     -
-      uuid: d09d7d135dfc49d0b35e2a0ed5d2ac20
-      name: Bandwidth
-      graph_items:
-        -
-          sortorder: '1'
-          color: 1A7C11
-          item:
-            host: 'Unifi USG'
-            key: download_bandwidth_smooth
-        -
-          sortorder: '2'
-          color: F63100
-          item:
-            host: 'Unifi USG'
-            key: upload_bandwidth_smooth
-    -
       uuid: 0d21337806de4d03bda1b762c0a98ee4
       name: Bandwidth
       graph_items:
@@ -5673,12 +5490,6 @@ zabbix_export:
           item:
             host: 'Unifi Protect Camera'
             key: tx_bandwidth
-        -
-          sortorder: '3'
-          color: 2774A4
-          item:
-            host: 'Unifi Protect Camera'
-            key: tx_bandwidth_smooth
         -
           sortorder: '4'
           color: A54F10
