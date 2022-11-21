@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-11-06T03:11:49Z'
+  date: '2022-11-21T01:33:37Z'
   template_groups:
     -
       uuid: 15155c95a3d048f4856272ae12fd42c5
@@ -109,7 +109,7 @@ zabbix_export:
           type: CALCULATED
           key: monthly_average_net_power_consumption
           value_type: FLOAT
-          units: Wh
+          units: W
           params: 'avg(//net_power_consumption,30d)'
         -
           uuid: c0ea86e3665c4539b080a94d76d14396
@@ -258,7 +258,7 @@ zabbix_export:
           type: CALCULATED
           key: weekly_average_power_consumption
           value_type: FLOAT
-          units: Wh
+          units: W
           params: 'avg(//net_power_consumption,7d)'
         -
           uuid: de6c4602b739426fafc8dcf5f2e85369
@@ -1479,48 +1479,6 @@ zabbix_export:
                 - \1
           master_item:
             key: 'ssh.run[ifconfig]'
-        -
-          uuid: cdfa6a9fcacd4ec48cebab6137f5a3e7
-          name: 'Outoing Bandwidth Moving Average Threshold'
-          type: DEPENDENT
-          key: outgoing_bandwidth_moving_average_threshold
-          delay: '0'
-          units: Bps
-          preprocessing:
-            -
-              type: IN_RANGE
-              parameters:
-                - '0'
-                - '160000000'
-              error_handler: CUSTOM_VALUE
-              error_handler_params: '8000000'
-          master_item:
-            key: outgoing_bandwidth_moving_average_threshold_raw
-          tags:
-            -
-              tag: Application
-              value: Bandwidth
-        -
-          uuid: f72f7655c36840f0aa07c339921f4e32
-          name: 'Outoing Bandwidth Moving Average Threshold Raw'
-          type: CALCULATED
-          key: outgoing_bandwidth_moving_average_threshold_raw
-          units: Bps
-          params: |
-            ( 
-            last(//tx_bandwidth_smooth,#1:now-1d) +
-            last(//tx_bandwidth_smooth,#1:now-2d) +
-            last(//tx_bandwidth_smooth,#1:now-3d) +
-            last(//tx_bandwidth_smooth,#1:now-4d) +
-            last(//tx_bandwidth_smooth,#1:now-5d) +
-            last(//tx_bandwidth_smooth,#1:now-6d) +
-            last(//tx_bandwidth_smooth,#1:now-7d) 
-            
-            ) /7 * 0.45
-          tags:
-            -
-              tag: Application
-              value: Bandwidth
         -
           uuid: 2cef0436644d43b89057c680ee659c3f
           name: 'Reception Bandwidth'
@@ -4598,18 +4556,6 @@ zabbix_export:
               tag: Application
               value: Host
         -
-          uuid: 4412da02249643e5a550d06ec615fba8
-          name: 'CPU Smooth'
-          type: CALCULATED
-          key: cpu_smooth
-          value_type: FLOAT
-          units: '%'
-          params: 'avg(//cpu,{$UNIFI_SMOOTHING_PERIOD})'
-          tags:
-            -
-              tag: Application
-              value: Host
-        -
           uuid: bd014f86f61b49f9986807955f0ced54
           name: 'Download Bandwidth'
           type: DEPENDENT
@@ -5117,18 +5063,6 @@ zabbix_export:
             -
               tag: Application
               value: wan
-        -
-          uuid: 673fc15b8624479089f70a6c8ab34ba7
-          name: 'Wan Latency Smooth'
-          type: CALCULATED
-          key: wan_latency_smooth
-          value_type: FLOAT
-          units: ms
-          params: 'avg(//wan_latency,{$UNIFI_SMOOTHING_PERIOD})'
-          tags:
-            -
-              tag: Application
-              value: wan
       discovery_rules:
         -
           uuid: feb50bd260ce4553a47bb89eeb5e46e8
@@ -5490,12 +5424,6 @@ zabbix_export:
           item:
             host: 'Unifi Protect Camera'
             key: tx_bandwidth
-        -
-          sortorder: '4'
-          color: A54F10
-          item:
-            host: 'Unifi Protect Camera'
-            key: outgoing_bandwidth_moving_average_threshold_raw
     -
       uuid: dd9c1e7a2b6a44a590a8ce1e131e75ed
       name: 'Bandwidth Used'
@@ -5565,12 +5493,6 @@ zabbix_export:
       uuid: 347ef23ef5a94b629dabcc89b74331a0
       name: 'CPU and Memory'
       graph_items:
-        -
-          sortorder: '1'
-          color: 1A7C11
-          item:
-            host: 'Unifi USG'
-            key: cpu_smooth
         -
           sortorder: '2'
           color: F63100
