@@ -106,7 +106,7 @@ function retrievePortNamesInto() {
 	local jqFile=$1
 	local outStream="/dev/null"
 	local options=
-	sleep $(( TIMEOUT + 1 )) # This ensures we leave the switch alone while mca-dump proper is processed;  the next invocation will find the result	
+	#sleep $(( TIMEOUT + 1 )) # This ensures we leave the switch alone while mca-dump proper is processed;  the next invocation will find the result
  	if [[ -n "${VERBOSE:-}" ]]; then
  		#shellcheck disable=SC2086
  		echo spawn ssh  ${SSH_PORT} ${VERBOSE_SSH} ${HE_RSA_SSH_KEY_OPTIONS} -o LogLevel=Error -o StrictHostKeyChecking=accept-new "${PRIVKEY_OPTION}" "${USER}@${TARGET_DEVICE}"  >&2
@@ -368,7 +368,8 @@ if [[ ${DEVICE_TYPE:-} == 'SWITCH_DISCOVERY' ]]; then
 	# o=$(runWithTimeout 60 retrievePortNamesInto "${jqProgram}") &
 	#	nohup needs a cmd-line utility
 	#	nohup runWithTimeout 60 retrievePortNamesInto "${jqProgram}" &
-	(set -m; runWithTimeout 60 retrievePortNamesInto "${jqProgram}" &)
+	#(set -m; runWithTimeout 60 retrievePortNamesInto "${jqProgram}" &) &
+	runWithTimeout 60 retrievePortNamesInto "${jqProgram}" &
 fi
 
 # {$UNIFI_SSHPASS_PASSWORD_PATH} means the macro didn't resolve in Zabbix
@@ -447,6 +448,7 @@ else
 		EXIT_CODE=$?
 		if [[ -z "${VALIDATION}" ]] || [[ "${VALIDATION}" == "false" ]] || (( EXIT_CODE != 0 )); then
 			OUTPUT=$(errorJsonWithReason "validationError: ${JQ_VALIDATOR}")
+			EXIT_CODE=1
 		fi
 	fi
 	if (( EXIT_CODE == 0 )); then
@@ -498,10 +500,10 @@ fi
 
 if (( EXIT_CODE != 0 )); then
 	echo "$(date) $TARGET_DEVICE" >> "${errFile}"
-	echo "  ${OUTPUT}" >> "${errFile}"
-	if [[ -n "${JSON_OUTPUT}" ]]; then
-		echo "  ${JSON_OUTPUT}" >> "${errFile}"
+	if [[ -n "${VERBOSE}" ]]; then
+		echo "  ${OUTPUT}" >> "${errFile}"
 	fi
+	echo "  ${JSON_OUTPUT}" >> "${errFile}"
 fi
 
 exit $EXIT_CODE
