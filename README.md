@@ -11,7 +11,7 @@ I am currently running those on the current versions of the base software as of 
 
 I am now testing and exporting from zabbix server 6.2.   I am not sure how far backwards compatible those templates are with older versions of Zabbix.  
 
-It may be problematic to import those templates in anything less than 6.2
+It may be problematic to import those templates in anything less than 6.2. A couple of people have asked to have a version based on 6.0.  For now, look at the workaround in https://github.com/patricegautier/unifiZabbix/issues/64
 
 
 ## Install jq and expect on your Zabbix server
@@ -67,10 +67,9 @@ A couple of things on top of that:
 
 For example a Switch should have 2 templates assigned to it:  Unifi SSH Host and Unifi Switch
 
-UPDATE: It is no longer necessary to assign SSH Host to either APs or Switches;  The corresponding templates are now pulling those values directly.  The number of SSH operations and general load on devices is basically halved with this change, since AP and Switches are the most common devices
-
-<i>(In a perfect world, I would have had the specific templates inherit from that one and all the right items appear that way but Zabbix does not support exporting and reimporting a template hierarchy as of 5.2.  Assigning both templates is the work-around)</i>.  
-
+<b>UPDATE</b>: It is no longer necessary to assign SSH Host to APs, Switches, UDMPs or USGs;  The corresponding templates are now pulling those values directly.  The number of SSH operations and general load on devices is basically halved with this change, since AP and Switches are the most common devices.
+ You should still assign this template to NVRs and Cloud Keys.  A future version will remove that requirement as well.
+ 
 • <b>Unifi SSH High Priority Host</b> is a variant of the first template with higher alert levels that can be used instead; don't assign both to the same device
 
 • <b>Unifi Wifi Site</b> is meant to aggregate WiFi traffic across your wifi networks for a Unifi site.  Just assign it to one of the APs that can see all the networks in question and assign the {$AP_GROUP} macro for that host to the name of a zabbix host group that contains all the APs for that site.
