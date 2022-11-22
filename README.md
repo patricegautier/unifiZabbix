@@ -14,13 +14,17 @@ I am now testing and exporting from zabbix server 6.2.   I am not sure how far b
 It may be problematic to import those templates in anything less than 6.2
 
 
-## Install jq on your Zabbix server
+## Install jq and expect on your Zabbix server
 
 You need to install jq on your system: https://stedolan.github.io/jq/
 
 On Raspbian, this can be done with:
 
-	apt-get install jq
+	sudo apt-get install jq
+
+You also need to install expect, again on raspbian that can be done with 
+
+	sudo apt-get install expect
 
 ## Install mca-dump-short and ssh-run scripts as a Zabbix external script
 
@@ -106,7 +110,7 @@ for UDMPs and AirMax devices, you will need to do it by hand.  *ssh-copy-id* hel
 
 	sudo -u zabbix ssh-copy-id -i <path_to_your_privateKey> yourUserName@oneOfYourUnifiDevicesIP
 
-You can also use updatePublicKey.sh from this repository.
+I have a more sophisticated script I use to do this at https://github.com/patricegautier/certRenewalScripts/blob/master/updatePublicKey.sh
 
 IMPORTANT NOTE:  on some Unifi devices (APs and Switches in particular) the authorized keys are stored not in the usual ~/.ssh/authorized_keys, but in ./var/etc/dropbear/authorized_keys.  If you provision those keys from the controller UI or using the updatePublicKey script above it will hit the right spot, but ssh-copy-id will not
 

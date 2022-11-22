@@ -116,7 +116,6 @@ function retrievePortNamesInto() {
  		outStream="/dev/stdout"
  	fi
 
-	
 	/usr/bin/expect ${options} > ${outStream} <<EOD
       set timeout 30
 
@@ -221,11 +220,6 @@ EOD
 	fi
 
 	if [[ -f "$logFile" ]]; then 
-		if [[ -n "${VERBOSE:-}" ]]; then
-			echo "Show Run Begin:-----"
-			cat "$logFile"
-			echo "Show Run End:-----"
-		fi
 		#shellcheck disable=SC2002
 		cat "$logFile" | tr -d '\r' | awk "$PORT_NAMES_AWK" > "${jqFile}"
 		rm -f "$logFile" 2>/dev/null
@@ -241,14 +235,11 @@ function insertPortNamesIntoJson() {
 	local -n out=$1
 	local jqProgramFile=$2
 	local json=$3
-	if [[ -n "${VERBOSE:-}" ]]; then
-		echo "jqProgramFile: ${jqProgramFile}"
-	fi
 	if [[ -f "${jqProgramFile}" ]]; then	
 		if [[ -n "${VERBOSE:-}" ]]; then
-			echo "JQ Program:"
+			echo "jqProgramFile: "
 			cat "${jqProgramFile}"
-			echo
+			echo; echo
 		fi
 		#shellcheck disable=SC2034
 		out=$(echo "${json}" | jq -f "${jqProgramFile}" -r)
@@ -322,6 +313,12 @@ do
   esac
 done
 
+declare EXIT_CODE=0
+declare OUTPUT=
+declare JSON_OUTPUT=
+declare ERROR_FILE=/tmp/mca-$RANDOM.err
+
+
 if [[ -n "${ECHO_OUTPUT:-}" ]]; then
 	START_TIME=$(date +%s)
 fi
@@ -360,17 +357,6 @@ if [[ -z "${JQ_VALIDATOR:-}" ]]; then
 	JQ_VALIDATOR=${VALIDATOR_BY_TYPE["${DEVICE_TYPE}"]:-}
 fi
 
-if [[ ${DEVICE_TYPE:-} == 'SWITCH_DISCOVERY' ]]; then
-	declare switchDiscoveryDir="/tmp/unifiSwitchDiscovery"
-	mkdir -p "${switchDiscoveryDir}"
-	declare jqProgram="${switchDiscoveryDir}/switchPorts-${TARGET_DEVICE}.jq"
-	#shellcheck disable=SC2034 
-	# o=$(runWithTimeout 60 retrievePortNamesInto "${jqProgram}") &
-	#	nohup needs a cmd-line utility
-	#	nohup runWithTimeout 60 retrievePortNamesInto "${jqProgram}" &
-	#(set -m; runWithTimeout 60 retrievePortNamesInto "${jqProgram}" &) &
-	runWithTimeout 60 retrievePortNamesInto "${jqProgram}" &
-fi
 
 # {$UNIFI_SSHPASS_PASSWORD_PATH} means the macro didn't resolve in Zabbix
 if [[ -n "${PASSWORD_FILE_PATH}" ]] && ! [[ "${PASSWORD_FILE_PATH}" == "{\$UNIFI_SSHPASS_PASSWORD_PATH}" ]]; then 
@@ -414,76 +400,91 @@ elif [[ -n "${DEVICE_TYPE:-}" ]]; then
 fi
 	
 
-
-INDENT_OPTION="--indent 0"
-
-
-if [[ -n "${VERBOSE:-}" ]]; then
-	INDENT_OPTION=
-    echo  "ssh ${SSH_PORT} ${HE_RSA_SSH_KEY_OPTIONS} -o LogLevel=Error -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} ${USER}@${TARGET_DEVICE} mca-dump | jq ${INDENT_OPTION} ${JQ_OPTIONS:-}"
+if [[ ${DEVICE_TYPE:-} == 'SWITCH_DISCOVERY' ]]; then
+	declare exp; exp=$(which expect)
+	if [[ -z "${exp}" ]]; then exp=$(ls /usr/bin/expect); fi
+	if [[ -z "${exp}" ]]; then 
+		OUTPUT=$(errorJsonWithReason "please install 'expect' to run SWITCH_DISCOVERY")
+		EXIT_CODE=1
+	else
+		declare switchDiscoveryDir="/tmp/unifiSwitchDiscovery"
+		mkdir -p "${switchDiscoveryDir}"
+		declare jqProgram="${switchDiscoveryDir}/switchPorts-${TARGET_DEVICE}.jq"
+		#shellcheck disable=SC2034 
+		# o=$(runWithTimeout 60 retrievePortNamesInto "${jqProgram}") &
+		#	nohup needs a cmd-line utility
+		#	nohup runWithTimeout 60 retrievePortNamesInto "${jqProgram}" &
+		#(set -m; runWithTimeout 60 retrievePortNamesInto "${jqProgram}" &) &
+		runWithTimeout 60 retrievePortNamesInto "${jqProgram}" &
+	fi
 fi
 
-declare EXIT_CODE=0
-declare OUTPUT=
-declare JSON_OUTPUT=
-declare ERROR_FILE=/tmp/mca-$RANDOM.err
-if [[ -n "${SSHPASS_OPTIONS:-}" ]]; then
-	#shellcheck disable=SC2086
-	OUTPUT=$(runWithTimeout "${TIMEOUT}" sshpass ${SSHPASS_OPTIONS} ssh ${SSH_PORT} ${VERBOSE_SSH} ${HE_RSA_SSH_KEY_OPTIONS} -o ConnectTimeout=5 -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} "${USER}@${TARGET_DEVICE}" mca-dump 2> "${ERROR_FILE}")
-else 
-	#shellcheck disable=SC2086
-	OUTPUT=$(runWithTimeout "${TIMEOUT}" ssh  ${SSH_PORT} ${VERBOSE_SSH} ${HE_RSA_SSH_KEY_OPTIONS} -o ConnectTimeout=5 -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} "${USER}@${TARGET_DEVICE}" mca-dump  2> "${ERROR_FILE}")
-fi
-EXIT_CODE=$?
-JSON_OUTPUT="${OUTPUT}"
+if (( EXIT_CODE == 0 )); then
+
+	INDENT_OPTION="--indent 0"
 
 
-if (( EXIT_CODE >=127 && EXIT_CODE != 255 )); then
-	OUTPUT=$(errorJsonWithReason "time out with exit code $EXIT_CODE")
-elif (( EXIT_CODE != 0 )) || [[ -z "${OUTPUT}" ]]; then
-	OUTPUT=$(errorJsonWithReason "$(echo "error remote invoking mca-dump-short"; cat "${ERROR_FILE}"; echo "${OUTPUT}" )")
-else
-	if [[ -n "${JQ_VALIDATOR:-}" ]]; then
-		VALIDATION=$(echo "${OUTPUT}" | jq "${JQ_VALIDATOR}")
-		EXIT_CODE=$?
-		if [[ -z "${VALIDATION}" ]] || [[ "${VALIDATION}" == "false" ]] || (( EXIT_CODE != 0 )); then
-			OUTPUT=$(errorJsonWithReason "validationError: ${JQ_VALIDATOR}")
-			EXIT_CODE=1
+	if [[ -n "${VERBOSE:-}" ]]; then
+		INDENT_OPTION=
+		echo  "ssh ${SSH_PORT} ${HE_RSA_SSH_KEY_OPTIONS} -o LogLevel=Error -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} ${USER}@${TARGET_DEVICE} mca-dump | jq ${INDENT_OPTION} ${JQ_OPTIONS:-}"
+	fi
+
+
+	if [[ -n "${SSHPASS_OPTIONS:-}" ]]; then
+		#shellcheck disable=SC2086
+		OUTPUT=$(runWithTimeout "${TIMEOUT}" sshpass ${SSHPASS_OPTIONS} ssh ${SSH_PORT} ${VERBOSE_SSH} ${HE_RSA_SSH_KEY_OPTIONS} -o ConnectTimeout=5 -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} "${USER}@${TARGET_DEVICE}" mca-dump 2> "${ERROR_FILE}")
+	else 
+		#shellcheck disable=SC2086
+		OUTPUT=$(runWithTimeout "${TIMEOUT}" ssh  ${SSH_PORT} ${VERBOSE_SSH} ${HE_RSA_SSH_KEY_OPTIONS} -o ConnectTimeout=5 -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} "${USER}@${TARGET_DEVICE}" mca-dump  2> "${ERROR_FILE}")
+	fi
+	EXIT_CODE=$?
+	JSON_OUTPUT="${OUTPUT}"
+
+
+	if (( EXIT_CODE >=127 && EXIT_CODE != 255 )); then
+		OUTPUT=$(errorJsonWithReason "time out with exit code $EXIT_CODE")
+	elif (( EXIT_CODE != 0 )) || [[ -z "${OUTPUT}" ]]; then
+		OUTPUT=$(errorJsonWithReason "$(echo "error remote invoking mca-dump-short"; cat "${ERROR_FILE}"; echo "${OUTPUT}" )")
+	else
+		if [[ -n "${JQ_VALIDATOR:-}" ]]; then
+			VALIDATION=$(echo "${OUTPUT}" | jq "${JQ_VALIDATOR}")
+			EXIT_CODE=$?
+			if [[ -z "${VALIDATION}" ]] || [[ "${VALIDATION}" == "false" ]] || (( EXIT_CODE != 0 )); then
+				OUTPUT=$(errorJsonWithReason "validationError: ${JQ_VALIDATOR}")
+				EXIT_CODE=1
+			fi
+		fi
+		if (( EXIT_CODE == 0 )); then
+			errorFile="/tmp/jq$RANDOM$RANDOM.err"
+			jqInput=${OUTPUT}
+			OUTPUT=
+			#shellcheck disable=SC2086
+			OUTPUT=$(echo  "${jqInput}" | jq ${INDENT_OPTION} "${JQ_OPTIONS}" 2> "${errorFile}")
+			EXIT_CODE=$?
+			if (( EXIT_CODE != 0 )) || [[ -z "${OUTPUT}" ]]; then
+				OUTPUT=$(errorJsonWithReason "jq ${INDENT_OPTION} ${JQ_OPTIONS} returned status $EXIT_CODE; $(cat $errorFile);  JQ input was ${jqInput}")
+				EXIT_CODE=1
+			fi
+			rm "${errorFile}" 2>/dev/null
 		fi
 	fi
-	if (( EXIT_CODE == 0 )); then
-		errorFile="/tmp/jq$RANDOM$RANDOM.err"
-		jqInput=${OUTPUT}
+	rm -f  "${ERROR_FILE}" 2>/dev/null
+
+	if (( EXIT_CODE == 0 )) && [[ "${DEVICE_TYPE:-}" == 'SWITCH_DISCOVERY' ]]; then
+		# do not wait anymore for retrievePortNamesInto
+		# this will ensure we don't time out, but sometimes we will use an older file
+		# wait 
+		errorFile="/tmp/jq${RANDOM}${RANDOM}.err"
+		jqInput="${OUTPUT}"
 		OUTPUT=
-		#shellcheck disable=SC2086
-		OUTPUT=$(echo  "${jqInput}" | jq ${INDENT_OPTION} "${JQ_OPTIONS}" 2> "${errorFile}")
-		EXIT_CODE=$?
-		if (( EXIT_CODE != 0 )) || [[ -z "${OUTPUT}" ]]; then
-			OUTPUT=$(errorJsonWithReason "jq ${INDENT_OPTION} ${JQ_OPTIONS} returned status $EXIT_CODE; $(cat $errorFile);  JQ input was ${jqInput}")
+		insertPortNamesIntoJson OUTPUT "${jqProgram}" "${jqInput}"  2> "${errorFile}"
+		CODE=$?
+		if (( CODE != 0 )) || [[ -z "${OUTPUT}" ]]; then
+			OUTPUT=$(errorJsonWithReason "insertPortNamesIntoJson failed with error code $CODE; $(cat $errorFile)")
 			EXIT_CODE=1
 		fi
 		rm "${errorFile}" 2>/dev/null
 	fi
-fi
-rm -f  "${ERROR_FILE}" 2>/dev/null
-
-if (( EXIT_CODE == 0 )) && [[ "${DEVICE_TYPE:-}" == 'SWITCH_DISCOVERY' ]]; then
-	# do not wait anymore for retrievePortNamesInto
-	# this will ensure we don't time out, but sometimes we will use an older file
-	# wait 
-	errorFile="/tmp/jq${RANDOM}${RANDOM}.err"
-	jqInput="${OUTPUT}"
-	OUTPUT=
-	if [[ -n "${VERBOSE}" ]]; then
-		echo "Port replacement Program: ${jqProgram}"
-	fi
-	insertPortNamesIntoJson OUTPUT "${jqProgram}" "${jqInput}"  2> "${errorFile}"
-	CODE=$?
-	if (( CODE != 0 )) || [[ -z "${OUTPUT}" ]]; then
-		OUTPUT=$(errorJsonWithReason "insertPortNamesIntoJson failed with error code $CODE; $(cat $errorFile)")
-		EXIT_CODE=1
-	fi
-	rm "${errorFile}" 2>/dev/null
 fi
 
 echo -n "${OUTPUT}"
