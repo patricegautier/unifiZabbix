@@ -109,7 +109,7 @@ function retrievePortNamesInto() {
 	#sleep $(( TIMEOUT + 1 )) # This ensures we leave the switch alone while mca-dump proper is processed;  the next invocation will find the result
  	if [[ -n "${VERBOSE:-}" ]]; then
  		#shellcheck disable=SC2086
- 		echo spawn ssh  ${SSH_PORT} ${VERBOSE_SSH} ${HE_RSA_SSH_KEY_OPTIONS} -o LogLevel=Error -o StrictHostKeyChecking=accept-new "${PRIVKEY_OPTION}" "${USER}@${TARGET_DEVICE}"  >&2
+ 		echo ${SSHPASS_OPTIONS} spawn ssh  ${SSH_PORT} ${VERBOSE_SSH} ${HE_RSA_SSH_KEY_OPTIONS} -o LogLevel=Error -o StrictHostKeyChecking=accept-new "${PRIVKEY_OPTION}" "${USER}@${TARGET_DEVICE}"  >&2
  	fi
  	if [[ -n "${VERBOSE_PORT_DISCOVERY:-}" ]]; then
  		options="-d"
@@ -119,7 +119,8 @@ function retrievePortNamesInto() {
 	/usr/bin/expect ${options} > ${outStream} <<EOD
       set timeout 30
 
-      spawn ssh  ${SSH_PORT} ${HE_RSA_SSH_KEY_OPTIONS} -o LogLevel=Error -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} ${USER}@${TARGET_DEVICE}
+      spawn ${SSHPASS_OPTIONS} ssh  ${SSH_PORT} ${HE_RSA_SSH_KEY_OPTIONS} -o LogLevel=Error -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} ${USER}@${TARGET_DEVICE}
+      
 	  send -- "\r"
 
       expect ".*#"
@@ -186,31 +187,52 @@ function retrievePortNamesInto() {
 		  log_file;
 	  	 }
 
-	  	-re ".*\r\n" {
-		  send -- "telnet 127.0.0.1\r"
-		  expect "(UBNT) >"
-		  
-		  send -- "enable\r"
-		  expect "(UBNT) #"
-		  
-		  send -- "terminal length 0\r"
-		  expect "(UBNT) #"
-		  
-		  send -- "show run\r"
-		  log_file -noappend ${logFile};
-		  expect "(UBNT) #"
-		  
-		  send -- "exit\r"
-		  log_file;
-		  expect "(UBNT) >"
+		-re ".*\r\n" { 
+			send -- "telnet 127.0.0.1\r"
+			expect { 
+				"(UBNT) >" { 
+					send -- "enable\r"
+					expect "(UBNT) #" 
 
-		  send -- "exit\r"
-		  expect ".*#"
-		  
-		  send -- "exit\r"
-		  expect eof
+					send -- "terminal length 0\r"
+					expect "(UBNT) #"
+
+					send -- "show run\r" 
+					log_file -noappend ${logFile};
+
+					expect "(UBNT) #" 
+					send -- "exit\r" log_file;
+
+					expect "(UBNT) >"
+					send -- "exit\r"
+
+					expect ".*#" send -- "exit\r"
+					expect eof 
+
+				} 
+				"telnet: not found\r\n" { 
+					send -- "cli\r"
+					expect -re ".*#" 
+
+					send -- "terminal length 0\r"
+					expect -re ".*#" 
+
+					send -- "show run\r" 
+					log_file -noappend ${logFile};
+					expect -re ".*#" 
+				
+					send "exit\r" 
+					log_file;
+					expect -re ".*>"
+				
+					send -- "exit\r" 
+					expect -re ".*#"
+
+					send -- "exit\r" 
+					expect eof 
+				}
+			}
 		}
-	}
 EOD
 	local exitCode=$?
 	if (( exitCode != 0 )); then
@@ -364,7 +386,7 @@ if [[ -n "${PASSWORD_FILE_PATH}" ]] && ! [[ "${PASSWORD_FILE_PATH}" == "{\$UNIFI
 		echo "Password file not found '$PASSWORD_FILE_PATH'"
 		exit 1
 	fi
-	SSHPASS_OPTIONS="-f ${PASSWORD_FILE_PATH} ${VERBOSE_OPTION}"
+	SSHPASS_OPTIONS="sshpass -f ${PASSWORD_FILE_PATH} ${VERBOSE_OPTION}"
 	PRIVKEY_OPTION=
 fi
 
@@ -429,14 +451,8 @@ if (( EXIT_CODE == 0 )); then
 		echo  "ssh ${SSH_PORT} ${HE_RSA_SSH_KEY_OPTIONS} -o LogLevel=Error -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} ${USER}@${TARGET_DEVICE} mca-dump | jq ${INDENT_OPTION} ${JQ_OPTIONS:-}"
 	fi
 
-
-	if [[ -n "${SSHPASS_OPTIONS:-}" ]]; then
-		#shellcheck disable=SC2086
-		OUTPUT=$(runWithTimeout "${TIMEOUT}" sshpass ${SSHPASS_OPTIONS} ssh ${SSH_PORT} ${VERBOSE_SSH} ${HE_RSA_SSH_KEY_OPTIONS} -o ConnectTimeout=5 -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} "${USER}@${TARGET_DEVICE}" mca-dump 2> "${ERROR_FILE}")
-	else 
-		#shellcheck disable=SC2086
-		OUTPUT=$(runWithTimeout "${TIMEOUT}" ssh  ${SSH_PORT} ${VERBOSE_SSH} ${HE_RSA_SSH_KEY_OPTIONS} -o ConnectTimeout=5 -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} "${USER}@${TARGET_DEVICE}" mca-dump  2> "${ERROR_FILE}")
-	fi
+	#shellcheck disable=SC2086
+	OUTPUT=$(runWithTimeout "${TIMEOUT}" ${SSHPASS_OPTIONS} ssh  ${SSH_PORT} ${VERBOSE_SSH} ${HE_RSA_SSH_KEY_OPTIONS} -o ConnectTimeout=5 -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} "${USER}@${TARGET_DEVICE}" mca-dump  2> "${ERROR_FILE}")
 	EXIT_CODE=$?
 	JSON_OUTPUT="${OUTPUT}"
 
