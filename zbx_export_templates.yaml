@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-11-21T01:33:37Z'
+  date: '2022-12-10T00:39:26Z'
   template_groups:
     -
       uuid: 15155c95a3d048f4856272ae12fd42c5
@@ -19,6 +19,9 @@ zabbix_export:
       uuid: 3992b5de5504463d9538197893b1fdbc
       template: 'SunMAX SolarPoint'
       name: 'SunMAX SolarPoint'
+      templates:
+        -
+          name: 'Unsupported Item'
       groups:
         -
           name: 'Unifi Zabbix Export'
@@ -762,6 +765,9 @@ zabbix_export:
         uses mca-dump via ssh to get AP info.
         
         Assign this template to all APs in your site
+      templates:
+        -
+          name: 'Unsupported Item'
       groups:
         -
           name: Patrice
@@ -823,6 +829,18 @@ zabbix_export:
             -
               tag: Application
               value: Host
+        -
+          uuid: aa79c0aace6b4f8bbb7276dd7ccb8055
+          name: ping
+          type: SIMPLE
+          key: 'icmpping[]'
+          triggers:
+            -
+              uuid: 7a5a38bb6cbd477d9c5205eae71f5869
+              expression: 'max(/Unifi AP/icmpping[],{$UNIFI_ALERT_PERIOD})=0'
+              name: 'AP {HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_PERIOD}'
+              priority: WARNING
+              manual_close: 'YES'
         -
           uuid: 7c68c34cc8f64eba86c7ae2ef30efd7f
           name: 'Load Average 1mn'
@@ -1029,9 +1047,13 @@ zabbix_export:
             -
               uuid: b8c15f7c71934ce89958890a93893a3b
               expression: 'nodata(/Unifi AP/uptime,{$UNIFI_ALERT_PERIOD})=1'
-              name: '{HOST.NAME} has not reported statistics in more than {$UNIFI_ALERT_PERIOD}'
+              name: 'AP {HOST.NAME} has not reported statistics in more than {$UNIFI_ALERT_PERIOD}'
               priority: WARNING
               manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'AP {HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_PERIOD}'
+                  expression: 'max(/Unifi AP/icmpping[],{$UNIFI_ALERT_PERIOD})=0'
         -
           uuid: 26900b13cdb742259963690fb57cf251
           name: 'Wireless Reception Bandwidth'
@@ -1417,6 +1439,9 @@ zabbix_export:
       template: 'Unifi Protect Camera'
       name: 'Unifi Protect Camera'
       description: 'Assign this to all the protect cameras to track availability and OS versions'
+      templates:
+        -
+          name: 'Unsupported Item'
       groups:
         -
           name: Unifi
@@ -1976,6 +2001,9 @@ zabbix_export:
       template: 'Unifi SSH High Priority Host'
       name: 'Unifi SSH High Priority Host'
       description: 'Link this template to NVRs and Gateways'
+      templates:
+        -
+          name: 'Unsupported Item'
       groups:
         -
           name: 'Unifi Zabbix Export'
@@ -2231,6 +2259,9 @@ zabbix_export:
         This will work with any SSH host with basic UNIX on the other side really.
         
         Additionally,. this will fill the OS version and the MAC address in the inventory section.
+      templates:
+        -
+          name: 'Unsupported Item'
       groups:
         -
           name: 'Unifi Zabbix Export'
@@ -2483,6 +2514,9 @@ zabbix_export:
       template: 'Unifi Switch'
       name: 'Unifi Switch'
       description: 'Link this template to all Unifi switches'
+      templates:
+        -
+          name: 'Unsupported Item'
       groups:
         -
           name: Patrice
@@ -2559,6 +2593,18 @@ zabbix_export:
             -
               tag: Application
               value: Host
+        -
+          uuid: c2b45cc0a0ad4079879229108e2ef1a6
+          name: ping
+          type: SIMPLE
+          key: 'icmpping[]'
+          triggers:
+            -
+              uuid: a82ac34472b547428f7084e2fb00fd86
+              expression: 'max(/Unifi Switch/icmpping[],{$UNIFI_ALERT_PERIOD})=0'
+              name: 'Switch {HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_PERIOD}'
+              priority: WARNING
+              manual_close: 'YES'
         -
           uuid: 4047c5bb508b454ea435ed14736b573b
           name: 'Load Average 1mn'
@@ -2851,9 +2897,13 @@ zabbix_export:
             -
               uuid: 61975534a4404efa8df675da2609c5f2
               expression: 'nodata(/Unifi Switch/uptime,{$UNIFI_ALERT_PERIOD})=1'
-              name: '{HOST.NAME} has not reported statistics for more than {$UNIFI_ALERT_PERIOD}'
+              name: 'Switch {HOST.NAME} has not reported statistics for more than {$UNIFI_ALERT_PERIOD}'
               priority: WARNING
               manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'Switch {HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_PERIOD}'
+                  expression: 'max(/Unifi Switch/icmpping[],{$UNIFI_ALERT_PERIOD})=0'
       discovery_rules:
         -
           uuid: c63e03a538104cdebad4f428337e2952
@@ -2914,6 +2964,8 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - '$[?(@.has_fan=="true")]'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '[]'
         -
           uuid: 3440ec98490a4b40bcc1dddca0955cb8
           name: 'POE Discovery'
@@ -3003,6 +3055,8 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - '$[?(@.power=="true")]'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '[]'
         -
           uuid: ccacdb7fcb1c41d1a3e58f7a201e6603
           name: 'POE Discovery by Port'
@@ -3063,6 +3117,8 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - '$.port_table[?(@.poe_power>=0)]'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '[]'
         -
           uuid: 2363ae0485a84853af24157aab6ed5f5
           name: 'Switch Port Discovery'
@@ -3396,6 +3452,8 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - '$[?(@.has_temperature=="true")]'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '[]'
       macros:
         -
           macro: '{$UNIFI_LOAD_AVERAGE_HIGH}'
@@ -3408,6 +3466,9 @@ zabbix_export:
       template: 'Unifi UDMP'
       name: 'Unifi UDMP'
       description: 'Link this template to UDMPs'
+      templates:
+        -
+          name: 'Unsupported Item'
       groups:
         -
           name: Patrice
@@ -4290,7 +4351,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.vpn[*].remotes[0]'
+                - '$.vpn[?(@.id =~ "site-to-site")].remotes[0]'
         -
           uuid: c4593426190a422dbdf3341a066c4214
           name: 'Switch Port Discovery'
@@ -4522,6 +4583,9 @@ zabbix_export:
       template: 'Unifi USG'
       name: 'Unifi USG'
       description: 'Link this template to USGs'
+      templates:
+        -
+          name: 'Unsupported Item'
       groups:
         -
           name: Patrice
@@ -4800,11 +4864,11 @@ zabbix_export:
                   name: '{HOST.NAME} load average is > {$UNIFI_LOAD_AVERAGE_HIGH}'
                   expression: 'last(/Unifi USG/load_avg_15mn,#1)>{$UNIFI_LOAD_AVERAGE_HIGH}'
         -
-          uuid: 4503d713fb44413ea199a63178ad08e2
-          name: mca-dump-discovery
+          uuid: 01ee1019a6924fb68849a55218890a6f
+          name: mca-dump
           type: EXTERNAL
-          key: 'mca-dump-short.sh[ "-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}" ]'
-          delay: '{$UNIFI_DISCOVERY_FREQUENCY}'
+          key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}","-o", "{$UNIFI_CHECK_TIMEOUT}"]'
+          delay: '{$UNIFI_CHECK_FREQUENCY}'
           history: '0'
           trends: '0'
           value_type: TEXT
@@ -4818,11 +4882,11 @@ zabbix_export:
               tag: Application
               value: Host
         -
-          uuid: 01ee1019a6924fb68849a55218890a6f
-          name: mca-dump
+          uuid: 4503d713fb44413ea199a63178ad08e2
+          name: mca-dump-discovery
           type: EXTERNAL
-          key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}","-o", "{$UNIFI_CHECK_TIMEOUT}"]'
-          delay: '{$UNIFI_CHECK_FREQUENCY}'
+          key: 'mca-dump-short.sh[ "-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}" ]'
+          delay: '{$UNIFI_DISCOVERY_FREQUENCY}'
           history: '0'
           trends: '0'
           value_type: TEXT
@@ -5299,6 +5363,26 @@ zabbix_export:
           macro: '{$AP_GROUP}'
           value: 'Override me!'
           description: 'The name of the group containing the site MAPs'
+    -
+      uuid: 072f39c9bbcd485ea94a6761aa8e5a5d
+      template: 'Unsupported Item'
+      name: 'Unsupported Item'
+      groups:
+        -
+          name: 'Unifi Zabbix Export'
+      items:
+        -
+          uuid: 7a317b840d1f4692ab882cd7e9edf619
+          name: 'Unsupported Items'
+          type: INTERNAL
+          key: 'zabbix[host,,items_unsupported]'
+          triggers:
+            -
+              uuid: a0e30c37e9954b52a9427de788cdbb2e
+              expression: 'min(/Unsupported Item/zabbix[host,,items_unsupported], {$UNIFI_ALERT_PERIOD})>0'
+              name: '{HOST.NAME} has unsupported items'
+              priority: INFO
+              manual_close: 'YES'
   triggers:
     -
       uuid: 986b14fb36e8416ca24d2af88b06b613
