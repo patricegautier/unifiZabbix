@@ -201,12 +201,15 @@ function retrievePortNamesInto() {
 					log_file -noappend ${logFile};
 
 					expect "(UBNT) #" 
-					send -- "exit\r" log_file;
+					send -- "exit\r"
+					log_file;
 
 					expect "(UBNT) >"
 					send -- "exit\r"
 
-					expect ".*#" send -- "exit\r"
+					expect ".*#" 
+					
+					send -- "exit\r"
 					expect eof 
 
 				} 
@@ -236,8 +239,13 @@ function retrievePortNamesInto() {
 EOD
 	local exitCode=$?
 	if (( exitCode != 0 )); then
-		echo "$(date) $TARGET_DEVICE" >> "${errFile}"
-		echo "  retrievePortNamesInto failed - log is in $logFile"
+		{ 	echo "$(date) $TARGET_DEVICE"; 
+			echo "  retrievePortNamesInto failed with code $exitCode";
+			echo "Full command was mca-dump-short.sh $FULL_ARGS" 
+			if [[ -f "$logFile" ]]; then 
+				cat "$logFile"
+			fi
+		} >> "${errFile}"
 		exit ${exitCode}
 	fi
 
@@ -291,10 +299,10 @@ function usage() {
 	  -v verbose and non compressed output
 	  -w verbose output for port discovery
 	  -o <timeout> max timeout (3s minimum)
-	  -O echoes debug and timing info to /tmp/mcaDumpShort.log; errors are alwasy echoed to /tmp/mcaDumpShort.err
+	  -O echoes debug and timing info to /tmp/mcaDumpShort.log; errors are always echoed to /tmp/mcaDumpShort.err
 	  -V <jqExpression> Provide a JQ expression that must return a non empty output to validate the results. A json error is returned otherwiswe
 	EOF
-	exit 2
+	exit 1
 }
 
 #------------------------------------------------------------------------------------------------
@@ -311,6 +319,7 @@ declare logFile="/tmp/mcaDumpShort.log"
 declare errFile="/tmp/mcaDumpShort.err"
 declare ECHO_OUTPUT=
 declare VERBOSE=
+declare FULL_ARGS="$*"
 
 while getopts 'i:u:t:hd:vp:wm:o:OV:U:P:e' OPT
 do
@@ -515,12 +524,12 @@ if [[ -n "${ECHO_OUTPUT:-}" ]]; then
 	fi
 fi
 
-if (( EXIT_CODE != 0 )); then
-	echo "$(date) $TARGET_DEVICE" >> "${errFile}"
-	if [[ -n "${VERBOSE}" ]]; then
-		echo "  ${OUTPUT}" >> "${errFile}"
-	fi
-	echo "  ${JSON_OUTPUT}" >> "${errFile}"
+if (( EXIT_CODE != 0 )); then {
+	echo "----------------------------------"
+	echo "$(date) $TARGET_DEVICE"
+	echo "  ${OUTPUT}"
+	echo "  ${JSON_OUTPUT}" 
+} >> "${errFile}"
 fi
 
 exit $EXIT_CODE
