@@ -401,7 +401,7 @@ fi
 
 
 if [[ ${DEVICE_TYPE:-} == 'AP' ]]; then
-	JQ_OPTIONS='del (.port_table) | del(.radio_table[].scan_table) | del (.vap_table[].sta_table)'
+	JQ_OPTIONS='del (.port_table) | del(.radio_table[].scan_table) | ( .vap_table[]|= ( .clientCount = ( .sta_table|length ) ) ) | del (.vap_table[].sta_table)'
 elif [[ ${DEVICE_TYPE:-} == 'SWITCH' ]]; then
 	JQ_OPTIONS='del (.port_table[].mac_table)'
 elif [[ ${DEVICE_TYPE:-} == 'SWITCH_FEATURE_DISCOVERY' ]]; then

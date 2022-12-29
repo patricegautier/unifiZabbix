@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-12-10T00:39:26Z'
+  date: '2022-12-29T23:29:26Z'
   template_groups:
     -
       uuid: 15155c95a3d048f4856272ae12fd42c5
@@ -49,6 +49,7 @@ zabbix_export:
               uuid: 6b2607bd0add48f4bcf5e8a6aee1a517
               expression: 'last(/SunMAX SolarPoint/batteryCharge,#1)<5000'
               name: 'Battery Charge is below 50%'
+              opdata: 'last(/SunMAX SolarPoint/batteryCharge,#1)'
               priority: INFO
               manual_close: 'YES'
             -
@@ -85,6 +86,13 @@ zabbix_export:
               expression: 'nodata(/SunMAX SolarPoint/batteryVoltage,{$UNIFI_ALERT_PERIOD})=1'
               name: '{HOST.NAME} has not reported data in more than {$UNIFI_ALERT_PERIOD}'
               priority: WARNING
+        -
+          uuid: 90941e741dfa4b7a847ce07a6560d6eb
+          name: 'Battery charge daily rolling average'
+          type: CALCULATED
+          key: battery_charge_rolling_average
+          value_type: FLOAT
+          params: 'avg(//batteryCharge,1d)'
         -
           uuid: 3ece83b6e20a483bbd40f760d16d3e22
           name: 'Daily Average Net Power Consumption'
@@ -779,6 +787,29 @@ zabbix_export:
           name: 'Unifi Zabbix Export'
       items:
         -
+          uuid: a2688fc87cae4123b83872e829862842
+          name: 'Client Count'
+          type: DEPENDENT
+          key: clientCount
+          delay: '0'
+          units: Clients
+          preprocessing:
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
+              error_handler: DISCARD_VALUE
+            -
+              type: JSONPATH
+              parameters:
+                - '$.vap_table.[*].clientCount.sum()'
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}"]'
+          tags:
+            -
+              tag: Application
+              value: Radio
+        -
           uuid: c0502d070bf24f8481781eed09b02e36
           name: 'CPU Utilization'
           type: DEPENDENT
@@ -798,7 +829,7 @@ zabbix_export:
               parameters:
                 - '$.[''system-stats''].cpu'
           master_item:
-            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}" ]'
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}"]'
           tags:
             -
               tag: Application
@@ -824,7 +855,7 @@ zabbix_export:
               parameters:
                 - $.hostname
           master_item:
-            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}" ]'
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}"]'
           tags:
             -
               tag: Application
@@ -859,7 +890,7 @@ zabbix_export:
               parameters:
                 - '$.[''sys_stats''].loadavg_1'
           master_item:
-            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}" ]'
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}"]'
           tags:
             -
               tag: Application
@@ -882,7 +913,7 @@ zabbix_export:
               parameters:
                 - '$.[''sys_stats''].loadavg_5'
           master_item:
-            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}" ]'
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}"]'
           tags:
             -
               tag: Application
@@ -905,7 +936,7 @@ zabbix_export:
               parameters:
                 - '$.[''sys_stats''].loadavg_15'
           master_item:
-            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}" ]'
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}"]'
           tags:
             -
               tag: Application
@@ -914,7 +945,7 @@ zabbix_export:
           uuid: d5b6cf216295410d8702946b303d9579
           name: mca-dump
           type: EXTERNAL
-          key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}" ]'
+          key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}"]'
           delay: '{$UNIFI_CHECK_FREQUENCY}'
           history: '0'
           trends: '0'
@@ -955,7 +986,7 @@ zabbix_export:
               parameters:
                 - $.sys_stats.mem_total
           master_item:
-            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}" ]'
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}"]'
           tags:
             -
               tag: Application
@@ -979,7 +1010,7 @@ zabbix_export:
               parameters:
                 - $.sys_stats.mem_used
           master_item:
-            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}" ]'
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}"]'
           tags:
             -
               tag: Application
@@ -1008,7 +1039,7 @@ zabbix_export:
                 - '-1'
                 - '100'
           master_item:
-            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}" ]'
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}"]'
           tags:
             -
               tag: Application
@@ -1038,7 +1069,7 @@ zabbix_export:
               parameters:
                 - $.uptime
           master_item:
-            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}" ]'
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}"]'
           tags:
             -
               tag: Application
@@ -1080,7 +1111,7 @@ zabbix_export:
               parameters:
                 - '8'
           master_item:
-            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}" ]'
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}"]'
           tags:
             -
               tag: Application
@@ -1111,7 +1142,7 @@ zabbix_export:
               parameters:
                 - '8'
           master_item:
-            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}" ]'
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}"]'
           tags:
             -
               tag: Application
@@ -1144,7 +1175,7 @@ zabbix_export:
                   parameters:
                     - '$.vap_table[?(@.radio == ''{#RADIO_NAME}'')].channel.first()'
               master_item:
-                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}" ]'
+                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}"]'
               tags:
                 -
                   tag: Application
@@ -1205,7 +1236,7 @@ zabbix_export:
                   parameters:
                     - '$.radio_table[?(@.radio == ''{#RADIO_NAME}'')].athstats.cu_self_rx.first()'
               master_item:
-                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}" ]'
+                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}"]'
               tags:
                 -
                   tag: Application
@@ -1229,7 +1260,7 @@ zabbix_export:
                   parameters:
                     - '$.radio_table[?(@.radio == ''{#RADIO_NAME}'')].athstats.cu_total.first()'
               master_item:
-                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}" ]'
+                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}"]'
               tags:
                 -
                   tag: Application
@@ -1272,7 +1303,7 @@ zabbix_export:
                   parameters:
                     - '$.radio_table[?(@.radio == ''{#RADIO_NAME}'')].athstats.cu_self_tx.first()'
               master_item:
-                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}" ]'
+                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}"]'
               tags:
                 -
                   tag: Application
@@ -1299,13 +1330,13 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}" ]'
+                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}"]'
               tags:
                 -
                   tag: Application
                   value: Radio
           master_item:
-            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}" ]'
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}"]'
           lld_macro_paths:
             -
               lld_macro: '{#RADIO_NAME}'
@@ -1329,6 +1360,29 @@ zabbix_export:
           lifetime: 1d
           description: 'Wifi Network Discovery Rule'
           item_prototypes:
+            -
+              uuid: 6596b148b2d14ce3aca993d8dc1acf5f
+              name: '{#ESSID}-{#RADIO_NAME} Number Of Clients'
+              type: DEPENDENT
+              key: 'num_clients[{#ESSID}-{#RADIO_NAME}]'
+              delay: '0'
+              units: clients
+              preprocessing:
+                -
+                  type: CHECK_JSON_ERROR
+                  parameters:
+                    - $.mcaDumpError
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.vap_table.[ ?(@.essid == "{#ESSID}"  && @.radio == "{#RADIO_NAME}") ].clientCount.first()'
+              master_item:
+                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}"]'
+              tags:
+                -
+                  tag: Application
+                  value: Radio
             -
               uuid: 99af4e53516341b1b4e40d814fe7a258
               name: '{#ESSID}-{#RADIO_NAME} Rx Bandwidth'
@@ -1355,7 +1409,7 @@ zabbix_export:
                   parameters:
                     - '8'
               master_item:
-                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}" ]'
+                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}"]'
               tags:
                 -
                   tag: Application
@@ -1386,7 +1440,7 @@ zabbix_export:
                   parameters:
                     - '8'
               master_item:
-                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}" ]'
+                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}"]'
               tags:
                 -
                   tag: Application
@@ -1394,7 +1448,7 @@ zabbix_export:
           graph_prototypes:
             -
               uuid: 27c2c173f4d24b48b7341f0762c727a4
-              name: '{#ESSID}-{#RADIO_NAME} Bandwidth'
+              name: '{#ESSID}-{#RADIO_NAME} Bandwidth and Clients'
               graph_items:
                 -
                   sortorder: '1'
@@ -1408,8 +1462,16 @@ zabbix_export:
                   item:
                     host: 'Unifi AP'
                     key: 'tx_bandwidth[{#ESSID}-{#RADIO_NAME}]'
+                -
+                  sortorder: '3'
+                  color: '274482'
+                  yaxisside: RIGHT
+                  calc_fnc: ALL
+                  item:
+                    host: 'Unifi AP'
+                    key: 'num_clients[{#ESSID}-{#RADIO_NAME}]'
           master_item:
-            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}" ]'
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}"]'
           lld_macro_paths:
             -
               lld_macro: '{#ESSID}'
@@ -5380,8 +5442,8 @@ zabbix_export:
             -
               uuid: a0e30c37e9954b52a9427de788cdbb2e
               expression: 'min(/Unsupported Item/zabbix[host,,items_unsupported], {$UNIFI_ALERT_PERIOD})>0'
-              name: '{HOST.NAME} has unsupported items'
-              priority: INFO
+              name: '{HOST.NAME} has unsupported item(s)'
+              opdata: 'min(/Unsupported Item/zabbix[host,,items_unsupported], {$UNIFI_ALERT_PERIOD})'
               manual_close: 'YES'
   triggers:
     -
@@ -5477,22 +5539,6 @@ zabbix_export:
             host: 'Unifi UDMP'
             key: upload_bandwidth
     -
-      uuid: 0d21337806de4d03bda1b762c0a98ee4
-      name: Bandwidth
-      graph_items:
-        -
-          sortorder: '1'
-          color: 1A7C11
-          item:
-            host: 'Unifi AP'
-            key: wireless_reception_bandwidth
-        -
-          sortorder: '2'
-          color: F63100
-          item:
-            host: 'Unifi AP'
-            key: wireless_transmission_bandwidth
-    -
       uuid: fad2952510f34a4897c8194393d3e6e3
       name: Bandwidth
       graph_items:
@@ -5508,6 +5554,30 @@ zabbix_export:
           item:
             host: 'Unifi Protect Camera'
             key: tx_bandwidth
+    -
+      uuid: 0d21337806de4d03bda1b762c0a98ee4
+      name: 'Bandwidth and Clients'
+      graph_items:
+        -
+          sortorder: '1'
+          color: 1A7C11
+          item:
+            host: 'Unifi AP'
+            key: wireless_reception_bandwidth
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Unifi AP'
+            key: wireless_transmission_bandwidth
+        -
+          sortorder: '3'
+          color: '274482'
+          yaxisside: RIGHT
+          calc_fnc: ALL
+          item:
+            host: 'Unifi AP'
+            key: clientCount
     -
       uuid: dd9c1e7a2b6a44a590a8ce1e131e75ed
       name: 'Bandwidth Used'
