@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-12-29T23:29:26Z'
+  date: '2023-01-01T00:00:48Z'
   template_groups:
     -
       uuid: 15155c95a3d048f4856272ae12fd42c5
@@ -787,12 +787,12 @@ zabbix_export:
           name: 'Unifi Zabbix Export'
       items:
         -
-          uuid: a2688fc87cae4123b83872e829862842
+          uuid: e63c657c75794479a6ce8a5ef1c676e9
           name: 'Client Count'
           type: DEPENDENT
-          key: clientCount
+          key: client_count
           delay: '0'
-          units: Clients
+          units: clients
           preprocessing:
             -
               type: CHECK_JSON_ERROR
@@ -1362,9 +1362,9 @@ zabbix_export:
           item_prototypes:
             -
               uuid: 6596b148b2d14ce3aca993d8dc1acf5f
-              name: '{#ESSID}-{#RADIO_NAME} Number Of Clients'
+              name: '{#ESSID}-{#RADIO_NAME} Client Count'
               type: DEPENDENT
-              key: 'num_clients[{#ESSID}-{#RADIO_NAME}]'
+              key: 'client_count[{#ESSID}-{#RADIO_NAME}]'
               delay: '0'
               units: clients
               preprocessing:
@@ -1469,7 +1469,7 @@ zabbix_export:
                   calc_fnc: ALL
                   item:
                     host: 'Unifi AP'
-                    key: 'num_clients[{#ESSID}-{#RADIO_NAME}]'
+                    key: 'client_count[{#ESSID}-{#RADIO_NAME}]'
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}"]'
           lld_macro_paths:
@@ -5312,6 +5312,17 @@ zabbix_export:
           name: 'Unifi Zabbix Export'
       items:
         -
+          uuid: 08c05c41551148dabe5437bc729f0564
+          name: 'Client Count'
+          type: CALCULATED
+          key: client_count
+          units: clients
+          params: 'sum(last_foreach(/*/client_count?[group="{$AP_GROUP}"]))'
+          tags:
+            -
+              tag: Application
+              value: Radio
+        -
           uuid: 24671ab8f5d44096b16f5e5b1dcb9326
           name: mca-dump
           type: EXTERNAL
@@ -5361,6 +5372,18 @@ zabbix_export:
           delay: '0'
           item_prototypes:
             -
+              uuid: 5dec0a594c78406db461df4bb2d5152f
+              name: '{#ESSID}-{#RADIO_NAME} Client Count'
+              type: CALCULATED
+              key: 'client_count[{#ESSID}-{#RADIO_NAME}]'
+              value_type: FLOAT
+              units: clients
+              params: 'sum(last_foreach(/*/client_count[{#ESSID}-{#RADIO_NAME}]?[group="{$AP_GROUP}"]))'
+              tags:
+                -
+                  tag: Application
+                  value: Radio
+            -
               uuid: 460c978a4cfb40b1930c4a47dac748e9
               name: '{#ESSID}-{#RADIO_NAME} Total Reception Bandwidth'
               type: CALCULATED
@@ -5401,6 +5424,16 @@ zabbix_export:
                   item:
                     host: 'Unifi WiFi Site'
                     key: 'tx_bandwidth[{#ESSID}-{#RADIO_NAME}]'
+            -
+              uuid: ebba8b69c09749c0a5691cfd147bdac5
+              name: '{#ESSID}-{#RADIO_NAME}  Clients'
+              graph_items:
+                -
+                  color: 1A7C11
+                  calc_fnc: ALL
+                  item:
+                    host: 'Unifi WiFi Site'
+                    key: 'client_count[{#ESSID}-{#RADIO_NAME}]'
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}" ]'
           lld_macro_paths:
@@ -5570,14 +5603,6 @@ zabbix_export:
           item:
             host: 'Unifi AP'
             key: wireless_transmission_bandwidth
-        -
-          sortorder: '3'
-          color: '274482'
-          yaxisside: RIGHT
-          calc_fnc: ALL
-          item:
-            host: 'Unifi AP'
-            key: clientCount
     -
       uuid: dd9c1e7a2b6a44a590a8ce1e131e75ed
       name: 'Bandwidth Used'
@@ -5611,6 +5636,17 @@ zabbix_export:
           item:
             host: 'SunMAX SolarPoint'
             key: batteryVoltage
+    -
+      uuid: 681748e7fc8c4bde954dca81adc5a453
+      name: Clients
+      ymin_type_1: FIXED
+      graph_items:
+        -
+          color: 1A7C11
+          calc_fnc: ALL
+          item:
+            host: 'Unifi WiFi Site'
+            key: client_count
     -
       uuid: f7f3c8e61e564d0d9f8057f70d9c0072
       name: 'CPU and Memory'
