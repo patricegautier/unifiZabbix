@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2023-01-01T01:39:32Z'
+  date: '2023-01-07T21:59:16Z'
   template_groups:
     -
       uuid: 15155c95a3d048f4856272ae12fd42c5
@@ -57,6 +57,10 @@ zabbix_export:
               expression: 'last(/SunMAX SolarPoint/batteryCharge,#1)<2500'
               name: 'Bettery Charge is below 25%'
               priority: WARNING
+              dependencies:
+                -
+                  name: 'Battery Charge is below 50%'
+                  expression: 'last(/SunMAX SolarPoint/batteryCharge,#1)<5000'
         -
           uuid: 91ff5c8032bd4589895de0596d34aa7b
           name: 'Battery Voltage'
@@ -379,7 +383,7 @@ zabbix_export:
                   uuid: 7bd866530508400d99031acd429303f9
                   expression: 'last(/SunMAX SolarPoint/port__suspended_[{#PORT_NAME}],#1)="true"'
                   name: '{#PORT_NAME} Port is Suspended'
-                  priority: WARNING
+                  priority: AVERAGE
           master_item:
             key: 'solarpointBattery.sh["-u", "{$SOLARPOINT_USERNAME}", "-p", "{$SOLARPOINT_PASSWORD}", {HOST.CONN}]'
           lld_macro_paths:
@@ -869,7 +873,7 @@ zabbix_export:
             -
               uuid: 7a5a38bb6cbd477d9c5205eae71f5869
               expression: 'max(/Unifi AP/icmpping[],{$UNIFI_ALERT_PERIOD})=0'
-              name: 'AP {HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_PERIOD}'
+              name: '{HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_PERIOD}'
               priority: WARNING
               manual_close: 'YES'
         -
@@ -1083,7 +1087,7 @@ zabbix_export:
               manual_close: 'YES'
               dependencies:
                 -
-                  name: 'AP {HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_PERIOD}'
+                  name: '{HOST.NAME} has not been pingable for more than {$UNIFI_ALERT_PERIOD}'
                   expression: 'max(/Unifi AP/icmpping[],{$UNIFI_ALERT_PERIOD})=0'
         -
           uuid: 26900b13cdb742259963690fb57cf251
@@ -3566,7 +3570,7 @@ zabbix_export:
             -
               uuid: bfac9fee93424eebbe3a3a3925f56ebc
               expression: 'last(/Unifi UDMP/cpu,#1)>{$UNIFI_CPU_UTILIZATION_HIGH}'
-              name: '{HOST.NAME} CPU Utilization is > {$UNIFI_CPU_UTILIZATION_HIGH}'
+              name: '{HOST.NAME} CPU Utilization is > {$UNIFI_CPU_UTILIZATION_HIGH}%'
               opdata: 'last(/Unifi UDMP/cpu,#1)'
               priority: AVERAGE
               manual_close: 'YES'
@@ -3606,6 +3610,11 @@ zabbix_export:
               type: MULTIPLIER
               parameters:
                 - '8'
+            -
+              type: IN_RANGE
+              parameters:
+                - '0'
+                - '10000000000'
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
           tags:
@@ -4105,6 +4114,11 @@ zabbix_export:
               type: MULTIPLIER
               parameters:
                 - '8'
+            -
+              type: IN_RANGE
+              parameters:
+                - '0'
+                - '10000000000'
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
           tags:
@@ -4500,6 +4514,12 @@ zabbix_export:
                   type: MULTIPLIER
                   parameters:
                     - '8'
+                -
+                  type: IN_RANGE
+                  parameters:
+                    - '0'
+                    - '100000000000'
+                  error_handler: DISCARD_VALUE
               master_item:
                 key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
               tags:
@@ -4532,6 +4552,12 @@ zabbix_export:
                   type: MULTIPLIER
                   parameters:
                     - '8'
+                -
+                  type: IN_RANGE
+                  parameters:
+                    - '0'
+                    - '100000000000'
+                  error_handler: DISCARD_VALUE
               master_item:
                 key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
               tags:
