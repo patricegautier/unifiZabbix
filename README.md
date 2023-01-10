@@ -43,7 +43,7 @@ and the same for ssh-run
 
 ## Import the Unifi templates into Zabbix
 
-Import zbx_export_templates.xml into Zabbix, from Configuration > Templates > Import
+Import zbx_export_templates.yaml into Zabbix, from Configuration > Templates > Import
 
 You should now have the following templates available, and it should be pretty self explanatory what type of device you need to link them to in Zabbix.
 
@@ -241,7 +241,7 @@ You can customize this for 2G/5G with {$UNIFI_CHANNEL_USAGE_INFO_THRESHOLD:"ng"}
 ### {$UNIFI_PORT_USAGE_AVERAGE_THRESHOLD}
 The percentages above which to issue and info/average event for switch Port usage.  I have this set to 40, 60 and 50 respectively
 
-
+Note: those macros do not come with the import, you have to create them by hand;  they will survive subsequent imports..
 
 
 
