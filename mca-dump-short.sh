@@ -98,7 +98,8 @@ function runWithTimeout() {
 
 function errorJsonWithReason() {
 	local reason; reason=$(echo "$1" | tr -d "\"'\n\r" )
-	echo '{ "mcaDumpError":"Error", "reason":"'"${reason}"'", "device":"'"${TARGET_DEVICE}"'" }'
+	local t; t=$(date)
+	echo '{ "reason":"'"${reason}"'", "time":"'"${t}"'", "device":"'"${TARGET_DEVICE}"'", "mcaDumpError":"Error" }'
 }
 
 function retrievePortNamesInto() {
@@ -127,28 +128,8 @@ function retrievePortNamesInto() {
 	  send -- "cat /etc/board.info | grep board.name | cut -d'=' -f2\r"
       expect ".*\r\n"
 	  expect {
-	  	"USW-Flex-XG\r\n" { 
-		  expect -re ".*#"
 
-		  send -- "telnet 127.0.0.1\r\r"
-		  expect -re ".*#"
-		  
-		  send -- "terminal datadump\r"
-		  expect -re ".*#"
-		  
-		  send -- "show run\r"
-		  log_file -noappend ${logFile};
-		  expect -re ".*#"
-		  
-		  send -- "exit\r"
-		  log_file;
-		  expect -re ".*#"
-
-		  send -- "exit\r" 
-		  expect eof
-	  	}
-	  	
-	  	"USW-Aggregation\r\n" { 
+	  	-re "(USW-Aggregation|USW-Flex-XG)\r\n" { 
 		  expect -re ".*#"
 
 		  send -- "cli\r"
@@ -162,16 +143,7 @@ function retrievePortNamesInto() {
 		  expect -re ".*#"
 		  
 		  send -- "exit\r"
-		  log_file;
-		  expect -re ".*>"
 
-		  send -- "exit\r"
-		  expect -re ".*#"
-
-		  
-		  send -- "exit\r"
-		  expect eof
-		  
 	  	}	  	
 	  	
 	  	"USW-Flex\r\n" {
@@ -202,15 +174,6 @@ function retrievePortNamesInto() {
 
 					expect "(UBNT) #" 
 					send -- "exit\r"
-					log_file;
-
-					expect "(UBNT) >"
-					send -- "exit\r"
-
-					expect ".*#" 
-					
-					send -- "exit\r"
-					expect eof 
 
 				} 
 				"telnet: not found\r\n" { 
@@ -225,14 +188,6 @@ function retrievePortNamesInto() {
 					expect -re ".*#" 
 				
 					send "exit\r" 
-					log_file;
-					expect -re ".*>"
-				
-					send -- "exit\r" 
-					expect -re ".*#"
-
-					send -- "exit\r" 
-					expect eof 
 				}
 			}
 		}
@@ -300,7 +255,8 @@ function usage() {
 	  -w verbose output for port discovery
 	  -o <timeout> max timeout (3s minimum)
 	  -O echoes debug and timing info to /tmp/mcaDumpShort.log; errors are always echoed to /tmp/mcaDumpShort.err
-	  -V <jqExpression> Provide a JQ expression that must return a non empty output to validate the results. A json error is returned otherwiswe
+	  -V <jqExpression> Provide a JQ expression that must return a non empty output to validate the results. A json error is returned otherwise
+	  -b run SSH in batch mode (do not ask for passwords)
 	EOF
 	exit 1
 }
@@ -320,8 +276,9 @@ declare errFile="/tmp/mcaDumpShort.err"
 declare ECHO_OUTPUT=
 declare VERBOSE=
 declare FULL_ARGS="$*"
+declare BATCH_MODE=
 
-while getopts 'i:u:t:hd:vp:wm:o:OV:U:P:e' OPT
+while getopts 'i:u:t:hd:vp:wm:o:OV:U:P:eb' OPT
 do
   case $OPT in
     i) PRIVKEY_OPTION="-i "${OPTARG} ;;
@@ -336,6 +293,7 @@ do
     o) TIMEOUT=$(( OPTARG-1 )) ;;
     O) ECHO_OUTPUT=true ;;
     V) JQ_VALIDATOR=${OPTARG} ;;
+    b) BATCH_MODE="-o BatchMode=yes" ;;
     e) echo -n "$(errorJsonWithReason "simulated error")"; exit 1 ;;
     U)  if [[ -n "${OPTARG}" ]] &&  [[ "${OPTARG}" != "{\$UNIFI_VERBOSE_SSH}" ]]; then
     		VERBOSE_SSH="${OPTARG}"
@@ -457,19 +415,19 @@ if (( EXIT_CODE == 0 )); then
 
 	if [[ -n "${VERBOSE:-}" ]]; then
 		INDENT_OPTION=
-		echo  "ssh ${SSH_PORT} ${HE_RSA_SSH_KEY_OPTIONS} -o LogLevel=Error -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} ${USER}@${TARGET_DEVICE} mca-dump | jq ${INDENT_OPTION} ${JQ_OPTIONS:-}"
+		echo  "ssh ${SSH_PORT} ${HE_RSA_SSH_KEY_OPTIONS} ${BATCH_MODE} -o LogLevel=Error -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} ${USER}@${TARGET_DEVICE} mca-dump | jq ${INDENT_OPTION} ${JQ_OPTIONS:-}"
 	fi
 
 	#shellcheck disable=SC2086
-	OUTPUT=$(runWithTimeout "${TIMEOUT}" ${SSHPASS_OPTIONS} ssh  ${SSH_PORT} ${VERBOSE_SSH} ${HE_RSA_SSH_KEY_OPTIONS} -o ConnectTimeout=5 -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} "${USER}@${TARGET_DEVICE}" mca-dump  2> "${ERROR_FILE}")
+	OUTPUT=$(runWithTimeout "${TIMEOUT}" ${SSHPASS_OPTIONS} ssh  ${SSH_PORT} ${VERBOSE_SSH} ${HE_RSA_SSH_KEY_OPTIONS} ${BATCH_MODE} -o ConnectTimeout=5 -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} "${USER}@${TARGET_DEVICE}" mca-dump  2> "${ERROR_FILE}")
 	EXIT_CODE=$?
 	JSON_OUTPUT="${OUTPUT}"
 
 
 	if (( EXIT_CODE >=127 && EXIT_CODE != 255 )); then
-		OUTPUT=$(errorJsonWithReason "time out with exit code $EXIT_CODE")
+		OUTPUT=$(errorJsonWithReason "timeout ($EXIT_CODE)")
 	elif (( EXIT_CODE != 0 )) || [[ -z "${OUTPUT}" ]]; then
-		OUTPUT=$(errorJsonWithReason "$(echo "error remote invoking mca-dump-short"; cat "${ERROR_FILE}"; echo "${OUTPUT}" )")
+		OUTPUT=$(errorJsonWithReason "$(echo "Error remote invoking mca-dump-short: "; cat "${ERROR_FILE}"; echo "${OUTPUT}" )")
 	else
 		if [[ -n "${JQ_VALIDATOR:-}" ]]; then
 			VALIDATION=$(echo "${OUTPUT}" | jq "${JQ_VALIDATOR}")
@@ -512,7 +470,6 @@ if (( EXIT_CODE == 0 )); then
 	fi
 fi
 
-echo -n "${OUTPUT}"
 
 if [[ -n "${ECHO_OUTPUT:-}" ]]; then
 	END_TIME=$(date +%s)
@@ -531,6 +488,9 @@ if (( EXIT_CODE != 0 )); then {
 	echo "  ${JSON_OUTPUT}" 
 } >> "${errFile}"
 fi
+
+echo "${OUTPUT}"
+
 
 exit $EXIT_CODE
 
