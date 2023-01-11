@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2023-01-07T21:59:16Z'
+  date: '2023-01-11T02:34:39Z'
   template_groups:
     -
       uuid: 15155c95a3d048f4856272ae12fd42c5
@@ -46,21 +46,21 @@ zabbix_export:
               value: Battery
           triggers:
             -
+              uuid: 779c1fdbf6d848988411e38c8f70cc3e
+              expression: 'last(/SunMAX SolarPoint/batteryCharge,#1)<2500'
+              name: 'Battery Charge is below 25%'
+              priority: WARNING
+              dependencies:
+                -
+                  name: 'Battery Charge is below 50%'
+                  expression: 'last(/SunMAX SolarPoint/batteryCharge,#1)<5000'
+            -
               uuid: 6b2607bd0add48f4bcf5e8a6aee1a517
               expression: 'last(/SunMAX SolarPoint/batteryCharge,#1)<5000'
               name: 'Battery Charge is below 50%'
               opdata: 'last(/SunMAX SolarPoint/batteryCharge,#1)'
               priority: INFO
               manual_close: 'YES'
-            -
-              uuid: 779c1fdbf6d848988411e38c8f70cc3e
-              expression: 'last(/SunMAX SolarPoint/batteryCharge,#1)<2500'
-              name: 'Bettery Charge is below 25%'
-              priority: WARNING
-              dependencies:
-                -
-                  name: 'Battery Charge is below 50%'
-                  expression: 'last(/SunMAX SolarPoint/batteryCharge,#1)<5000'
         -
           uuid: 91ff5c8032bd4589895de0596d34aa7b
           name: 'Battery Voltage'
@@ -2634,32 +2634,6 @@ zabbix_export:
               tag: Application
               value: Host
         -
-          uuid: 3aab4c5928fe428eaa68c3ded3c966d8
-          name: Hostname
-          type: DEPENDENT
-          key: hostname
-          delay: '0'
-          trends: '0'
-          value_type: TEXT
-          inventory_link: NAME
-          preprocessing:
-            -
-              type: CHECK_JSON_ERROR
-              parameters:
-                - $.mcaDumpError
-              error_handler: CUSTOM_ERROR
-              error_handler_params: mcaDumpError
-            -
-              type: JSONPATH
-              parameters:
-                - $.hostname
-          master_item:
-            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "SWITCH", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-U", "{$UNIFI_VERBOSE_SSH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
-          tags:
-            -
-              tag: Application
-              value: Host
-        -
           uuid: c2b45cc0a0ad4079879229108e2ef1a6
           name: ping
           type: SIMPLE
@@ -2728,6 +2702,32 @@ zabbix_export:
                 - $.sys_stats.loadavg_15
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "SWITCH", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-U", "{$UNIFI_VERBOSE_SSH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
+        -
+          uuid: 3aab4c5928fe428eaa68c3ded3c966d8
+          name: 'mac address'
+          type: DEPENDENT
+          key: mac_address
+          delay: '0'
+          trends: '0'
+          value_type: TEXT
+          inventory_link: MACADDRESS_A
+          preprocessing:
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
+              error_handler: CUSTOM_ERROR
+              error_handler_params: mcaDumpError
+            -
+              type: JSONPATH
+              parameters:
+                - $.mac
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "SWITCH", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-U", "{$UNIFI_VERBOSE_SSH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
+          tags:
+            -
+              tag: Application
+              value: Host
         -
           uuid: c4668b5e15954379bbe9515188d96624
           name: mca-dump
@@ -4366,6 +4366,8 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - '$.vpn[*].remotes[?(@.ip  == ''{#REMOTE_SITE_IP}'')].rxRate.first()'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
               master_item:
                 key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
               tags:
@@ -4389,6 +4391,8 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - '$.vpn[*].remotes[?(@.ip  == ''{#REMOTE_SITE_IP}'')].txRate.first()'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
               master_item:
                 key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
               tags:
