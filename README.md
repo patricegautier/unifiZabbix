@@ -317,8 +317,13 @@ That will give you access to power production and consumption, as well as set a 
 
 
 
+# Updating to a new version
 
-
+• You should simply have to import the updates zbx_export_templates.yaml into zabbix and those will replace the current template.
+• Also check if there are any updates to any of the scripts (mcaDumpShort.sh in particular) and if so please copy those files in the right spot on your zabbix server/proxies
+• Macros that you have defined in Administration > General > Macros will survive importing a new template version, so no action needed there
+• Macros that you have defined directly on one of your devices that uses one of the templates in this project also survive
+• If you did define some macros on the templates themselves, those will get blown out during the import.. You can either move those macros to one of the aforementioned spts or if that's not practicaly you can also define your own template that links to one of the templates in this projects, put the macros on that new template and have your devices use that.  It's also a good way to customize the templates to your case, though I would of course hope you would contribute your enhancements back!
 
 
 # Troubleshooting - Notes
