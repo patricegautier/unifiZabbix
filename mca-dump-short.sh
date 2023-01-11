@@ -49,52 +49,30 @@ match($0, "^interface [A-z0-9]+$") {
 # for i in 51 52 53 54 55 56 58; do  echo "-------- 192.168.217.$i"; time mca-dump-short.sh -t SWITCH_DISCOVERY -u patrice -d 192.168.217.$i  | jq | grep -E "model|port_desc"; done
 # for i in 50 51 52 53 54 56 59; do  echo "-------- 192.168.207.$i"; time mca-dump-short.sh -t SWITCH_DISCOVERY -u patrice -d 192.168.207.$i  | jq | grep -E "model|port_desc"; done
 
-declare SLEEP_INTERVAL=0.5
-declare TIMEOUT_MULTIPLIER=2   #  1/SLEEP_INTERVAL
 
-function runWithTimeout() {
-    local timeout=$(( $1 * TIMEOUT_MULTIPLIER ))
-    if [[ -n "${timeout}" ]]; then
-		shift 
-	
-		( "$@" &
-		  local child=$!
-		  # Avoid default notification in non-interactive shell for SIGTERM
-		  trap -- "" SIGTERM
-			( 	
-				#echo "Starting Watchdog with ${timeout}s time out"
-				local elapsedCount=0
-				local childGone=
-				while (( elapsedCount < timeout )) && [[ -z "${childGone}" ]]; do
-					sleep $SLEEP_INTERVAL
-					elapsedCount=$(( elapsedCount + 1 ))
-					#echo "Waiting for child #${child}:  Elapsed $elapsedCount"
-					local childPresent; 
-					#shellcheck disable=SC2009
-					childPresent=$(ps -o pid -p ${child} | grep -v PID)
-					if [[ -z "${childPresent}" ]]; then
-						# the child has either completed or died, either way no time out
-						childGone=true
-						#echo "Child #${child} left"
-					fi
-				done
-				if [[ -z "${childGone}" ]]; then #it's a timeout
-					#echo "Child #${child} timed out"				
-					kill -KILL $child
-					#local killResult=$?
-					#if (( killResult != 0 )); then
-						#echo "Could not kill child still running, pid $child"
-					#fi
-				fi
-				#echo Exiting Watchdog
-			) &
-		  wait $child 2>/dev/null
-		  exit $?
-		)
-	else
-		"$@"
-	fi
+function runWithTimeout () { 
+	local timeout=$1
+	shift
+	"$@" &
+	local child=$!
+	# Avoid default notification in non-interactive shell for SIGTERM
+	trap -- "" SIGTERM
+	local now; now=$(date +%s%N); now="${now:0:-6}"
+	local endDate; endDate=$(( now + timeout*1000 ))
+	local running=true
+	( 	while (( now < endDate )) && [[ -n "${running}" ]];  
+	  	do 
+	  		sleep 0.1
+			if ! ps -p ${child} > /dev/null; then
+				running=
+			fi
+			now=$(date +%s%N); now="${now:0:-6}"
+		done
+		if [[ -n "${running}" ]]; then kill ${child} 2> /dev/null; fi
+	) &
+	wait ${child}
 }
+
 
 function errorJsonWithReason() {
 	local reason; reason=$(echo "$1" | tr -d "\"'\n\r" )
@@ -103,7 +81,7 @@ function errorJsonWithReason() {
 }
 
 function retrievePortNamesInto() {
-	local logFile=$1.log
+	local logFile="$1-$RANDOM.log"
 	local jqFile=$1
 	local outStream="/dev/null"
 	local options=
@@ -137,6 +115,9 @@ function retrievePortNamesInto() {
 		  
 		  send -- "terminal length 0\r"
 		  expect -re ".*#"
+
+		  send -- "terminal datadump\r"
+ 		  expect -re ".*#"
 		  
 		  send -- "show run\r"
 		  log_file -noappend ${logFile};
@@ -404,7 +385,8 @@ if [[ ${DEVICE_TYPE:-} == 'SWITCH_DISCOVERY' ]]; then
 		#	nohup needs a cmd-line utility
 		#	nohup runWithTimeout 60 retrievePortNamesInto "${jqProgram}" &
 		#(set -m; runWithTimeout 60 retrievePortNamesInto "${jqProgram}" &) &
-		runWithTimeout 60 retrievePortNamesInto "${jqProgram}" &
+		#runWithTimeout 60 retrievePortNamesInto "${jqProgram}" &
+		runWithTimeout 60 retrievePortNamesInto "${jqProgram}" > /dev/null 2> /dev/null < /dev/null & disown
 	fi
 fi
 
