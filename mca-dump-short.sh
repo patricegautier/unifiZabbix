@@ -8,7 +8,11 @@ declare HE_RSA_SSH_KEY_OPTIONS='-o PubkeyAcceptedKeyTypes=+ssh-rsa -o HostKeyAlg
 declare -A VALIDATOR_BY_TYPE
 VALIDATOR_BY_TYPE["AP"]=".vap_table? != null and .radio_table != null and ( .radio_table | map(select(.athstats.cu_total>0)) | length>0 ) "
 VALIDATOR_BY_TYPE["UDMP"]=".network_table? != null"
-VALIDATOR_BY_TYPE["USG"]="( .network_table? != null ) and ( .network_table | map(select(.mac!=null)) | length>0 ) and ( ( .[\"system-stats\"].temps | length ) == 4 ) "
+VALIDATOR_BY_TYPE["USG"]="( .network_table? != null ) and ( .network_table | map(select(.mac!=null)) | length>0 )"
+declare -A OPTIONAL_VALIDATOR_BY_TYPE
+declare -A OPTION_MESSAGE
+OPTIONAL_VALIDATOR_BY_TYPE["USG"]=" ( ( .[\"system-stats\"].temps | length ) == 4 ) "
+OPTION_MESSAGE["USG"]="missingTemperatures"
 
 
 
@@ -76,9 +80,26 @@ function runWithTimeout () {
 
 function errorJsonWithReason() {
 	local reason; reason=$(echo "$1" | tr -d "\"'\n\r" )
-	local t; t=$(date)
-	echo '{ "reason":"'"${reason}"'", "time":"'"${t}"'", "device":"'"${TARGET_DEVICE}"'", "mcaDumpError":"Error" }'
+	local t; t=$(date +"%T")
+	echo '{ "at":"'"${t}"'", "r":"'"${reason}"'", "device":"'"${TARGET_DEVICE}"'", "mcaDumpError":"Error" }'
 }
+
+function insertWarningIntoJsonOutput() {
+	local warning=$1
+	local output=$2
+	echo "${output}" | jq ". + { mcaDumpWarning: { \"${warning}\": true } }"
+	echoErr "$warning"
+}
+
+function echoErr() {
+	local error=$1
+	{
+		echo "----------------------------------"
+		echo "$(date) $TARGET_DEVICE"
+		echo "  ${error}"
+	} >> "${errFile}"
+}
+
 
 function retrievePortNamesInto() {
 	local logFile="$1-$RANDOM.log"
@@ -326,6 +347,7 @@ fi
 if [[ -z "${JQ_VALIDATOR:-}" ]]; then
 	JQ_VALIDATOR=${VALIDATOR_BY_TYPE["${DEVICE_TYPE}"]:-}
 fi
+declare JQ_OPTION_VALIDATOR=${OPTIONAL_VALIDATOR_BY_TYPE["${DEVICE_TYPE}"]:-}
 
 
 # {$UNIFI_SSHPASS_PASSWORD_PATH} means the macro didn't resolve in Zabbix
@@ -410,6 +432,7 @@ if (( EXIT_CODE == 0 )); then
 		OUTPUT=$(errorJsonWithReason "timeout ($EXIT_CODE)")
 	elif (( EXIT_CODE != 0 )) || [[ -z "${OUTPUT}" ]]; then
 		OUTPUT=$(errorJsonWithReason "$(echo "Error remote invoking mca-dump-short: "; cat "${ERROR_FILE}"; echo "${OUTPUT}" )")
+		EXIT_CODE=1
 	else
 		if [[ -n "${JQ_VALIDATOR:-}" ]]; then
 			VALIDATION=$(echo "${OUTPUT}" | jq "${JQ_VALIDATOR}")
@@ -419,6 +442,14 @@ if (( EXIT_CODE == 0 )); then
 				EXIT_CODE=1
 			fi
 		fi
+		if [[ -n "${JQ_OPTION_VALIDATOR:-}" ]]; then
+			OPTION_VALIDATION=$(echo "${OUTPUT}" | jq "${JQ_OPTION_VALIDATOR}")
+			EXIT_CODE=$?
+			if [[ -z "${OPTION_VALIDATION}" ]] || [[ "${OPTION_VALIDATION}" == "false" ]] || (( EXIT_CODE != 0 )); then				
+				MESSAGE=${OPTION_MESSAGE["${DEVICE_TYPE}"]:-"unknownWarning"}
+				OUTPUT=$(insertWarningIntoJsonOutput "$MESSAGE" "$OUTPUT")
+			fi			
+		fi		
 		if (( EXIT_CODE == 0 )); then
 			errorFile="/tmp/jq$RANDOM$RANDOM.err"
 			jqInput=${OUTPUT}
@@ -463,12 +494,8 @@ if [[ -n "${ECHO_OUTPUT:-}" ]]; then
 	fi
 fi
 
-if (( EXIT_CODE != 0 )); then {
-	echo "----------------------------------"
-	echo "$(date) $TARGET_DEVICE"
-	echo "  ${OUTPUT}"
-	echo "  ${JSON_OUTPUT}" 
-} >> "${errFile}"
+if (( EXIT_CODE != 0 )); then
+	echoErr " ${OUTPUT}\n  ${JSON_OUTPUT}" 
 fi
 
 echo "${OUTPUT}"

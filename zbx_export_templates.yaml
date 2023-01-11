@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2023-01-11T02:34:39Z'
+  date: '2023-01-11T22:23:44Z'
   template_groups:
     -
       uuid: 15155c95a3d048f4856272ae12fd42c5
@@ -4969,6 +4969,12 @@ zabbix_export:
               type: CHECK_JSON_ERROR
               parameters:
                 - $.mcaDumpError
+              error_handler: DISCARD_VALUE
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpWarning.missingTemperatures
+              error_handler: DISCARD_VALUE
           tags:
             -
               tag: Application
@@ -5091,6 +5097,11 @@ zabbix_export:
                 - $.mcaDumpError
               error_handler: DISCARD_VALUE
             -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpWarning.missingTemperatures
+              error_handler: DISCARD_VALUE
+            -
               type: JSONPATH
               parameters:
                 - '$.["system-stats"].temps.CPU'
@@ -5117,6 +5128,11 @@ zabbix_export:
               type: CHECK_JSON_ERROR
               parameters:
                 - $.mcaDumpError
+              error_handler: DISCARD_VALUE
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpWarning.missingTemperatures
               error_handler: DISCARD_VALUE
             -
               type: JSONPATH
