@@ -4021,7 +4021,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.temperatures.[?(@.name == ''PHY'')].value.first()'
+                - '$.temperatures.[?(@.name == ''Local'')].value.first()'
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
           tags:
