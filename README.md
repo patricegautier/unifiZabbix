@@ -332,6 +332,8 @@ That will give you access to power production and consumption, as well as set a 
 	
 		 sudo service zabbix-server restart
 
+• mcaDumpShort.sh is also logging all errors to /tmp/mcaDumpShort.err on the zabbixServer (or proxy if you are using one).  It's a good source of info to debug issues too.
+
 • Macros Cheat Sheet
 
 This is my set of values
