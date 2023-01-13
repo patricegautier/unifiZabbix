@@ -334,6 +334,14 @@ That will give you access to power production and consumption, as well as set a 
 
 • mcaDumpShort.sh is also logging all errors to /tmp/mcaDumpShort.err on the zabbixServer (or proxy if you are using one).  It's a good source of info to debug issues too.
 
+• If you see timeouts, there are 2 values to experiment with:
+	
+in your zabbix server conf, usually /etc/zabbix/zabbix_server.conf add adjust the zabbix timeout (default is 3s):
+
+	TimeOut=30
+
+and then in the Zabbix UI, change the macro value for UNIFI_CHECK_TIMEOUT in Administration > General Macros so sth a little smaller than the first value, maybe 25 in this case.
+
 • Macros Cheat Sheet
 
 This is my set of values
