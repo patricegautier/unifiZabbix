@@ -15,44 +15,8 @@ OPTIONAL_VALIDATOR_BY_TYPE["USG"]=" ( ( .[\"system-stats\"].temps | length ) == 
 OPTION_MESSAGE["USG"]="missingTemperatures"
 
 
-
-# thanks @zpolisensky for this contribution
-#shellcheck disable=SC2016
-PORT_NAMES_AWK='
-BEGIN { IFS=" \n"; first=1; countedPortId=0 }
-match($0, "^interface 0/[0-9]+$") { 
-	portId=substr($2,3)
-}
-match($0, "^interface [A-z0-9]+$") { 
-	countedPortId=countedPortId+1
-	portId=countedPortId
-}
-/description / {
-		desc=""
-		defaultDesc="Port " portId
-		for (i=2; i<=NF; i++) {
-			f=$i
-			if (i==2) f=substr(f,2)
-			if (i==NF) 
-				f=substr(f,1,length(f)-1)
-			else
-				f=f " "
-			desc=desc f
-		}
-		if (first != 1) printf "| "
-		first=0
-		if ( desc == defaultDesc) 
-			desc="-"
-		else
-			desc="(" desc ")"
-		printf ".port_table[" portId-1 "] += { \"port_desc\": \"" desc "\" }"
-	}'
-
-
-
-# for i in 51 52 53 54 55 56 58; do  echo "-------- 192.168.217.$i"; time mca-dump-short.sh -t SWITCH_DISCOVERY -u patrice -d 192.168.217.$i  | jq | grep -E "model|port_desc"; done
-# for i in 50 51 52 53 54 56 59; do  echo "-------- 192.168.207.$i"; time mca-dump-short.sh -t SWITCH_DISCOVERY -u patrice -d 192.168.207.$i  | jq | grep -E "model|port_desc"; done
-
+#---------------------------------------------------------------------------------------
+# Utilities
 
 function runWithTimeout () { 
 	local timeout=$1
@@ -98,6 +62,100 @@ function echoErr() {
 		echo "$(date) $TARGET_DEVICE"
 		echo "  ${error}"
 	} >> "${errFile}"
+}
+
+function issueSSHCommand() {
+	local command=$*
+ 	if [[ -n "${VERBOSE:-}" ]]; then
+ 		#shellcheck disable=SC2086
+ 		echo ${SSHPASS_OPTIONS} ssh  ${SSH_PORT} ${VERBOSE_SSH} ${HE_RSA_SSH_KEY_OPTIONS} ${BATCH_MODE} -o ConnectTimeout=5 -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} "${USER}@${TARGET_DEVICE}" "$command"
+ 	fi
+ 	#shellcheck disable=SC2086
+	${SSHPASS_OPTIONS} ssh  ${SSH_PORT} ${VERBOSE_SSH} ${HE_RSA_SSH_KEY_OPTIONS} ${BATCH_MODE} -o ConnectTimeout=5 -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} "${USER}@${TARGET_DEVICE}" "$command"
+}
+
+#---------------------------------------------------------------------------------------
+# Fan Discovery
+
+function fanDiscovery() {
+	local -n exitCode=$1
+	exitCode=0
+	shift
+	local sensors; sensors=$(issueSSHCommand sensors | grep -E "^fan[0-9]:" | cut -d' ' -f1)
+	exitCode=$?
+	if (( exitCode == 0 )); then
+		local first=true
+		echo -n "[ "
+		for fan in $sensors; do
+			if [[ -n "$fan" ]]; then 
+				if [[ -z "$first" ]]; then echo -n ","; else first=; fi				
+				echo -n "{ \"name\": \"${fan::-1}\" }"
+			fi
+		done
+		echo -n " ]"
+	fi
+}
+
+#---------------------------------------------------------------------------------------
+# Switch Discovery
+
+
+# thanks @zpolisensky for this contribution
+#shellcheck disable=SC2016
+PORT_NAMES_AWK='
+BEGIN { IFS=" \n"; first=1; countedPortId=0 }
+match($0, "^interface 0/[0-9]+$") { 
+	portId=substr($2,3)
+}
+match($0, "^interface [A-z0-9]+$") { 
+	countedPortId=countedPortId+1
+	portId=countedPortId
+}
+/description / {
+		desc=""
+		defaultDesc="Port " portId
+		for (i=2; i<=NF; i++) {
+			f=$i
+			if (i==2) f=substr(f,2)
+			if (i==NF) 
+				f=substr(f,1,length(f)-1)
+			else
+				f=f " "
+			desc=desc f
+		}
+		if (first != 1) printf "| "
+		first=0
+		if ( desc == defaultDesc) 
+			desc="-"
+		else
+			desc="(" desc ")"
+		printf ".port_table[" portId-1 "] += { \"port_desc\": \"" desc "\" }"
+	}'
+
+
+
+
+
+function startSwitchDiscovery() {
+	local target=$1
+	declare exp; exp=$(which expect)
+	if [[ -z "${exp}" ]]; then exp=$(ls /usr/bin/expect); fi
+	if [[ -z "${exp}" ]]; then 
+		OUTPUT=$(errorJsonWithReason "please install 'expect' to run SWITCH_DISCOVERY")
+		return 1
+	else
+		declare switchDiscoveryDir="/tmp/unifiSwitchDiscovery"
+		mkdir -p "${switchDiscoveryDir}"
+		declare jqProgram="${switchDiscoveryDir}/switchPorts-${target}.jq"
+		#shellcheck disable=SC2034 
+		# o=$(runWithTimeout 60 retrievePortNamesInto "${jqProgram}") &
+		#	nohup needs a cmd-line utility
+		#	nohup runWithTimeout 60 retrievePortNamesInto "${jqProgram}" &
+		#(set -m; runWithTimeout 60 retrievePortNamesInto "${jqProgram}" &) &
+		#runWithTimeout 60 retrievePortNamesInto "${jqProgram}" &
+		runWithTimeout 60 retrievePortNamesInto "${jqProgram}" > /dev/null 2> /dev/null < /dev/null & disown
+	fi
+	return 0
 }
 
 
@@ -236,6 +294,103 @@ function insertPortNamesIntoJson() {
 	fi
 }
 
+#---------------------------------------------------------------------------------------------------------------------
+# mca-dump invocation
+
+function invokeMcaDump() {
+	local deviceType=$1
+	local -n exitCode=$2
+	local -n output=$3
+	local -n jsonOutput=$4
+
+	INDENT_OPTION="--indent 0"
+
+	case "${deviceType:-}" in 
+
+		AP) 							JQ_OPTIONS='del (.port_table) | del(.radio_table[]?.scan_table) | ( .vap_table[]|= ( .clientCount = ( .sta_table|length ) ) ) | del (.vap_table[]?.sta_table)' ;;
+		SWITCH | SWITCH_DISCOVERY)		JQ_OPTIONS='del (.port_table[]?.mac_table)' ;;
+		SWITCH_FEATURE_DISCOVERY)		JQ_OPTIONS="[ { power:  .port_table |  any (  .poe_power >= 0 ) ,\
+												total_power_consumed_key_name: \"total_power_consumed\",\
+												max_power_key_name: \"max_power\",\
+												max_power: .total_max_power,\
+												percent_power_consumed_key_name: \"percent_power_consumed\",\
+												has_eth1: .has_eth1,\
+												has_temperature: .has_temperature,\
+												temperature_key_name: \"temperature\",\
+													overheating_key_name: \"overheating\",\
+												has_fan: .has_fan,\
+												fan_level_key_name: \"fan_level\"
+												} ]" ;;
+		UDMP| USG)						JQ_OPTIONS='del (.dpi_stats) | del(.fingerprints) | del( .network_table[]? |  select ( .address == null ))' ;;
+		CK)								JQ_OPTIONS='del (.dpi_stats)' ;;
+		*)								echo "Unknown device Type: '${DEVICE_TYPE:-}'"; usage ;;
+	esac
+
+
+	output=$(runWithTimeout "${TIMEOUT}" issueSSHCommand mca-dump  2> "${ERROR_FILE}")
+	exitCode=$?
+	#shellcheck disable=SC2034
+	jsonOutput="${output}"
+
+
+	if (( exitCode >=127 && exitCode != 255 )); then
+		output=$(errorJsonWithReason "timeout ($exitCode)")
+	elif (( exitCode != 0 )) || [[ -z "${output}" ]]; then
+		output=$(errorJsonWithReason "$(echo "Error remote invoking mca-dump-short: "; cat "${ERROR_FILE}"; echo "${output}" )")
+		exitCode=1
+	else
+		if [[ -n "${JQ_VALIDATOR:-}" ]]; then
+			VALIDATION=$(echo "${output}" | jq "${JQ_VALIDATOR}")
+			exitCode=$?
+			if [[ -z "${VALIDATION}" ]] || [[ "${VALIDATION}" == "false" ]] || (( exitCode != 0 )); then
+				output=$(errorJsonWithReason "validationError: ${JQ_VALIDATOR}")
+				exitCode=1
+			fi
+		fi
+		if [[ -n "${JQ_OPTION_VALIDATOR:-}" ]]; then
+			OPTION_VALIDATION=$(echo "${output}" | jq "${JQ_OPTION_VALIDATOR}")
+			exitCode=$?
+			if [[ -z "${OPTION_VALIDATION}" ]] || [[ "${OPTION_VALIDATION}" == "false" ]] || (( exitCode != 0 )); then				
+				MESSAGE=${OPTION_MESSAGE["${DEVICE_TYPE}"]:-"unknownWarning"}
+				output=$(insertWarningIntoJsonOutput "$MESSAGE" "$output")
+			fi			
+		fi		
+		if (( exitCode == 0 )); then
+			errorFile="/tmp/jq$RANDOM$RANDOM.err"
+			jqInput=${output}
+			output=
+			#shellcheck disable=SC2086
+			output=$(echo  "${jqInput}" | jq ${INDENT_OPTION} "${JQ_OPTIONS}" 2> "${errorFile}")
+			exitCode=$?
+			if (( exitCode != 0 )) || [[ -z "${output}" ]]; then
+				output=$(errorJsonWithReason "jq ${INDENT_OPTION} ${JQ_OPTIONS} returned status $exitCode; $(cat $errorFile);  JQ input was ${jqInput}")
+				exitCode=1
+			fi
+			rm "${errorFile}" 2>/dev/null
+		fi
+	fi
+	rm -f  "${ERROR_FILE}" 2>/dev/null
+
+	if (( exitCode == 0 )) && [[ "${DEVICE_TYPE:-}" == 'SWITCH_DISCOVERY' ]]; then
+		# do not wait anymore for retrievePortNamesInto
+		# this will ensure we don't time out, but sometimes we will use an older file
+		# wait 
+		errorFile="/tmp/jq${RANDOM}${RANDOM}.err"
+		jqInput="${output}"
+		output=
+		insertPortNamesIntoJson output "${jqProgram}" "${jqInput}"  2> "${errorFile}"
+		CODE=$?
+		if (( CODE != 0 )) || [[ -z "${output}" ]]; then
+			output=$(errorJsonWithReason "insertPortNamesIntoJson failed with error code $CODE; $(cat $errorFile)")
+			exitCode=1
+		fi
+		rm "${errorFile}" 2>/dev/null
+	fi
+}
+
+
+#------------------------------------------------------------------------------------------------
+
 
 function usage() {
 
@@ -246,7 +401,7 @@ function usage() {
 	fi
 	
 	cat <<- EOF
-	Usage ${0}  -i privateKeyPath -p <passwordFilePath> -u user -v -d targetDevice [-t AP|SWITCH|SWITCH_FEATURE_DISCOVERY|SWITCH_DISCOVERY|UDMP|USG|CK|WIFI_SITE]
+	Usage ${0}  -i privateKeyPath -p <passwordFilePath> -u user -v -d targetDevice [-t AP|SWITCH|SWITCH_FEATURE_DISCOVERY|SWITCH_DISCOVERY|UDMP|UDMP_FAN_DISCOVERY|UDMP_TEMP_DISCOVERY|USG|CK|WIFI_SITE]
 	  -i specify private public key pair path
 	  -p specify password file path to be passed to sshpass -f. Note if both -i and -p are provided, the password file will be used
 	  -u SSH user name for Unifi device
@@ -360,127 +515,16 @@ if [[ -n "${PASSWORD_FILE_PATH}" ]] && ! [[ "${PASSWORD_FILE_PATH}" == "{\$UNIFI
 	PRIVKEY_OPTION=
 fi
 
-
-if [[ ${DEVICE_TYPE:-} == 'AP' ]]; then
-	JQ_OPTIONS='del (.port_table) | del(.radio_table[].scan_table) | ( .vap_table[]|= ( .clientCount = ( .sta_table|length ) ) ) | del (.vap_table[].sta_table)'
-elif [[ ${DEVICE_TYPE:-} == 'SWITCH' ]]; then
-	JQ_OPTIONS='del (.port_table[].mac_table)'
-elif [[ ${DEVICE_TYPE:-} == 'SWITCH_FEATURE_DISCOVERY' ]]; then
-        JQ_OPTIONS="[ { power:  .port_table |  any (  .poe_power >= 0 ) ,\
-	total_power_consumed_key_name: \"total_power_consumed\",\
-	max_power_key_name: \"max_power\",\
-	max_power: .total_max_power,\
-	percent_power_consumed_key_name: \"percent_power_consumed\",\
-	has_eth1: .has_eth1,\
-	has_temperature: .has_temperature,\
-	temperature_key_name: \"temperature\",\
-        overheating_key_name: \"overheating\",\
-	has_fan: .has_fan,\
-	fan_level_key_name: \"fan_level\"
-	} ]"
-elif [[ ${DEVICE_TYPE:-} == 'UDMP' ]]; then
-	JQ_OPTIONS='del (.dpi_stats) | del(.fingerprints) | del( .network_table[] |  select ( .address == null ))'
-elif [[ ${DEVICE_TYPE:-} == 'USG' ]]; then
-	JQ_OPTIONS='del (.dpi_stats) | del(.fingerprints) | del( .network_table[] |  select ( .address == null ))'
-elif [[ ${DEVICE_TYPE:-} == 'CK' ]]; then
-	JQ_OPTIONS='del (.dpi_stats)'
-elif [[ ${DEVICE_TYPE:-} == 'SWITCH_DISCOVERY' ]]; then
-	JQ_OPTIONS='del (.port_table[].mac_table)'
-elif [[ -n "${DEVICE_TYPE:-}" ]]; then
-	echo "Unknown device Type: '${DEVICE_TYPE:-}'"
-	usage
-fi
-	
-
 if [[ ${DEVICE_TYPE:-} == 'SWITCH_DISCOVERY' ]]; then
-	declare exp; exp=$(which expect)
-	if [[ -z "${exp}" ]]; then exp=$(ls /usr/bin/expect); fi
-	if [[ -z "${exp}" ]]; then 
-		OUTPUT=$(errorJsonWithReason "please install 'expect' to run SWITCH_DISCOVERY")
-		EXIT_CODE=1
-	else
-		declare switchDiscoveryDir="/tmp/unifiSwitchDiscovery"
-		mkdir -p "${switchDiscoveryDir}"
-		declare jqProgram="${switchDiscoveryDir}/switchPorts-${TARGET_DEVICE}.jq"
-		#shellcheck disable=SC2034 
-		# o=$(runWithTimeout 60 retrievePortNamesInto "${jqProgram}") &
-		#	nohup needs a cmd-line utility
-		#	nohup runWithTimeout 60 retrievePortNamesInto "${jqProgram}" &
-		#(set -m; runWithTimeout 60 retrievePortNamesInto "${jqProgram}" &) &
-		#runWithTimeout 60 retrievePortNamesInto "${jqProgram}" &
-		runWithTimeout 60 retrievePortNamesInto "${jqProgram}" > /dev/null 2> /dev/null < /dev/null & disown
-	fi
+	startSwitchDiscovery "${TARGET_DEVICE}"  # asynchronously discover port names
+	EXIT_CODE=$?
 fi
 
 if (( EXIT_CODE == 0 )); then
-
-	INDENT_OPTION="--indent 0"
-
-
-	if [[ -n "${VERBOSE:-}" ]]; then
-		INDENT_OPTION=
-		echo  "ssh ${SSH_PORT} ${HE_RSA_SSH_KEY_OPTIONS} ${BATCH_MODE} -o LogLevel=Error -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} ${USER}@${TARGET_DEVICE} mca-dump | jq ${INDENT_OPTION} ${JQ_OPTIONS:-}"
-	fi
-
-	#shellcheck disable=SC2086
-	OUTPUT=$(runWithTimeout "${TIMEOUT}" ${SSHPASS_OPTIONS} ssh  ${SSH_PORT} ${VERBOSE_SSH} ${HE_RSA_SSH_KEY_OPTIONS} ${BATCH_MODE} -o ConnectTimeout=5 -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} "${USER}@${TARGET_DEVICE}" mca-dump  2> "${ERROR_FILE}")
-	EXIT_CODE=$?
-	JSON_OUTPUT="${OUTPUT}"
-
-
-	if (( EXIT_CODE >=127 && EXIT_CODE != 255 )); then
-		OUTPUT=$(errorJsonWithReason "timeout ($EXIT_CODE)")
-	elif (( EXIT_CODE != 0 )) || [[ -z "${OUTPUT}" ]]; then
-		OUTPUT=$(errorJsonWithReason "$(echo "Error remote invoking mca-dump-short: "; cat "${ERROR_FILE}"; echo "${OUTPUT}" )")
-		EXIT_CODE=1
-	else
-		if [[ -n "${JQ_VALIDATOR:-}" ]]; then
-			VALIDATION=$(echo "${OUTPUT}" | jq "${JQ_VALIDATOR}")
-			EXIT_CODE=$?
-			if [[ -z "${VALIDATION}" ]] || [[ "${VALIDATION}" == "false" ]] || (( EXIT_CODE != 0 )); then
-				OUTPUT=$(errorJsonWithReason "validationError: ${JQ_VALIDATOR}")
-				EXIT_CODE=1
-			fi
-		fi
-		if [[ -n "${JQ_OPTION_VALIDATOR:-}" ]]; then
-			OPTION_VALIDATION=$(echo "${OUTPUT}" | jq "${JQ_OPTION_VALIDATOR}")
-			EXIT_CODE=$?
-			if [[ -z "${OPTION_VALIDATION}" ]] || [[ "${OPTION_VALIDATION}" == "false" ]] || (( EXIT_CODE != 0 )); then				
-				MESSAGE=${OPTION_MESSAGE["${DEVICE_TYPE}"]:-"unknownWarning"}
-				OUTPUT=$(insertWarningIntoJsonOutput "$MESSAGE" "$OUTPUT")
-			fi			
-		fi		
-		if (( EXIT_CODE == 0 )); then
-			errorFile="/tmp/jq$RANDOM$RANDOM.err"
-			jqInput=${OUTPUT}
-			OUTPUT=
-			#shellcheck disable=SC2086
-			OUTPUT=$(echo  "${jqInput}" | jq ${INDENT_OPTION} "${JQ_OPTIONS}" 2> "${errorFile}")
-			EXIT_CODE=$?
-			if (( EXIT_CODE != 0 )) || [[ -z "${OUTPUT}" ]]; then
-				OUTPUT=$(errorJsonWithReason "jq ${INDENT_OPTION} ${JQ_OPTIONS} returned status $EXIT_CODE; $(cat $errorFile);  JQ input was ${jqInput}")
-				EXIT_CODE=1
-			fi
-			rm "${errorFile}" 2>/dev/null
-		fi
-	fi
-	rm -f  "${ERROR_FILE}" 2>/dev/null
-
-	if (( EXIT_CODE == 0 )) && [[ "${DEVICE_TYPE:-}" == 'SWITCH_DISCOVERY' ]]; then
-		# do not wait anymore for retrievePortNamesInto
-		# this will ensure we don't time out, but sometimes we will use an older file
-		# wait 
-		errorFile="/tmp/jq${RANDOM}${RANDOM}.err"
-		jqInput="${OUTPUT}"
-		OUTPUT=
-		insertPortNamesIntoJson OUTPUT "${jqProgram}" "${jqInput}"  2> "${errorFile}"
-		CODE=$?
-		if (( CODE != 0 )) || [[ -z "${OUTPUT}" ]]; then
-			OUTPUT=$(errorJsonWithReason "insertPortNamesIntoJson failed with error code $CODE; $(cat $errorFile)")
-			EXIT_CODE=1
-		fi
-		rm "${errorFile}" 2>/dev/null
-	fi
+	case "${DEVICE_TYPE}" in
+		UDMP_FAN_DISCOVERY)	fanDiscovery EXIT_CODE OUTPUT JSON_OUTPUT ;;
+		*)					invokeMcaDump "$DEVICE_TYPE" EXIT_CODE OUTPUT JSON_OUTPUT ;;
+	esac
 fi
 
 
