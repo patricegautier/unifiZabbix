@@ -1,0 +1,2 @@
+#-- SC2317 (info): Command appears to be unreachable. Check usage (or ignore if invoked indirectly).
+disable=SC2317

@@ -1,8 +1,8 @@
-#!/bin/bash
+#!/usr/local/bin/bash
 # set -x
+set -uo pipefail
 
-usage()
-{
+usage() {
 	cat << EOF
 Usage ${0}  -i privateKeyPath -p <passwordFilePath> -u user -v -d targetDevice <command-to-run>
 	-i specify private public key pair path
@@ -14,11 +14,9 @@ EOF
 	exit 2
 }
 
-SSHPASS_OPTIONS=
-PRIVKEY_OPTION=
-PASSWORD_FILE_PATH=
-VERBOSE_OPTION=
-
+declare SSHPASS_OPTIONS=
+declare PRIVKEY_OPTION=
+declare PASSWORD_FILE_PATH=
 
 while getopts 'i:u:hd:vp:' OPT
 do
@@ -26,36 +24,30 @@ do
     i) PRIVKEY_OPTION="-i "${OPTARG} ;;
     u) USER=${OPTARG} ;;
     d) TARGET_DEVICE=${OPTARG} ;;
-    v) VERBOSE=true ;;
+    v) VERBOSE="-v" ;;
     p) PASSWORD_FILE_PATH=${OPTARG} ;;
-    h) usage ;;
+    *) usage ;;
   esac
 done
 
 shift $((OPTIND-1))
-REMOTE_COMMAND=$@
-
-if ! [[ -z ${VERBOSE} ]]; then
-        VERBOSE_OPTION="-v"
-fi
+REMOTE_COMMAND=$*
 
 # {$UNIFI_SSHPASS_PASSWORD_PATH} means the macro didn't resolve in Zabbix
-if ! [[ -z ${PASSWORD_FILE_PATH} ]] && ! [[ ${PASSWORD_FILE_PATH} == "{\$UNIFI_SSHPASS_PASSWORD_PATH}" ]]; then 
-	SSHPASS_OPTIONS="-f "${PASSWORD_FILE_PATH}" "${VERBOSE_OPTION}
+if [[ -n "${PASSWORD_FILE_PATH}" ]] && [[ "${PASSWORD_FILE_PATH}" != "{\$UNIFI_SSHPASS_PASSWORD_PATH}" ]]; then 
+	SSHPASS_OPTIONS="-f ${PASSWORD_FILE_PATH} ${VERBOSE:-}"
 	PRIVKEY_OPTION=
 fi
 
-
-if ! [[ -z ${VERBOSE} ]]; then
-    	echo ${SSHPASS_COMMAND} 'ssh -o LogLevel=Error -o StrictHostKeyChecking=accept-new ' ${PRIVKEY_OPTION} ${USER}@${TARGET_DEVICE} ${REMOTE_COMMAND}
+if [[ -n "${VERBOSE:-}" ]]; then
+	# shellcheck disable=SC2086
+   	echo "${SSHPASS_COMMAND}" 'ssh -o LogLevel=Error -o StrictHostKeyChecking=accept-new ' ${PRIVKEY_OPTION} "${USER}@${TARGET_DEVICE}" "${REMOTE_COMMAND}"
 fi
 
-
-if ! [[ -z ${SSHPASS_OPTIONS} ]]; then
-	sshpass ${SSHPASS_OPTIONS} ssh -o LogLevel=Error -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} ${USER}@${TARGET_DEVICE} "${REMOTE_COMMAND}"
+if [[ -n "${SSHPASS_OPTIONS}" ]]; then
+	# shellcheck disable=SC2086
+	sshpass "${SSHPASS_OPTIONS}" ssh -o LogLevel=Error -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} "${USER}@${TARGET_DEVICE}" "${REMOTE_COMMAND}"
 else
-	ssh -o LogLevel=Error -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} ${USER}@${TARGET_DEVICE} "${REMOTE_COMMAND}"
+	# shellcheck disable=SC2086
+	ssh -o LogLevel=Error -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} "${USER}@${TARGET_DEVICE}" "${REMOTE_COMMAND}"
 fi
-
-
-
