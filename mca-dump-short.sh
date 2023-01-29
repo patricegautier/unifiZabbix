@@ -174,7 +174,8 @@ function retrievePortNamesInto() {
  		outStream="/dev/stdout"
  	fi
 
-	/usr/bin/expect ${options} > ${outStream} <<EOD
+	#shellcheck disable=SC2086
+	/usr/bin/expect ${options} > "${outStream}" <<EOD
       set timeout 30
 
       spawn ${SSHPASS_OPTIONS} ssh  ${SSH_PORT} ${HE_RSA_SSH_KEY_OPTIONS} -o LogLevel=Error -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} ${USER}@${TARGET_DEVICE}
@@ -261,7 +262,7 @@ EOD
 				cat "$logFile"
 			fi
 		} >> "${errFile}"
-		exit ${exitCode}
+		exit "${exitCode}"
 	fi
 
 	if [[ -f "$logFile" ]]; then 
@@ -336,7 +337,7 @@ function invokeMcaDump() {
 	if (( exitCode >=127 && exitCode != 255 )); then
 		output=$(errorJsonWithReason "timeout ($exitCode)")
 	elif (( exitCode != 0 )) || [[ -z "${output}" ]]; then
-		output=$(errorJsonWithReason "$(echo "Error remote invoking mca-dump-short: "; cat "${ERROR_FILE}"; echo "${output}" )")
+		output=$(errorJsonWithReason "$(echo "Remote pb: "; cat "${ERROR_FILE}"; echo "${output}" )")
 		exitCode=1
 	else
 		if [[ -n "${JQ_VALIDATOR:-}" ]]; then
