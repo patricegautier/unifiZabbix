@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2023-01-21T03:17:49Z'
+  date: '2023-01-30T20:18:27Z'
   template_groups:
     -
       uuid: 15155c95a3d048f4856272ae12fd42c5
@@ -1768,6 +1768,10 @@ zabbix_export:
               name: '{HOST.NAME} Incoming Bandwidth Problem'
               priority: AVERAGE
               manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'Unifi Protect is not running on {HOST.NAME}'
+                  expression: 'last(/Unifi Protect Cloud Key/ssh.run[protect],#1)<>0'
         -
           uuid: 017f3db264db4c1c801661a46f465e46
           name: nstat
@@ -1787,6 +1791,24 @@ zabbix_export:
               tag: Application
               value: Network
         -
+          uuid: e74e3b2e99fb4f58a58076bbf59bbc51
+          name: 'Unifi-Protect Service Status'
+          type: SSH
+          key: 'ssh.run[protect]'
+          delay: '{$UNIFI_CHECK_FREQUENCY}'
+          params: 'service unifi-protect status >/dev/null; echo $?'
+          authtype: PUBLIC_KEY
+          username: '{$UNIFI_USER}'
+          publickey: '{$UNIFI_PUB_KEY}'
+          privatekey: '{$UNIFI_PRIV_KEY}'
+          triggers:
+            -
+              uuid: 7d52e86e0fbf4eb4a5149f4bf20a0a9b
+              expression: 'last(/Unifi Protect Cloud Key/ssh.run[protect],#1)<>0'
+              name: 'Unifi Protect is not running on {HOST.NAME}'
+              opdata: 'Status: last(/Unifi Protect Cloud Key/ssh.run[protect],#1)'
+              priority: AVERAGE
+        -
           uuid: e1d2e198baa2468fae4e354627b99bcd
           name: 'Web Entry Point'
           type: HTTP_AGENT
@@ -1800,7 +1822,7 @@ zabbix_export:
             -
               uuid: 7aa3a5e7e07244be87bd122c49a916f6
               expression: 'find(/Unifi Protect Cloud Key/web_app,{$UNIFI_ALERT_PERIOD},"like","200")=0'
-              name: 'Protect is not running on {HOST.NAME}'
+              name: 'Unifi Protect Web App is not running on {HOST.NAME}'
               priority: AVERAGE
     -
       uuid: 5c308fb434614ef8acf2f94a04963cf4
@@ -1925,6 +1947,10 @@ zabbix_export:
               name: '{HOST.NAME} Incoming Bandwidth Problem'
               priority: AVERAGE
               manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'Unifi Protect is not running on {HOST.NAME}'
+                  expression: 'last(/Unifi Protect NVR4/ssh.run[protect],#1)<>0'
         -
           uuid: e466492496544c28a4216331a5613846
           name: nodename
@@ -1980,6 +2006,24 @@ zabbix_export:
             -
               tag: Application
               value: Network
+        -
+          uuid: 33970b555e2f43adb919b8f0ba543b06
+          name: 'Protect Service Status'
+          type: SSH
+          key: 'ssh.run[protect]'
+          delay: '{$UNIFI_CHECK_FREQUENCY}'
+          params: 'service unifi-protect status >/dev/null; echo $?'
+          authtype: PUBLIC_KEY
+          username: '{$UNIFI_USER}'
+          publickey: '{$UNIFI_PUB_KEY}'
+          privatekey: '{$UNIFI_PRIV_KEY}'
+          triggers:
+            -
+              uuid: 4618f80f013744cc91733bf5a15bb46a
+              expression: 'last(/Unifi Protect NVR4/ssh.run[protect],#1)<>0'
+              name: 'Unifi Protect is not running on {HOST.NAME}'
+              opdata: 'Status: last(/Unifi Protect Cloud Key/ssh.run[protect],#1)'
+              priority: AVERAGE
         -
           uuid: cc50528fc52543a0972b0a325733a22e
           name: 'Temp 1'
@@ -2060,7 +2104,7 @@ zabbix_export:
             -
               uuid: 0f0a28c883bc43daaa955e6e57d7ee19
               expression: 'find(/Unifi Protect NVR4/web_app,{$UNIFI_ALERT_PERIOD},"like","200")=0'
-              name: 'Protect is not running on {HOST.NAME}'
+              name: 'Protect Web App is not running on {HOST.NAME}'
               priority: AVERAGE
     -
       uuid: 0dbc328172e34d8c8b7f3cdfd554d08d
@@ -5592,12 +5636,20 @@ zabbix_export:
       name: '{HOST.NAME} Incoming Bandwidth Too Low'
       priority: WARNING
       manual_close: 'YES'
+      dependencies:
+        -
+          name: '{HOST.NAME} Incoming Bandwidth Problem'
+          expression: 'avg(/Unifi Protect Cloud Key/IpExtInOctets,3600s) < 10000'
     -
       uuid: 8e2e73da9a224f61b24511db3c331864
       expression: 'avg(/Unifi Protect NVR4/IpExtInOctets,1h) < last(/Unifi Protect NVR4/incoming_bandwidth_moving_average_threshold,#1)'
       name: '{HOST.NAME} Incoming Bandwidth Too Low'
       priority: WARNING
       manual_close: 'YES'
+      dependencies:
+        -
+          name: '{HOST.NAME} Incoming Bandwidth Problem'
+          expression: 'avg(/Unifi Protect NVR4/IpExtInOctets,1h) < 10000'
     -
       uuid: 52cec550f270441f9c5cdd764897ce53
       expression: 'last(/Unifi Protect NVR4/ssh.run[temp1],#1)>{$UNIFI_ALERT_TEMP} or last(/Unifi Protect NVR4/ssh.run[temp2],#1)>{$UNIFI_ALERT_TEMP} or last(/Unifi Protect NVR4/ssh.run[temp3],#1)>{$UNIFI_ALERT_TEMP}'
