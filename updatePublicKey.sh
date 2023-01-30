@@ -7,7 +7,7 @@ cat << EOF
 Usage "${0}" [-d] [-R] [-i privateKeyPath] [-s <fileName>] [-u user] user@targetMachine
 	-i specify private public key pair
 	-s use sshpass with given password file. Will ask for the password if sshpass is not installed
-	-d disabled strict host key checking with SSH option StrictHostKeyChecking=no
+	-d disable strict host key checking with SSH option StrictHostKeyChecking=no
 	-b for dropbear (used in protect cameras) additionally copy ~/.ssh/authorized_keys to /var/etc/dropbear
 	-u run the command as <user>
 	-R remove the local authorized key for that host
@@ -46,7 +46,7 @@ done
 shift $((OPTIND-1))
 
 
-TARGET=$@
+TARGET=$*
 
 
 if [[ -z ${TARGET} ]]; then
@@ -59,10 +59,10 @@ if [[ -z ${PRIVKEY_PATH} ]]; then
 fi
 
 PUBKEY_PATH=${PRIVKEY_PATH}".pub"
-PUBKEY=$(<${PUBKEY_PATH}) || exit 1;
+PUBKEY=$(<"${PUBKEY_PATH}") || exit 1;
 
 if [[ -z "${PUBKEY}" ]]; then
-	echo "Could not read public key at "${PUBKEY_PATH}
+	echo "Could not read public key at ${PUBKEY_PATH}"
 	exit 1
 fi
 
@@ -74,8 +74,8 @@ if [[ -z "${HOST}" ]]; then
 	exit 1
 fi
 
-if ! [[ -z ${REMOVE_KEY} ]]; then
-	ssh-keygen -R ${HOST} || exit 1
+if [[ -n "${REMOVE_KEY}" ]]; then
+	ssh-keygen -R "${HOST}" || exit 1
 fi
 
 if [[ -z "${NOPING}" ]]; then
@@ -83,28 +83,31 @@ if [[ -z "${NOPING}" ]]; then
 	#set -x
 	# Quick check to see if it is pingable
 	trap - SIGALRM
-	ping -c 1 -t 5 ${HOST} >> /dev/null
+	ping -c 1 -t 5 "${HOST}" >> /dev/null
 	R=$?
 	if ! [[ $R -eq 0 ]]; then
-		echo ${HOST}" is not reachable - ping returned $R"
+		echo "${HOST} is not reachable - ping returned $R"
 		exit 1
 	fi
 fi
 
-${SUDO_USER} ssh ${BIND_INTERFACE_OPTION} ${IPV4} -i ${PRIVKEY_PATH} -q -o "BatchMode yes" ${TARGET} true
+#shellcheck disable=SC2086
+${SUDO_USER} ssh ${BIND_INTERFACE_OPTION} ${IPV4} -i "${PRIVKEY_PATH}" -q -o "BatchMode yes" "${TARGET}" true
 PUBKEY_OK=$?
-SSHPASS=`which sshpass`
+SSHPASS=$(command -v sshpass)
 
 if [ ${PUBKEY_OK} != '0'  ]; then
-	echo Need to update public key for ${TARGET}
+	echo "Need to update public key for ${TARGET}"
 	unset DROPBEAR_CMD
-   	if ! [[ -z ${DROPBEAR} ]]; then
+   	if [[ -n "${DROPBEAR}" ]]; then
 	   	DROPBEAR_CMD=" && cp .ssh/authorized_keys /var/etc/dropbear/"
    	fi
 	if [[ -z ${SSH_PASS_FILE} ]] || ! [[ -e ${SSH_PASS_FILE} ]] || [[ -z ${SSHPASS} ]]; then
-	   	${SUDO_USER} ssh ${BIND_INTERFACE_OPTION} ${IPV4} ${STRICT} ${TARGET} "mkdir -p .ssh && echo '${PUBKEY}' >> .ssh/authorized_keys ${DROPBEAR_CMD}" || exit 1;
+		#shellcheck disable=SC2086
+	   	${SUDO_USER} ssh ${BIND_INTERFACE_OPTION} ${IPV4} ${STRICT} "${TARGET}" "mkdir -p .ssh && echo '${PUBKEY}' >> .ssh/authorized_keys ${DROPBEAR_CMD}" || exit 1;
 	else
-	   	${SUDO_USER} sshpass -f ${SSH_PASS_FILE} ssh ${IPV4} ${BIND_INTERFACE_OPTION} ${STRICT} ${TARGET} "mkdir -p .ssh && echo '${PUBKEY}' >> .ssh/authorized_keys ${DROPBEAR_CMD}" || exit 1;		
+		#shellcheck disable=SC2086
+	   	${SUDO_USER} sshpass -f "${SSH_PASS_FILE}" ssh ${IPV4} ${BIND_INTERFACE_OPTION} ${STRICT} "${TARGET}" "mkdir -p .ssh && echo '${PUBKEY}' >> .ssh/authorized_keys ${DROPBEAR_CMD}" || exit 1;		
 	fi
 fi
 
