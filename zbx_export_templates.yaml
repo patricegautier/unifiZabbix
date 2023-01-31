@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2023-01-31T01:51:55Z'
+  date: '2023-01-31T01:59:14Z'
   template_groups:
     -
       uuid: 15155c95a3d048f4856272ae12fd42c5
@@ -1761,7 +1761,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Unifi Protect is not running on {HOST.NAME}'
-                  expression: 'last(/Unifi Protect Cloud Key/ssh.run[protect],#1)<>0'
+                  expression: 'min(/Unifi Protect Cloud Key/ssh.run[protect],{$UNIFI_ALERT_PERIOD})>0'
             -
               uuid: 1e88147fdc28426f9b8d227993f6045e
               expression: 'nodata(/Unifi Protect Cloud Key/IpExtInOctets,{$UNIFI_ALERT_PERIOD})=1'
@@ -1804,7 +1804,7 @@ zabbix_export:
           triggers:
             -
               uuid: 7d52e86e0fbf4eb4a5149f4bf20a0a9b
-              expression: 'last(/Unifi Protect Cloud Key/ssh.run[protect],#1)<>0'
+              expression: 'min(/Unifi Protect Cloud Key/ssh.run[protect],{$UNIFI_ALERT_PERIOD})>0'
               name: 'Unifi Protect is not running on {HOST.NAME}'
               opdata: 'Status: last(/Unifi Protect Cloud Key/ssh.run[protect],#1)'
               priority: AVERAGE
@@ -1937,7 +1937,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Unifi Protect is not running on {HOST.NAME}'
-                  expression: 'last(/Unifi Protect NVR4/ssh.run[protect],#1)<>0'
+                  expression: 'min(/Unifi Protect NVR4/ssh.run[protect],{$UNIFI_ALERT_PERIOD})>0'
             -
               uuid: e4308a68f1df4a8e9ff7b3692a51355e
               expression: 'nodata(/Unifi Protect NVR4/IpExtInOctets,{$UNIFI_ALERT_PERIOD})=1'
@@ -2020,7 +2020,7 @@ zabbix_export:
           triggers:
             -
               uuid: 4618f80f013744cc91733bf5a15bb46a
-              expression: 'last(/Unifi Protect NVR4/ssh.run[protect],#1)<>0'
+              expression: 'min(/Unifi Protect NVR4/ssh.run[protect],{$UNIFI_ALERT_PERIOD})>0'
               name: 'Unifi Protect is not running on {HOST.NAME}'
               opdata: 'Status: last(/Unifi Protect Cloud Key/ssh.run[protect],#1)'
               priority: AVERAGE
