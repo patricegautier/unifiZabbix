@@ -136,17 +136,16 @@ match($0, "^interface [A-z0-9]+$") {
 
 
 
-declare switchDiscoveryDir="/tmp/unifiSwitchDiscovery"
+declare SWITCH_DISCOVERY_DIR="/tmp/unifiSwitchDiscovery"
 function startSwitchDiscovery() {
-	local target=$1
-	local jqProgram=$2
+	local jqProgram=$1
 	local exp; exp=$(command -v expect)
 	if [[ -z "${exp}" ]]; then exp=$(ls /usr/bin/expect); fi
 	if [[ -z "${exp}" ]]; then 
 		OUTPUT=$(errorJsonWithReason "please install 'expect' to run SWITCH_DISCOVERY")
 		return 1
 	else
-		mkdir -p "${switchDiscoveryDir}"
+		mkdir -p "${SWITCH_DISCOVERY_DIR}"
 		#shellcheck disable=SC2034 
 		# o=$(runWithTimeout 60 retrievePortNamesInto "${jqProgram}") &
 		#	nohup needs a cmd-line utility
@@ -517,9 +516,9 @@ if [[ -n "${PASSWORD_FILE_PATH}" ]] && ! [[ "${PASSWORD_FILE_PATH}" == "{\$UNIFI
 	PRIVKEY_OPTION=
 fi
 
-declate JQ_PROGRAM="${switchDiscoveryDir}/switchPorts-${target}.jq"
+declate JQ_PROGRAM="${SWITCH_DISCOVERY_DIR}/switchPorts-${TARGET_DEVICE}.jq"
 if [[ ${DEVICE_TYPE:-} == 'SWITCH_DISCOVERY' ]]; then
-	startSwitchDiscovery "${TARGET_DEVICE}" "$JQ_PROGRAM"  # asynchronously discover port names
+	startSwitchDiscovery "$JQ_PROGRAM"  # asynchronously discover port names
 	EXIT_CODE=$?
 fi
 
