@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2023-01-31T01:59:14Z'
+  date: '2023-02-09T06:32:29Z'
   template_groups:
     -
       uuid: 15155c95a3d048f4856272ae12fd42c5
@@ -1631,7 +1631,7 @@ zabbix_export:
           name: uname
           type: SSH
           key: 'ssh.run[uname]'
-          delay: 1d
+          delay: 1h
           trends: '0'
           value_type: CHAR
           params: 'uname -a'
@@ -3427,6 +3427,15 @@ zabbix_export:
                 -
                   name: '{{#PORT_IS_UPLINK}.regsub("true", "Uplink")} {{#PORT_MEDIA}.regsub("SFP", \0)} Port {#PORT_IDX} above {$UNIFI_PORT_USAGE_AVERAGE_THRESHOLD}%'
                   expression: 'last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)>0 and last(/Unifi Switch/up_[{#PORT_IDX}],#1)="true" and last(/Unifi Switch/stp_state_[{#PORT_IDX}],#1)="forwarding" and ( avg(/Unifi Switch/rx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})>last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)*{$UNIFI_PORT_USAGE_AVERAGE_THRESHOLD}/100 or avg(/Unifi Switch/tx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})>last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)*{$UNIFI_PORT_USAGE_AVERAGE_THRESHOLD}/100 )'
+            -
+              uuid: eaf603c09ea74aa19692349a662034de
+              expression: 'last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#2)>0 and last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)>0 and last(/Unifi Switch/up_[{#PORT_IDX}],#1)="true" and last(/Unifi Switch/stp_state_[{#PORT_IDX}],#1)="forwarding" and (last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1) <> last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#2))'
+              recovery_mode: NONE
+              name: '{{#PORT_IS_UPLINK}.regsub("true", "Uplink")} {{#PORT_MEDIA}.regsub("SFP", \0)} Port {#PORT_IDX} has changed Connection Speed'
+              opdata: 'last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)'
+              priority: INFO
+              description: 'Might indicate bad wiring, or just a new device with a different interface being connected'
+              manual_close: 'YES'
           graph_prototypes:
             -
               uuid: 573a52f59a844f798b12c86c12a7acd4
@@ -3534,7 +3543,7 @@ zabbix_export:
           graph_prototypes:
             -
               uuid: b6431556a31941d29b7b592c57342e4d
-              name: Temperature
+              name: 'Temperature [{#TEMPERATURE_KEY_NAME}]'
               graph_items:
                 -
                   color: 1A7C11
