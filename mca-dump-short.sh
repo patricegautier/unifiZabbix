@@ -516,7 +516,7 @@ if [[ -n "${PASSWORD_FILE_PATH}" ]] && ! [[ "${PASSWORD_FILE_PATH}" == "{\$UNIFI
 	PRIVKEY_OPTION=
 fi
 
-declate JQ_PROGRAM="${SWITCH_DISCOVERY_DIR}/switchPorts-${TARGET_DEVICE}.jq"
+declare JQ_PROGRAM="${SWITCH_DISCOVERY_DIR}/switchPorts-${TARGET_DEVICE}.jq"
 if [[ ${DEVICE_TYPE:-} == 'SWITCH_DISCOVERY' ]]; then
 	startSwitchDiscovery "$JQ_PROGRAM"  # asynchronously discover port names
 	EXIT_CODE=$?
