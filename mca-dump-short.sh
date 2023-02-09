@@ -138,7 +138,8 @@ match($0, "^interface [A-z0-9]+$") {
 
 function startSwitchDiscovery() {
 	local target=$1
-	declare exp; exp=$(which expect)
+	local jqProgram=$2
+	local exp; exp=$(command -v expect)
 	if [[ -z "${exp}" ]]; then exp=$(ls /usr/bin/expect); fi
 	if [[ -z "${exp}" ]]; then 
 		OUTPUT=$(errorJsonWithReason "please install 'expect' to run SWITCH_DISCOVERY")
@@ -146,7 +147,6 @@ function startSwitchDiscovery() {
 	else
 		declare switchDiscoveryDir="/tmp/unifiSwitchDiscovery"
 		mkdir -p "${switchDiscoveryDir}"
-		declare jqProgram="${switchDiscoveryDir}/switchPorts-${target}.jq"
 		#shellcheck disable=SC2034 
 		# o=$(runWithTimeout 60 retrievePortNamesInto "${jqProgram}") &
 		#	nohup needs a cmd-line utility
@@ -300,9 +300,10 @@ function insertPortNamesIntoJson() {
 
 function invokeMcaDump() {
 	local deviceType=$1
-	local -n exitCode=$2
-	local -n output=$3
-	local -n jsonOutput=$4
+	local jqProgram=$2
+	local -n exitCode=$3
+	local -n output=$4
+	local -n jsonOutput=$5
 
 	INDENT_OPTION="--indent 0"
 
@@ -516,15 +517,16 @@ if [[ -n "${PASSWORD_FILE_PATH}" ]] && ! [[ "${PASSWORD_FILE_PATH}" == "{\$UNIFI
 	PRIVKEY_OPTION=
 fi
 
+declate JQ_PROGRAM="${switchDiscoveryDir}/switchPorts-${target}.jq"
 if [[ ${DEVICE_TYPE:-} == 'SWITCH_DISCOVERY' ]]; then
-	startSwitchDiscovery "${TARGET_DEVICE}"  # asynchronously discover port names
+	startSwitchDiscovery "${TARGET_DEVICE}" "$JQ_PROGRAM"  # asynchronously discover port names
 	EXIT_CODE=$?
 fi
 
 if (( EXIT_CODE == 0 )); then
 	case "${DEVICE_TYPE}" in
 		UDMP_FAN_DISCOVERY)	fanDiscovery EXIT_CODE OUTPUT JSON_OUTPUT ;;
-		*)					invokeMcaDump "$DEVICE_TYPE" EXIT_CODE OUTPUT JSON_OUTPUT ;;
+		*)					invokeMcaDump "$DEVICE_TYPE" "$JQ_PROGRAM" EXIT_CODE OUTPUT JSON_OUTPUT ;;
 	esac
 fi
 
