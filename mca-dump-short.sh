@@ -136,6 +136,7 @@ match($0, "^interface [A-z0-9]+$") {
 
 
 
+declare switchDiscoveryDir="/tmp/unifiSwitchDiscovery"
 function startSwitchDiscovery() {
 	local target=$1
 	local jqProgram=$2
@@ -145,7 +146,6 @@ function startSwitchDiscovery() {
 		OUTPUT=$(errorJsonWithReason "please install 'expect' to run SWITCH_DISCOVERY")
 		return 1
 	else
-		declare switchDiscoveryDir="/tmp/unifiSwitchDiscovery"
 		mkdir -p "${switchDiscoveryDir}"
 		#shellcheck disable=SC2034 
 		# o=$(runWithTimeout 60 retrievePortNamesInto "${jqProgram}") &
