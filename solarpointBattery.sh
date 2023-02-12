@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # This script will retrieve battery information from a SunMax SolarPoint device in JSON format
 #
