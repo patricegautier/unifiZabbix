@@ -51,7 +51,7 @@ function insertWarningIntoJsonOutput() {
 	local warning=$1
 	local output=$2
 	echo "${output}" | jq ". + { mcaDumpWarning: { \"${warning}\": true } }"
-	echoErr "$warning"
+	echoErr "warning: $warning"
 }
 
 function echoErr() {
