@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2023-02-09T06:32:29Z'
+  date: '2023-02-22T07:51:21Z'
   template_groups:
     -
       uuid: 15155c95a3d048f4856272ae12fd42c5
@@ -5083,11 +5083,6 @@ zabbix_export:
               type: CHECK_JSON_ERROR
               parameters:
                 - $.mcaDumpError
-              error_handler: DISCARD_VALUE
-            -
-              type: CHECK_JSON_ERROR
-              parameters:
-                - $.mcaDumpWarning.missingTemperatures
               error_handler: DISCARD_VALUE
           tags:
             -
