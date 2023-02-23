@@ -332,8 +332,7 @@ function invokeMcaDump() {
 	#shellcheck disable=SC2034
 	jsonOutput="${output}"
 
-
-	if (( exitCode >=127 && exitCode != 255 )); then
+	if (( exitCode >= 127 && exitCode != 255 )); then
 		output=$(errorJsonWithReason "timeout ($exitCode)")
 	elif (( exitCode != 0 )) || [[ -z "${output}" ]]; then
 		output=$(errorJsonWithReason "$(echo "Remote pb: "; cat "${ERROR_FILE}"; echo "${output}" )")
@@ -443,7 +442,7 @@ do
     t) DEVICE_TYPE=${OPTARG} ;;
     d) TARGET_DEVICE=${OPTARG} ;;
     P) TARGET_DEVICE_PORT=${OPTARG} ;;
-    v) VERBOSE=true ;;
+    v) export VERBOSE=true ;;
     p) PASSWORD_FILE_PATH=${OPTARG} ;;
     w) VERBOSE_PORT_DISCOVERY=true ;;
     m) logFile=${OPTARG} ;;
@@ -453,7 +452,7 @@ do
     b) BATCH_MODE="-o BatchMode=yes" ;;
     e) echo -n "$(errorJsonWithReason "simulated error")"; exit 1 ;;
     U)  if [[ -n "${OPTARG}" ]] &&  [[ "${OPTARG}" != "{\$UNIFI_VERBOSE_SSH}" ]]; then
-    		VERBOSE_SSH="${OPTARG}"
+    		export VERBOSE_SSH="${OPTARG}"
     	fi ;;
     *) usage ;;
   esac
@@ -470,7 +469,7 @@ if [[ -n "${ECHO_OUTPUT:-}" ]]; then
 fi
 
 if [[ -n "${VERBOSE:-}" ]]; then
-        VERBOSE_OPTION="-v"
+        export VERBOSE_OPTION="-v"
 fi
 
 if [[ -z "${TARGET_DEVICE:-}" ]]; then
