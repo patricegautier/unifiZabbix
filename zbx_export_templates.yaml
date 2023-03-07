@@ -3432,7 +3432,7 @@ zabbix_export:
               expression: 'last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#2)>0 and last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)>0 and last(/Unifi Switch/up_[{#PORT_IDX}],#1)="true" and last(/Unifi Switch/stp_state_[{#PORT_IDX}],#1)="forwarding" and (last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1) <> last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#2))'
               recovery_mode: NONE
               name: '{{#PORT_IS_UPLINK}.regsub("true", "Uplink")} {{#PORT_MEDIA}.regsub("SFP", \0)} Port {#PORT_IDX} has changed Connection Speed'
-              opdata: 'last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)'
+              opdata: 'Link speed on port {#PORT_IDX} changed to {ITEM.VALUE1}'
               priority: INFO
               description: 'Might indicate bad wiring, or just a new device with a different interface being connected'
               manual_close: 'YES'
