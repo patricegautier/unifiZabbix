@@ -1,6 +1,5 @@
 zabbix_export:
-  version: '6.2'
-  date: '2023-02-22T07:51:21Z'
+  version: '6.4'
   template_groups:
     -
       uuid: 15155c95a3d048f4856272ae12fd42c5
@@ -58,7 +57,7 @@ zabbix_export:
               uuid: 6b2607bd0add48f4bcf5e8a6aee1a517
               expression: 'last(/SunMAX SolarPoint/batteryCharge,#1)<5000'
               name: 'Battery Charge is below 50%'
-              opdata: 'last(/SunMAX SolarPoint/batteryCharge,#1)'
+              opdata: 'Battery charge is {ITEM.VALUE1} / 10000'
               priority: INFO
               manual_close: 'YES'
         -
@@ -1053,6 +1052,7 @@ zabbix_export:
               uuid: be561d7959ff4054a016af7adfd8b5c7
               expression: 'avg(/Unifi AP/sat,{$UNIFI_ALERT_PERIOD})<70'
               name: '{HOST.NAME} Satisfaction < 70 %'
+              opdata: 'Satisfaction is {ITEM.VALUE1}'
               priority: INFO
               manual_close: 'YES'
         -
@@ -1207,14 +1207,14 @@ zabbix_export:
                   uuid: 3f72d760eb204eceafe82682fbda16a5
                   expression: 'avg(/Unifi AP/cint[{#RADIO_NAME}],{$UNIFI_ALERT_PERIOD})>{$UNIFI_CHANNEL_INTERFERENCE_AVERAGE_THRESHOLD:"{#RADIO_NAME}"}'
                   name: '{HOST.NAME}  {#RADIO_NAME} Channel Interference > {$UNIFI_CHANNEL_INTERFERENCE_AVERAGE_THRESHOLD:"{#RADIO_NAME}"}%'
-                  opdata: '{ITEM.LASTVALUE}'
+                  opdata: 'Interference is {ITEM.VALUE1}'
                   priority: AVERAGE
                   manual_close: 'YES'
                 -
                   uuid: e774c76335834241b15c4e203889e7e0
                   expression: 'avg(/Unifi AP/cint[{#RADIO_NAME}],{$UNIFI_ALERT_PERIOD})>{$UNIFI_CHANNEL_INTERFERENCE_INFO_THRESHOLD:"{#RADIO_NAME}"}'
                   name: '{HOST.NAME}  {#RADIO_NAME} Channel Interference > {$UNIFI_CHANNEL_INTERFERENCE_INFO_THRESHOLD:"{#RADIO_NAME}"}%'
-                  opdata: '{ITEM.LASTVALUE}'
+                  opdata: 'Interference is {ITEM.VALUE1}'
                   priority: INFO
                   manual_close: 'YES'
                   dependencies:
@@ -1274,14 +1274,14 @@ zabbix_export:
                   uuid: 9047af0eb978454aab5768341986f29b
                   expression: 'avg(/Unifi AP/cu_total[{#RADIO_NAME}],{$UNIFI_ALERT_PERIOD})>{$UNIFI_CHANNEL_USAGE_AVERAGE_THRESHOLD:"{#RADIO_NAME}"}'
                   name: '{HOST.NAME}  {#RADIO_NAME} Channel Utilization > {$UNIFI_CHANNEL_USAGE_AVERAGE_THRESHOLD:"{#RADIO_NAME}"}%'
-                  opdata: '{ITEM.LASTVALUE}'
+                  opdata: 'Utilization is {ITEM.VALUE1}'
                   priority: AVERAGE
                   manual_close: 'YES'
                 -
                   uuid: 69372713ad284b79a905f5942c321b55
                   expression: 'avg(/Unifi AP/cu_total[{#RADIO_NAME}],{$UNIFI_ALERT_PERIOD})>{$UNIFI_CHANNEL_USAGE_INFO_THRESHOLD:"{#RADIO_NAME}"}'
                   name: '{HOST.NAME}  {#RADIO_NAME} Channel Utilization > {$UNIFI_CHANNEL_USAGE_INFO_THRESHOLD:"{#RADIO_NAME}"}%'
-                  opdata: '{ITEM.LASTVALUE}'
+                  opdata: 'Utilization is {ITEM.VALUE1}'
                   priority: INFO
                   manual_close: 'YES'
                   dependencies:
@@ -1679,6 +1679,7 @@ zabbix_export:
               uuid: ae881c785d1d4f7d9daf1ce86f0336ac
               expression: 'avg(/Unifi Protect Camera/tx_bandwidth,10m)<{$PROTECT_LOW_BANDWIDTH}'
               name: 'Camera {HOST.NAME} Outgoing Bandwidth Low'
+              opdata: 'Outgoing Bandwidth is {ITEM.VALUE1}'
               priority: WARNING
               dependencies:
                 -
@@ -1756,6 +1757,7 @@ zabbix_export:
               uuid: 7f2a2c7fdad34f378b385eb53e9e08c3
               expression: 'avg(/Unifi Protect Cloud Key/IpExtInOctets,3600s) < 10000'
               name: '{HOST.NAME} Incoming Bandwidth Problem'
+              opdata: 'Incoming Bandwidth is {ITEM.VALUE1}'
               priority: AVERAGE
               manual_close: 'YES'
               dependencies:
@@ -1806,7 +1808,6 @@ zabbix_export:
               uuid: 7d52e86e0fbf4eb4a5149f4bf20a0a9b
               expression: 'min(/Unifi Protect Cloud Key/ssh.run[protect],{$UNIFI_ALERT_PERIOD})>0'
               name: 'Unifi Protect is not running on {HOST.NAME}'
-              opdata: 'Status: last(/Unifi Protect Cloud Key/ssh.run[protect],#1)'
               priority: AVERAGE
         -
           uuid: e1d2e198baa2468fae4e354627b99bcd
@@ -1932,6 +1933,7 @@ zabbix_export:
               uuid: 3d4f53db083b401386c1d6e5983f7b54
               expression: 'avg(/Unifi Protect NVR4/IpExtInOctets,1h) < 10000'
               name: '{HOST.NAME} Incoming Bandwidth Problem'
+              opdata: 'Incoming Bandwidth is {ITEM.VALUE1}'
               priority: AVERAGE
               manual_close: 'YES'
               dependencies:
@@ -2336,6 +2338,7 @@ zabbix_export:
               uuid: 61e39b8d10334b2eb0673169b3f54510
               expression: 'change(/Unifi SSH High Priority Host/ssh.run[uname])=1'
               name: '{HOST.NAME} Version Change'
+              opdata: 'New Version is {ITEM.VALUE1}'
               priority: INFO
               manual_close: 'YES'
         -
@@ -2597,6 +2600,7 @@ zabbix_export:
               uuid: 5558237e8dab41a0b5070c3dcf8120a3
               expression: 'change(/Unifi SSH Host/ssh.run[uname])=1'
               name: '{HOST.NAME} Version Change'
+              opdata: 'New Version is {ITEM.VALUE1}'
               priority: INFO
               manual_close: 'YES'
         -
@@ -3408,11 +3412,13 @@ zabbix_export:
               uuid: 2bb9f140e9254b83b86f5318fd3a5240
               expression: 'last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)>0 and last(/Unifi Switch/up_[{#PORT_IDX}],#1)="true" and last(/Unifi Switch/stp_state_[{#PORT_IDX}],#1)="forwarding" and ( avg(/Unifi Switch/rx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})>last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)*{$UNIFI_PORT_USAGE_AVERAGE_THRESHOLD}/100 or avg(/Unifi Switch/tx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})>last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)*{$UNIFI_PORT_USAGE_AVERAGE_THRESHOLD}/100 )'
               name: '{{#PORT_IS_UPLINK}.regsub("true", "Uplink")} {{#PORT_MEDIA}.regsub("SFP", \0)} Port {#PORT_IDX} above {$UNIFI_PORT_USAGE_AVERAGE_THRESHOLD}%'
+              opdata: 'Port Usage is rx:{ITEM.VALUE4} tx:{ITEM.VALUE5}'
               priority: AVERAGE
             -
               uuid: ce61140da14e4a1ea919f2e083ee6835
               expression: 'last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)>0 and last(/Unifi Switch/up_[{#PORT_IDX}],#1)="true" and last(/Unifi Switch/stp_state_[{#PORT_IDX}],#1)="forwarding" and ( avg(/Unifi Switch/rx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})>last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)*{$UNIFI_PORT_USAGE_INFO_THRESHOLD}/100 or avg(/Unifi Switch/tx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})>last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)*{$UNIFI_PORT_USAGE_INFO_THRESHOLD}/100 )'
               name: '{{#PORT_IS_UPLINK}.regsub("true", "Uplink")} {{#PORT_MEDIA}.regsub("SFP", \0)} Port {#PORT_IDX} above {$UNIFI_PORT_USAGE_INFO_THRESHOLD}%'
+              opdata: 'Port Usage is rx:{ITEM.VALUE4} tx:{ITEM.VALUE5}'
               priority: INFO
               dependencies:
                 -
@@ -3422,6 +3428,7 @@ zabbix_export:
               uuid: 054404edaf6b444a9c293b68a48a9adf
               expression: 'last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)>0 and last(/Unifi Switch/up_[{#PORT_IDX}],#1)="true" and last(/Unifi Switch/stp_state_[{#PORT_IDX}],#1)="forwarding" and (  avg(/Unifi Switch/rx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})>last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)*{$UNIFI_PORT_USAGE_WARNING_THRESHOLD}/100 or avg(/Unifi Switch/tx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})>last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)*{$UNIFI_PORT_USAGE_WARNING_THRESHOLD}/100 )'
               name: '{{#PORT_IS_UPLINK}.regsub("true", "Uplink")} {{#PORT_MEDIA}.regsub("SFP", \0)} Port {#PORT_IDX} above {$UNIFI_PORT_USAGE_WARNING_THRESHOLD}%'
+              opdata: 'Port Usage is rx:{ITEM.VALUE4} tx:{ITEM.VALUE5}'
               priority: WARNING
               dependencies:
                 -
@@ -3432,7 +3439,7 @@ zabbix_export:
               expression: 'last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#2)>0 and last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)>0 and last(/Unifi Switch/up_[{#PORT_IDX}],#1)="true" and last(/Unifi Switch/stp_state_[{#PORT_IDX}],#1)="forwarding" and (last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1) <> last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#2))'
               recovery_mode: NONE
               name: '{{#PORT_IS_UPLINK}.regsub("true", "Uplink")} {{#PORT_MEDIA}.regsub("SFP", \0)} Port {#PORT_IDX} has changed Connection Speed'
-              opdata: 'last(/Unifi Switch/connection_speed_[{#PORT_IDX}],#1)'
+              opdata: 'Port Usage is rx:{ITEM.VALUE4} tx:{ITEM.VALUE5}'
               priority: INFO
               description: 'Might indicate bad wiring, or just a new device with a different interface being connected'
               manual_close: 'YES'
@@ -3624,7 +3631,7 @@ zabbix_export:
               uuid: bfac9fee93424eebbe3a3a3925f56ebc
               expression: 'last(/Unifi UDMP/cpu,#1)>{$UNIFI_CPU_UTILIZATION_HIGH}'
               name: '{HOST.NAME} CPU Utilization is > {$UNIFI_CPU_UTILIZATION_HIGH}%'
-              opdata: 'last(/Unifi UDMP/cpu,#1)'
+              opdata: 'CPU utilization is {ITEM.VALUE1}'
               priority: AVERAGE
               manual_close: 'YES'
         -
@@ -3881,7 +3888,7 @@ zabbix_export:
               uuid: 8ba158c318ec4aee9d1351de353b6d9d
               expression: 'last(/Unifi UDMP/load_avg_15mn,#1)>{$UNIFI_UDMP_LOAD_AVERAGE_HIGH}'
               name: '{HOST.NAME} load average is > {$UNIFI_UDMP_LOAD_AVERAGE_HIGH}'
-              opdata: 'last(/Unifi UDMP/load_avg_15mn,#1)'
+              opdata: 'Load Average is {ITEM.VALUE1}'
               priority: WARNING
               manual_close: 'YES'
         -
@@ -4646,6 +4653,7 @@ zabbix_export:
               uuid: 6e678d3587d944b8bb4a87b7a5ef5935
               expression: 'last(/Unifi UDMP/connection_speed_[{#PORT_IDX}],#1)>0 and last(/Unifi UDMP/up_[{#PORT_IDX}],#1)="true" and ( avg(/Unifi UDMP/rx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})>last(/Unifi UDMP/connection_speed_[{#PORT_IDX}],#1)*.25 or avg(/Unifi UDMP/tx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})>last(/Unifi UDMP/connection_speed_[{#PORT_IDX}],#1)*.25 )'
               name: '{{#PORT_IS_UPLINK}.regsub("true", "Uplink")} {{#PORT_MEDIA}.regsub("SFP", \0)} Port {#PORT_IDX} above 25%'
+              opdata: 'Port Usage is rx:{ITEM.VALUE3} tx:{ITEM.VALUE4}'
               priority: INFO
               dependencies:
                 -
@@ -4655,6 +4663,7 @@ zabbix_export:
               uuid: 14c2ce7629714ff38b1ed1fcaae6ebd3
               expression: 'last(/Unifi UDMP/connection_speed_[{#PORT_IDX}],#1)>0 and last(/Unifi UDMP/up_[{#PORT_IDX}],#1)="true" and (  avg(/Unifi UDMP/rx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})>last(/Unifi UDMP/connection_speed_[{#PORT_IDX}],#1)*.5 or avg(/Unifi UDMP/tx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})>last(/Unifi UDMP/connection_speed_[{#PORT_IDX}],#1)*.5 )'
               name: '{{#PORT_IS_UPLINK}.regsub("true", "Uplink")} {{#PORT_MEDIA}.regsub("SFP", \0)} Port {#PORT_IDX} above 50%'
+              opdata: 'Port Usage is rx:{ITEM.VALUE3} tx:{ITEM.VALUE4}'
               priority: WARNING
               dependencies:
                 -
@@ -4664,6 +4673,7 @@ zabbix_export:
               uuid: 37beea9d4c814e8f8818ddc65c207e3c
               expression: 'last(/Unifi UDMP/connection_speed_[{#PORT_IDX}],#1)>0 and last(/Unifi UDMP/up_[{#PORT_IDX}],#1)="true" and ( avg(/Unifi UDMP/rx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})>last(/Unifi UDMP/connection_speed_[{#PORT_IDX}],#1)*.75 or avg(/Unifi UDMP/tx_port_[{#PORT_IDX}],{$UNIFI_ALERT_PERIOD})>last(/Unifi UDMP/connection_speed_[{#PORT_IDX}],#1)*.75 )'
               name: '{{#PORT_IS_UPLINK}.regsub("true", "Uplink")} {{#PORT_MEDIA}.regsub("SFP", \0)} Port {#PORT_IDX} above 75%'
+              opdata: 'Port Usage is rx:{ITEM.VALUE3} tx:{ITEM.VALUE4}'
               priority: AVERAGE
           graph_prototypes:
             -
@@ -4741,7 +4751,7 @@ zabbix_export:
                   expression: 'last(/Unifi UDMP/temp_[{#TEMP_NAME}],#1)>{$UNIFI_ALERT_TEMP}'
                   name: 'High Temperature for {#TEMP_NAME}'
                   event_name: 'high_temperature_{#TEMP_NAME}'
-                  opdata: 'last(/Unifi UDMP/temp_[{#TEMP_NAME}],#1) C'
+                  opdata: 'Temperature is {ITEM.VALUE1}C'
                   priority: WARNING
           graph_prototypes:
             -
@@ -5055,14 +5065,14 @@ zabbix_export:
               uuid: a1ada827db7a4b4cb827072f9cb82436
               expression: 'last(/Unifi USG/load_avg_15mn,#1)>{$UNIFI_LOAD_AVERAGE_HIGH}'
               name: '{HOST.NAME} load average is > {$UNIFI_LOAD_AVERAGE_HIGH}'
-              opdata: 'last(/Unifi USG/load_avg_15mn,#1)'
+              opdata: 'Load Average is {ITEM.VALUE1}'
               priority: AVERAGE
               manual_close: 'YES'
             -
               uuid: 34e34199443f41fea3ba92deea88c5d0
               expression: 'last(/Unifi USG/load_avg_15mn,#1)>{$UNIFI_LOAD_AVERAGE_MEDIUM}'
               name: '{HOST.NAME} load average is > {$UNIFI_LOAD_AVERAGE_MEDIUM}'
-              opdata: 'last(/Unifi USG/load_avg_15mn,#1)'
+              opdata: 'Load Average is {ITEM.VALUE1}'
               priority: WARNING
               manual_close: 'YES'
               dependencies:
@@ -5631,13 +5641,14 @@ zabbix_export:
               uuid: a0e30c37e9954b52a9427de788cdbb2e
               expression: 'min(/Unsupported Item/zabbix[host,,items_unsupported], {$UNIFI_ALERT_LONG_PERIOD})>0'
               name: '{HOST.NAME} has unsupported item(s)'
-              opdata: 'min(/Unsupported Item/zabbix[host,,items_unsupported], {$UNIFI_ALERT_PERIOD})'
+              opdata: '{HOST.NAME} has {ITEM.VALUE1} unsupported item(s)'
               manual_close: 'YES'
   triggers:
     -
       uuid: 986b14fb36e8416ca24d2af88b06b613
       expression: 'avg(/Unifi Protect Cloud Key/IpExtInOctets,3600s) < last(/Unifi Protect Cloud Key/incoming_bandwidth_moving_average_threshold,#1)'
       name: '{HOST.NAME} Incoming Bandwidth Too Low'
+      opdata: 'Incoming Bandwidth is {ITEM.VALUE1}'
       priority: WARNING
       manual_close: 'YES'
       dependencies:
@@ -5648,6 +5659,7 @@ zabbix_export:
       uuid: 8e2e73da9a224f61b24511db3c331864
       expression: 'avg(/Unifi Protect NVR4/IpExtInOctets,1h) < last(/Unifi Protect NVR4/incoming_bandwidth_moving_average_threshold,#1)'
       name: '{HOST.NAME} Incoming Bandwidth Too Low'
+      opdata: 'Incoming Bandwidth is {ITEM.VALUE1}'
       priority: WARNING
       manual_close: 'YES'
       dependencies:
@@ -5658,24 +5670,27 @@ zabbix_export:
       uuid: 52cec550f270441f9c5cdd764897ce53
       expression: 'last(/Unifi Protect NVR4/ssh.run[temp1],#1)>{$UNIFI_ALERT_TEMP} or last(/Unifi Protect NVR4/ssh.run[temp2],#1)>{$UNIFI_ALERT_TEMP} or last(/Unifi Protect NVR4/ssh.run[temp3],#1)>{$UNIFI_ALERT_TEMP}'
       name: '{HOST.NAME} is hot'
+      opdata: 'Temperatures are {ITEM.VALUE1}, {ITEM.VALUE2}, {ITEM.VALUE3}'
       priority: WARNING
     -
       uuid: d71b7c4cdb084f10b4556d2cadd84f8d
       expression: 'last(/Unifi SSH High Priority Host/load_avg_15mn_uptime,#1)>last(/Unifi SSH High Priority Host/ssh.run[nproc],#1)*{$UNIFI_LOAD_AVERAGE_HIGH}'
       name: '{HOST.NAME} load average is > {$UNIFI_LOAD_AVERAGE_HIGH} per processor'
-      opdata: 'Load Average: last(/Unifi SSH High Priority Host/load_avg_15mn_uptime,#1)'
+      opdata: 'Load Average is {ITEM.VALUE1}'
       priority: WARNING
       manual_close: 'YES'
     -
       uuid: 665ee1289cf94f318e26c9e7474e4229
       expression: 'last(/Unifi SSH Host/load_avg_15mn_uptime,#1)>last(/Unifi SSH Host/ssh.run[nproc],#1)*{$UNIFI_LOAD_AVERAGE_HIGH}'
       name: '{HOST.NAME} load average is > {$UNIFI_LOAD_AVERAGE_HIGH} per processor'
+      opdata: 'Load Average is {ITEM.VALUE1}'
       priority: WARNING
       manual_close: 'YES'
     -
       uuid: b601c0fbee6e48668ec03ff912b5304c
       expression: 'last(/Unifi SSH High Priority Host/load_avg_15mn_uptime,#1)>last(/Unifi SSH High Priority Host/ssh.run[nproc],#1)*{$UNIFI_LOAD_AVERAGE_MEDIUM}'
       name: '{HOST.NAME} Load average is > {$UNIFI_LOAD_AVERAGE_MEDIUM} per processor'
+      opdata: 'Load Average is {ITEM.VALUE1}'
       priority: INFO
       manual_close: 'YES'
       dependencies:
@@ -5686,6 +5701,7 @@ zabbix_export:
       uuid: 22986a62ed9b40ec9c89acecff5045fa
       expression: 'last(/Unifi SSH Host/load_avg_15mn_uptime,#1)>last(/Unifi SSH Host/ssh.run[nproc],#1)*{$UNIFI_LOAD_AVERAGE_MEDIUM}'
       name: '{HOST.NAME} Load average is > {$UNIFI_LOAD_AVERAGE_MEDIUM} per processor'
+      opdata: 'Load Average is {ITEM.VALUE1}'
       priority: INFO
       manual_close: 'YES'
       dependencies:
