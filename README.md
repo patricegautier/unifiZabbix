@@ -350,7 +350,7 @@ This is my set of values
 
 • libSSH can be a source of problems:
 
-- if some of your items randomly fail with 'Cannot read data from SSH server' (in the UI or in  /var/log/zabbix/zabbix_server.log), the likely culprit is an outdated version of libssh, which sometimes returns an error code even on success.  You have to compile the last version from sources from libssh.org and recompile I'm afraid..  This was a problem on Raspbian buster for libssh 0.8.x and is confirmed fixed with libssh 0.9.5 at least.  
+- if some of your items randomly fail with 'Cannot read data from SSH server' (in the UI or in  /var/log/zabbix/zabbix_server.log), the likely culprit is an outdated version of libssh, which sometimes returns an error code even on success.  You have to compile the last version from sources from libssh.org and recompile I'm afraid..  This was a problem on Raspbian buster for libssh 0.8.x and is confirmed fixed with libssh 0.9.5 at least.  Note 03/23:  This seems to be resolved with Zabbix 6.4..
 
 On Raspbian Bullseye you can find libssl at https://packages.debian.org/bullseye/amd64/libssh-4/download
 
@@ -377,10 +377,5 @@ i.e automatically create all the proper hosts connected to the proper templates 
 ## Better SSH debugging
 
 Most of the pain in setting those templates up is debugging the SSH connections..  Add pre-processing to check for valid json on mca-dump-short to all templates
-
-
-## Even Moar data!
-
-There is a mountain of information to be retrieved from devices.  I added what made most sense to me, but let me know if you would like to see added.  Also there is potential for quite a few more triggers..
 
 
