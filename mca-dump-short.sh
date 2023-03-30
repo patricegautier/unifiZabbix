@@ -82,7 +82,7 @@ function truncateFileOnceADay() {
 		if ! size=$(wc -c < "$file"); then return; fi
 		if (( size > TRUNCATE_SIZE )); then
 			local haveToTrunc=1
-			local truncMarker=".$file.trunc"
+			local truncMarker="$file.truncMarker"
 			if [[ -f "$truncMarker" ]]; then
 				local trunkMarkerDate; 
 				if ! trunkMarkerDate=$(date -r "$truncMarker" +%s); then return; fi	
