@@ -73,6 +73,29 @@ function issueSSHCommand() {
 	${SSHPASS_OPTIONS} ssh ${SSH_PORT} ${VERBOSE_SSH} ${HE_RSA_SSH_KEY_OPTIONS} ${BATCH_MODE} -o ConnectTimeout=5 -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} "${USER}@${TARGET_DEVICE}" "$command"
 }
 
+declare TRUNCATE_SIZE=1000000 #1M
+declare TRUNCATE_FREQUENCY=3600 #1D
+function truncateFileOnceADay() {
+	local file=$1
+	if [[ -f "$file" ]]; then
+		local size
+		if ! size=$(wc -c <"$FILENAME"); then return; fi
+		if (( size > TRUNCATE_SIZE )); then
+			local truncMarker=".$file.trunc"
+			if [[ -f "$truncMarker" ]]; then
+				local trunkMarkerDate; 
+				if ! trunkMarkerDate=$(date -r "$truncMarker" +%s); then return; fi	
+				local now; now=$(date +%s)
+				if (( now - trunkMarkerDate > TRUNCATE_FREQUENCY )); then  
+					local tmpFile="$file.tmpTrunc"
+					tail -c "$TRUNCATE_SIZE" > "$tmpFile"
+					mv "$tmpFile" "$file"
+				fi
+			fi
+		fi 
+	fi
+}
+
 #---------------------------------------------------------------------------------------
 # Fan Discovery
 
@@ -326,6 +349,7 @@ function invokeMcaDump() {
 		*)								echo "Unknown device Type: '${DEVICE_TYPE:-}'"; usage ;;
 	esac
 
+	local ERROR_FILE=/tmp/mca-$RANDOM.err
 
 	output=$(runWithTimeout "${TIMEOUT}" issueSSHCommand mca-dump  2> "${ERROR_FILE}")
 	exitCode=$?
@@ -365,7 +389,7 @@ function invokeMcaDump() {
 				output=$(errorJsonWithReason "jq ${INDENT_OPTION} ${JQ_OPTIONS} returned status $exitCode; $(cat $errorFile);  JQ input was ${jqInput}")
 				exitCode=1
 			fi
-			rm "${errorFile}" 2>/dev/null
+			rm -f "${errorFile}" 2>/dev/null
 		fi
 	fi
 	rm -f  "${ERROR_FILE}" 2>/dev/null
@@ -461,7 +485,6 @@ done
 declare EXIT_CODE=0
 declare OUTPUT=
 declare JSON_OUTPUT=
-declare ERROR_FILE=/tmp/mca-$RANDOM.err
 
 
 if [[ -n "${ECHO_OUTPUT:-}" ]]; then
@@ -544,6 +567,8 @@ fi
 
 echo "${OUTPUT}"
 
+truncateFileOnceADay "$errFile"
+truncateFileOnceADay "$logFile"
 
 exit $EXIT_CODE
 
