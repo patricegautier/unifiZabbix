@@ -74,7 +74,7 @@ function issueSSHCommand() {
 }
 
 declare TRUNCATE_SIZE=5000 #1M
-declare TRUNCATE_FREQUENCY=3600 #1D
+declare TRUNCATE_FREQUENCY=600 #1D
 function truncateFileOnceADay() {
 	local file=$1
 	if [[ -f "$file" ]]; then
