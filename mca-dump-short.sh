@@ -93,7 +93,7 @@ function truncateFileOnceADay() {
 			fi
 			if (( haveToTrunc )); then
 				local tmpFile="$file.tmpTrunc"
-				tail -c "$TRUNCATE_SIZE" > "$tmpFile"
+				tail -c "$TRUNCATE_SIZE" "$file" > "$tmpFile"
 				mv "$tmpFile" "$file"
 				touch "$truncMarker"
 			fi
