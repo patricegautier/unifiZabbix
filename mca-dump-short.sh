@@ -362,14 +362,11 @@ function invokeMcaDump() {
 	jsonOutput="${output}"
 
 	if (( exitCode >= 127 && exitCode != 255 )); then
-		rm -f  "${mcaErrorFile}" 2>/dev/null
 		output=$(errorJsonWithReason "timeout ($exitCode)")
 	elif (( exitCode != 0 )) || [[ -z "${output}" ]]; then
 		output=$(errorJsonWithReason "$(echo "Remote pb: "; cat "${mcaErrorFile}"; echo "${output}" )")
 		exitCode=1
-		rm -f  "${mcaErrorFile}" 2>/dev/null
 	else
-		rm -f  "${mcaErrorFile}" 2>/dev/null
 		if [[ -n "${JQ_VALIDATOR:-}" ]]; then
 			local validation; validation=$(echo "${output}" | jq "${JQ_VALIDATOR}")
 			exitCode=$?
@@ -416,6 +413,7 @@ function invokeMcaDump() {
 		fi
 		rm "${errorFile}" 2>/dev/null
 	fi
+	rm -f  "${mcaErrorFile}" 2>/dev/null
 }
 
 
