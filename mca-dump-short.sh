@@ -79,7 +79,7 @@ function truncateFileOnceADay() {
 	local file=$1
 	if [[ -f "$file" ]]; then
 		local size
-		if ! size=$(wc -c <"$FILENAME"); then return; fi
+		if ! size=$(wc -c < "$file"); then return; fi
 		if (( size > TRUNCATE_SIZE )); then
 			local truncMarker=".$file.trunc"
 			if [[ -f "$truncMarker" ]]; then
