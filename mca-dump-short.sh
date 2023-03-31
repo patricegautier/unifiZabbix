@@ -73,8 +73,8 @@ function issueSSHCommand() {
 	${SSHPASS_OPTIONS} ssh ${SSH_PORT} ${VERBOSE_SSH} ${HE_RSA_SSH_KEY_OPTIONS} ${BATCH_MODE} -o ConnectTimeout=5 -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} "${USER}@${TARGET_DEVICE}" "$command"
 }
 
-declare TRUNCATE_SIZE=5000 #1M
-declare TRUNCATE_FREQUENCY=600 #1D
+declare TRUNCATE_SIZE=1000000 # 1M
+declare TRUNCATE_FREQUENCY=86400 #1D
 function truncateFileOnceADay() {
 	local file=$1
 	if [[ -f "$file" ]]; then
