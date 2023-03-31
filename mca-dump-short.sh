@@ -73,6 +73,34 @@ function issueSSHCommand() {
 	${SSHPASS_OPTIONS} ssh ${SSH_PORT} ${VERBOSE_SSH} ${HE_RSA_SSH_KEY_OPTIONS} ${BATCH_MODE} -o ConnectTimeout=5 -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} "${USER}@${TARGET_DEVICE}" "$command"
 }
 
+declare TRUNCATE_SIZE=1000000 # 1M
+declare TRUNCATE_FREQUENCY=86400 #1D
+function truncateFileOnceADay() {
+	local file=$1
+	if [[ -f "$file" ]]; then
+		local size
+		if ! size=$(wc -c < "$file"); then return; fi
+		if (( size > TRUNCATE_SIZE )); then
+			local haveToTrunc=1
+			local truncMarker="$file.truncMarker"
+			if [[ -f "$truncMarker" ]]; then
+				local trunkMarkerDate; 
+				if ! trunkMarkerDate=$(date -r "$truncMarker" +%s); then return; fi	
+				local now; now=$(date +%s)
+				if (( now - trunkMarkerDate < TRUNCATE_FREQUENCY )); then  
+					haveToTrunc=0
+				fi
+			fi
+			if (( haveToTrunc )); then
+				local tmpFile="$file.tmpTrunc"
+				tail -c "$TRUNCATE_SIZE" "$file" > "$tmpFile"
+				mv "$tmpFile" "$file"
+				touch "$truncMarker"
+			fi
+		fi 
+	fi
+}
+
 #---------------------------------------------------------------------------------------
 # Fan Discovery
 
@@ -326,8 +354,9 @@ function invokeMcaDump() {
 		*)								echo "Unknown device Type: '${DEVICE_TYPE:-}'"; usage ;;
 	esac
 
+	local mcaErrorFile=/tmp/mca-$RANDOM.err
 
-	output=$(runWithTimeout "${TIMEOUT}" issueSSHCommand mca-dump  2> "${ERROR_FILE}")
+	output=$(runWithTimeout "${TIMEOUT}" issueSSHCommand mca-dump  2> "${mcaErrorFile}")
 	exitCode=$?
 	#shellcheck disable=SC2034
 	jsonOutput="${output}"
@@ -335,23 +364,23 @@ function invokeMcaDump() {
 	if (( exitCode >= 127 && exitCode != 255 )); then
 		output=$(errorJsonWithReason "timeout ($exitCode)")
 	elif (( exitCode != 0 )) || [[ -z "${output}" ]]; then
-		output=$(errorJsonWithReason "$(echo "Remote pb: "; cat "${ERROR_FILE}"; echo "${output}" )")
+		output=$(errorJsonWithReason "$(echo "Remote pb: "; cat "${mcaErrorFile}"; echo "${output}" )")
 		exitCode=1
 	else
 		if [[ -n "${JQ_VALIDATOR:-}" ]]; then
-			VALIDATION=$(echo "${output}" | jq "${JQ_VALIDATOR}")
+			local validation; validation=$(echo "${output}" | jq "${JQ_VALIDATOR}")
 			exitCode=$?
-			if [[ -z "${VALIDATION}" ]] || [[ "${VALIDATION}" == "false" ]] || (( exitCode != 0 )); then
+			if [[ -z "${validation}" ]] || [[ "${validation}" == "false" ]] || (( exitCode != 0 )); then
 				output=$(errorJsonWithReason "validationError: ${JQ_VALIDATOR}")
 				exitCode=1
 			fi
 		fi
 		if [[ -n "${JQ_OPTION_VALIDATOR:-}" ]]; then
-			OPTION_VALIDATION=$(echo "${output}" | jq "${JQ_OPTION_VALIDATOR}")
+			local optionValidation; optionValidation=$(echo "${output}" | jq "${JQ_OPTION_VALIDATOR}")
 			exitCode=$?
-			if [[ -z "${OPTION_VALIDATION}" ]] || [[ "${OPTION_VALIDATION}" == "false" ]] || (( exitCode != 0 )); then				
-				MESSAGE=${OPTION_MESSAGE["${DEVICE_TYPE}"]:-"unknownWarning"}
-				output=$(insertWarningIntoJsonOutput "$MESSAGE" "$output")
+			if [[ -z "${optionValidation}" ]] || [[ "${optionValidation}" == "false" ]] || (( exitCode != 0 )); then				
+				local message=${OPTION_MESSAGE["${DEVICE_TYPE}"]:-"unknownWarning"}
+				output=$(insertWarningIntoJsonOutput "$message" "$output")
 			fi			
 		fi		
 		if (( exitCode == 0 )); then
@@ -365,10 +394,9 @@ function invokeMcaDump() {
 				output=$(errorJsonWithReason "jq ${INDENT_OPTION} ${JQ_OPTIONS} returned status $exitCode; $(cat $errorFile);  JQ input was ${jqInput}")
 				exitCode=1
 			fi
-			rm "${errorFile}" 2>/dev/null
+			rm -f "${errorFile}" 2>/dev/null
 		fi
 	fi
-	rm -f  "${ERROR_FILE}" 2>/dev/null
 
 	if (( exitCode == 0 )) && [[ "${DEVICE_TYPE:-}" == 'SWITCH_DISCOVERY' ]]; then
 		# do not wait anymore for retrievePortNamesInto
@@ -378,13 +406,14 @@ function invokeMcaDump() {
 		jqInput="${output}"
 		output=
 		insertPortNamesIntoJson output "${jqProgram}" "${jqInput}"  2> "${errorFile}"
-		CODE=$?
-		if (( CODE != 0 )) || [[ -z "${output}" ]]; then
-			output=$(errorJsonWithReason "insertPortNamesIntoJson failed with error code $CODE; $(cat $errorFile)")
+		local code=$?
+		if (( code != 0 )) || [[ -z "${output}" ]]; then
+			output=$(errorJsonWithReason "insertPortNamesIntoJson failed with error code $code; $(cat $errorFile)")
 			exitCode=1
 		fi
 		rm "${errorFile}" 2>/dev/null
 	fi
+	rm -f  "${mcaErrorFile}" 2>/dev/null
 }
 
 
@@ -461,7 +490,6 @@ done
 declare EXIT_CODE=0
 declare OUTPUT=
 declare JSON_OUTPUT=
-declare ERROR_FILE=/tmp/mca-$RANDOM.err
 
 
 if [[ -n "${ECHO_OUTPUT:-}" ]]; then
@@ -544,6 +572,8 @@ fi
 
 echo "${OUTPUT}"
 
+truncateFileOnceADay "$errFile"
+truncateFileOnceADay "$logFile"
 
 exit $EXIT_CODE
 
