@@ -205,6 +205,9 @@ The temperature in Celsius above which to alert.  I have set this to '90'.
 ### {$UNIFI_ALERT_PERIOD}
 The period after which to alert for most checks. I have this set to '10m'.  The triggers on this period are level 'Warning'
 
+### {$UNIFI_ALERT_LONG_PERIOD}
+The period after which to alert for lower priority checks, unsupported items for example. I have this set to '12h'.  The triggers on this period are level 'Not classified'
+
 ### {$PROTECT_CAMERA_PASSWORD}
 Set this to your cameras' password.  There's UI in the protect controller to set this on all cameras at once.  
 
