@@ -47,6 +47,13 @@ function errorJsonWithReason() {
 	echo '{ "at":"'"${t}"'", "r":"'"${reason}"'", "device":"'"${TARGET_DEVICE}"'", "mcaDumpError":"Error" }'
 }
 
+function validationErrorJsonWithReason() {
+	local reason; reason=$(echo "$1" | tr -d "\"'\n\r" )
+	local t; t=$(date +"%T")
+	echo '{ "at":"'"${t}"'", "r":"'"${reason}"'", "device":"'"${TARGET_DEVICE}"'", "mcaDumpValidationError":"Error" }'
+}
+
+
 function insertWarningIntoJsonOutput() {
 	local warning=$1
 	local output=$2
@@ -371,7 +378,7 @@ function invokeMcaDump() {
 			local validation; validation=$(echo "${output}" | jq "${JQ_VALIDATOR}")
 			exitCode=$?
 			if [[ -z "${validation}" ]] || [[ "${validation}" == "false" ]] || (( exitCode != 0 )); then
-				output=$(errorJsonWithReason "validationError: ${JQ_VALIDATOR}")
+				output=$(validationErrorJsonWithReason "validationError: ${JQ_VALIDATOR}")
 				exitCode=1
 			fi
 		fi
