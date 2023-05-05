@@ -5,7 +5,7 @@ declare HE_RSA_SSH_KEY_OPTIONS='-o PubkeyAcceptedKeyTypes=+ssh-rsa -o HostKeyAlg
 
 #AP|SWITCH|SWITCH_FEATURE_DISCOVERY|SWITCH_DISCOVERY|UDMP|USG|CK
 declare -A VALIDATOR_BY_TYPE
-VALIDATOR_BY_TYPE["AP"]=".vap_table? != null and .radio_table != null ) "
+VALIDATOR_BY_TYPE["AP"]=".vap_table? != null and .radio_table != null"
 VALIDATOR_BY_TYPE["UDMP"]=".network_table? != null"
 VALIDATOR_BY_TYPE["USG"]="( .network_table? != null ) and ( .network_table | map(select(.mac!=null)) | length>0 )"
 declare -A OPTIONAL_VALIDATOR_BY_TYPE
