@@ -1185,6 +1185,7 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - '$.vap_table[?(@.radio == ''{#RADIO_NAME}'')].channel.first()'
+                  error_handler: DISCARD_VALUE
               master_item:
                 key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
               tags:
@@ -1336,6 +1337,8 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - '$.vap_table[?(@.radio == ''{#RADIO_NAME}'')].tx_retries.first()'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
                 -
                   type: SIMPLE_CHANGE
                   parameters:
@@ -1361,7 +1364,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.radio_table.[?(@.athstats.name != 0)]'
+                - '$.radio_table.[?(@.athstats.name != 0 && @.athstats.n_tx_pkts > 0)]'
               error_handler: DISCARD_VALUE
         -
           uuid: 90e43b647faa4a6fa7af643960bcf0a5
@@ -3676,137 +3679,6 @@ zabbix_export:
               tag: Application
               value: Host
         -
-          uuid: 37128fdaf8a44d3ca2dd43030aeda754
-          name: 'Download Bandwidth'
-          type: DEPENDENT
-          key: download_bandwidth
-          delay: '0'
-          units: bps
-          preprocessing:
-            -
-              type: CHECK_JSON_ERROR
-              parameters:
-                - $.mcaDumpError
-            -
-              type: JSONPATH
-              parameters:
-                - '$.if_table.[?(@.latency > 0)].rx_bytes.first()'
-            -
-              type: CHANGE_PER_SECOND
-              parameters:
-                - ''
-            -
-              type: MULTIPLIER
-              parameters:
-                - '8'
-            -
-              type: IN_RANGE
-              parameters:
-                - '0'
-                - '10000000000'
-          master_item:
-            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
-          tags:
-            -
-              tag: Application
-              value: wan
-        -
-          uuid: 3f6a016441704b88bf6e46b8e7197978
-          name: 'Dropped Dowmload Packets'
-          type: DEPENDENT
-          key: dropped_download_packets
-          delay: '0'
-          units: packet
-          preprocessing:
-            -
-              type: CHECK_JSON_ERROR
-              parameters:
-                - $.mcaDumpError
-            -
-              type: JSONPATH
-              parameters:
-                - '$.if_table.[?(@.latency > 0)].rx_dropped.first()'
-            -
-              type: SIMPLE_CHANGE
-              parameters:
-                - ''
-          master_item:
-            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
-          tags:
-            -
-              tag: Application
-              value: wan
-        -
-          uuid: 429298f385a04a27b174f4043179c6c1
-          name: 'Dropped Upload Packets'
-          type: DEPENDENT
-          key: dropped_upload_packets
-          delay: '0'
-          units: packet
-          preprocessing:
-            -
-              type: CHECK_JSON_ERROR
-              parameters:
-                - $.mcaDumpError
-            -
-              type: JSONPATH
-              parameters:
-                - '$.if_table.[?(@.latency > 0)].tx_dropped.first()'
-            -
-              type: SIMPLE_CHANGE
-              parameters:
-                - ''
-          master_item:
-            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
-          tags:
-            -
-              tag: Application
-              value: wan
-        -
-          uuid: 8c6a8688114c426a8a6c7df47e295239
-          name: 'Error Download Packets'
-          type: DEPENDENT
-          key: error_download_packets
-          delay: '0'
-          units: packet
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - '$.if_table.[?(@.latency > 0)].rx_errors.first()'
-            -
-              type: SIMPLE_CHANGE
-              parameters:
-                - ''
-          master_item:
-            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
-          tags:
-            -
-              tag: Application
-              value: wan
-        -
-          uuid: f7dec452d1d4457ca0bf5acf2b60190f
-          name: 'Error Upload Packets'
-          type: DEPENDENT
-          key: error_upload_packets
-          delay: '0'
-          units: packet
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - '$.if_table.[?(@.latency > 0)].tx_errors.first()'
-            -
-              type: SIMPLE_CHANGE
-              parameters:
-                - ''
-          master_item:
-            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
-          tags:
-            -
-              tag: Application
-              value: wan
-        -
           uuid: 8e27edf5a301436ba32463a2fd615e44
           name: 'Fan Speed'
           type: DEPENDENT
@@ -4150,41 +4022,6 @@ zabbix_export:
               tag: Application
               value: Traffic
         -
-          uuid: b5b81d4dab514d4680b987094da82541
-          name: 'Upload Bandwidth'
-          type: DEPENDENT
-          key: upload_bandwidth
-          delay: '0'
-          units: bps
-          preprocessing:
-            -
-              type: CHECK_JSON_ERROR
-              parameters:
-                - $.mcaDumpError
-            -
-              type: JSONPATH
-              parameters:
-                - '$.if_table.[?(@.latency > 0)].tx_bytes.first()'
-            -
-              type: CHANGE_PER_SECOND
-              parameters:
-                - ''
-            -
-              type: MULTIPLIER
-              parameters:
-                - '8'
-            -
-              type: IN_RANGE
-              parameters:
-                - '0'
-                - '10000000000'
-          master_item:
-            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
-          tags:
-            -
-              tag: Application
-              value: wan
-        -
           uuid: ba7054579a914ad4aa25941fc192c3aa
           name: Uptime
           type: DEPENDENT
@@ -4214,28 +4051,6 @@ zabbix_export:
               name: '{HOST.NAME} is not reporting statistics'
               priority: HIGH
               manual_close: 'YES'
-        -
-          uuid: 8d57c1175b0b4f74b2d0add7c66a4e22
-          name: 'WAN Latency'
-          type: DEPENDENT
-          key: wan_latency
-          delay: '0'
-          units: ms
-          preprocessing:
-            -
-              type: CHECK_JSON_ERROR
-              parameters:
-                - $.mcaDumpError
-            -
-              type: JSONPATH
-              parameters:
-                - '$.if_table.[?(@.latency > 0)].latency.first()'
-          master_item:
-            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
-          tags:
-            -
-              tag: Application
-              value: wan
       discovery_rules:
         -
           uuid: 164715828328451f85ebcd3965b42cdd
@@ -4276,6 +4091,161 @@ zabbix_export:
             -
               lld_macro: '{#FAN_NAME}'
               path: $.name
+        -
+          uuid: 7b20ff6b9502498b9c37efe32b10ce9a
+          name: 'Interface Discovery'
+          type: DEPENDENT
+          key: interface_discovery
+          delay: '0'
+          description: 'Interface Discovery'
+          item_prototypes:
+            -
+              uuid: a83194a6f5a240fc8a130abb7489d9ef
+              name: '{#INTERFACE_NAME} Dropped Reception Packets'
+              type: DEPENDENT
+              key: 'dropped_rx_packets[{#INTERFACE_NAME}]'
+              delay: '0'
+              units: pkts
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.if_table[ ?(@.name == ''{#INTERFACE_NAME}'' ) ].rx_dropped.first()'
+                -
+                  type: SIMPLE_CHANGE
+                  parameters:
+                    - ''
+              master_item:
+                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
+            -
+              uuid: ef026690172b46eaaae587331a66136e
+              name: '{#INTERFACE_NAME} Dropped Transmission Packets'
+              type: DEPENDENT
+              key: 'dropped_tx_packets[{#INTERFACE_NAME}]'
+              delay: '0'
+              units: pkts
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.if_table[ ?(@.name == ''{#INTERFACE_NAME}'' ) ].tx_dropped.first()'
+                -
+                  type: SIMPLE_CHANGE
+                  parameters:
+                    - ''
+              master_item:
+                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
+            -
+              uuid: a0bff0f5cb4e4d56b810d2ea9d7d5be1
+              name: '{#INTERFACE_NAME} Error Reception Packets'
+              type: DEPENDENT
+              key: 'error_rx_packets[{#INTERFACE_NAME}]'
+              delay: '0'
+              units: pkts
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.if_table[ ?(@.name == ''{#INTERFACE_NAME}'' ) ].rx_errors.first()'
+                -
+                  type: SIMPLE_CHANGE
+                  parameters:
+                    - ''
+              master_item:
+                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
+            -
+              uuid: da5cfac36bc44556bdd78d0c83b2745e
+              name: '{#INTERFACE_NAME} Error Transmission Packets'
+              type: DEPENDENT
+              key: 'error_tx_packets[{#INTERFACE_NAME}]'
+              delay: '0'
+              units: pkts
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.if_table[ ?(@.name == ''{#INTERFACE_NAME}'' ) ].tx_errors.first()'
+                -
+                  type: SIMPLE_CHANGE
+                  parameters:
+                    - ''
+              master_item:
+                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
+            -
+              uuid: 9c4a2fc2e2de452d9fa6ccac4a2da967
+              name: '{#INTERFACE_NAME} Latency'
+              type: DEPENDENT
+              key: 'latency[{#INTERFACE_NAME}]'
+              delay: '0'
+              units: ms
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.if_table[ ?(@.name == ''{#INTERFACE_NAME}'' ) ].latency.first()'
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
+            -
+              uuid: 50a88a6badc740b48367d56752d7fb2b
+              name: '{#INTERFACE_NAME} Reception Bandwidth'
+              type: DEPENDENT
+              key: 'rx_bandwitdh[{#INTERFACE_NAME}]'
+              delay: '0'
+              units: bps
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.if_table[ ?(@.name == ''{#INTERFACE_NAME}'' ) ].rx_bytes.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+              master_item:
+                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
+            -
+              uuid: 59b810a80e6e401fa9618d3ea5f4ae87
+              name: '{#INTERFACE_NAME} Transmission Bandwidth'
+              type: DEPENDENT
+              key: 'tx_bandwitdh[{#INTERFACE_NAME}]'
+              delay: '0'
+              units: bps
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.if_table[ ?(@.name == ''{#INTERFACE_NAME}'' ) ].tx_bytes.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+              master_item:
+                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
+          lld_macro_paths:
+            -
+              lld_macro: '{#INTERFACE_NAME}'
+              path: $.name
+          preprocessing:
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
+              error_handler: DISCARD_VALUE
+            -
+              type: JSONPATH
+              parameters:
+                - '$.if_table[?(@.up == "true" && @.name != "" )]'
         -
           uuid: 85739b2b715a4246a543ebfdaa9aeb73
           name: 'Network Discovery'
@@ -4879,148 +4849,6 @@ zabbix_export:
               tag: Application
               value: Host
         -
-          uuid: bd014f86f61b49f9986807955f0ced54
-          name: 'Download Bandwidth'
-          type: DEPENDENT
-          key: download_bandwidth
-          delay: '0'
-          units: bps
-          preprocessing:
-            -
-              type: CHECK_JSON_ERROR
-              parameters:
-                - $.mcaDumpError
-              error_handler: CUSTOM_ERROR
-              error_handler_params: mcaDumpError
-            -
-              type: JSONPATH
-              parameters:
-                - '$.if_table.[?(@.latency > 0)].rx_bytes.first()'
-            -
-              type: CHANGE_PER_SECOND
-              parameters:
-                - ''
-            -
-              type: MULTIPLIER
-              parameters:
-                - '8'
-          master_item:
-            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}","-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
-          tags:
-            -
-              tag: Application
-              value: wan
-        -
-          uuid: ecf022ac405d40df9eab71535db74efb
-          name: 'Dropped Dowload Packets'
-          type: DEPENDENT
-          key: dropped_dowload_packets
-          delay: '0'
-          units: packet
-          preprocessing:
-            -
-              type: CHECK_JSON_ERROR
-              parameters:
-                - $.mcaDumpError
-              error_handler: CUSTOM_ERROR
-              error_handler_params: mcaDumpError
-            -
-              type: JSONPATH
-              parameters:
-                - '$.if_table.[?(@.latency > 0)].rx_dropped.first()'
-            -
-              type: SIMPLE_CHANGE
-              parameters:
-                - ''
-          master_item:
-            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}","-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
-          tags:
-            -
-              tag: Application
-              value: wan
-        -
-          uuid: 25fe82aeddae4bcaaf9200938f5bf374
-          name: 'Dropped Upload Packets'
-          type: DEPENDENT
-          key: dropped_upload_packets
-          delay: '0'
-          units: packet
-          preprocessing:
-            -
-              type: CHECK_JSON_ERROR
-              parameters:
-                - $.mcaDumpError
-            -
-              type: JSONPATH
-              parameters:
-                - '$.if_table.[?(@.latency > 0)].tx_dropped.first()'
-            -
-              type: SIMPLE_CHANGE
-              parameters:
-                - ''
-          master_item:
-            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}","-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
-          tags:
-            -
-              tag: Application
-              value: wan
-        -
-          uuid: ba029bfe37ed46afb282ddf488ad85e2
-          name: 'Error Download Packets'
-          type: DEPENDENT
-          key: error_download_packets
-          delay: '0'
-          units: packet
-          preprocessing:
-            -
-              type: CHECK_JSON_ERROR
-              parameters:
-                - $.mcaDumpError
-              error_handler: CUSTOM_ERROR
-              error_handler_params: mcaDumpError
-            -
-              type: JSONPATH
-              parameters:
-                - '$.if_table.[?(@.latency > 0)].rx_errors.first()'
-            -
-              type: SIMPLE_CHANGE
-              parameters:
-                - ''
-          master_item:
-            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}","-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
-          tags:
-            -
-              tag: Application
-              value: wan
-        -
-          uuid: 7c5b5eca37ba42c2be32eb0557911a58
-          name: 'Error Upload Packets'
-          type: DEPENDENT
-          key: error_upload_packets
-          delay: '0'
-          units: packet
-          preprocessing:
-            -
-              type: CHECK_JSON_ERROR
-              parameters:
-                - $.mcaDumpError
-              error_handler: CUSTOM_ERROR
-              error_handler_params: mcaDumpError
-            -
-              type: JSONPATH
-              parameters:
-                - '$.if_table.[?(@.latency > 0)].tx_errors.first()'
-            -
-              type: SIMPLE_CHANGE
-              parameters:
-                - ''
-          master_item:
-            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}","-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
-          tags:
-            -
-              tag: Application
-              value: wan
-        -
           uuid: a5aeed02d2de40468e2b803199236775
           name: Hostname
           type: DEPENDENT
@@ -5325,38 +5153,6 @@ zabbix_export:
               tag: Application
               value: Host
         -
-          uuid: 02c08e3965f44f07a54f7335dd5f5099
-          name: 'Upload Bandwidth'
-          type: DEPENDENT
-          key: upload_bandwidth
-          delay: '0'
-          units: bps
-          preprocessing:
-            -
-              type: CHECK_JSON_ERROR
-              parameters:
-                - $.mcaDumpError
-              error_handler: CUSTOM_ERROR
-              error_handler_params: mcaDumpError
-            -
-              type: JSONPATH
-              parameters:
-                - '$.if_table.[?(@.latency > 0)].tx_bytes.first()'
-            -
-              type: CHANGE_PER_SECOND
-              parameters:
-                - ''
-            -
-              type: MULTIPLIER
-              parameters:
-                - '8'
-          master_item:
-            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}","-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
-          tags:
-            -
-              tag: Application
-              value: wan
-        -
           uuid: 4a8bde0252204cbe912780251a386e7e
           name: Uptime
           type: DEPENDENT
@@ -5386,31 +5182,162 @@ zabbix_export:
               name: '{HOST.NAME} is not reporting statistics'
               priority: HIGH
               manual_close: 'YES'
+      discovery_rules:
         -
-          uuid: 8ea02a18a7b34d388b8189e7182aa386
-          name: 'WAN Latency'
+          uuid: 30628a74a4d047108b731201709dd0cf
+          name: 'Interface Discovery'
           type: DEPENDENT
-          key: wan_latency
+          key: interface_discovery
           delay: '0'
-          units: ms
+          item_prototypes:
+            -
+              uuid: a3a9a919765b42d38f402c9de8d6dcf6
+              name: '{#INTERFACE_NAME} Dropped Reception Packets'
+              type: DEPENDENT
+              key: 'dropped_rx_packets[{#INTERFACE_NAME}]'
+              delay: '0'
+              units: pkts
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.if_table[ ?(@.name == ''{#INTERFACE_NAME}'' ) ].rx_dropped.first()'
+                -
+                  type: SIMPLE_CHANGE
+                  parameters:
+                    - ''
+              master_item:
+                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}","-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
+            -
+              uuid: 776bba813b5a4074baced462d8790202
+              name: '{#INTERFACE_NAME} Dropped Transmission Packets'
+              type: DEPENDENT
+              key: 'dropped_tx_packets[{#INTERFACE_NAME}]'
+              delay: '0'
+              units: pkts
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.if_table[ ?(@.name == ''{#INTERFACE_NAME}'' ) ].tx_dropped.first()'
+                -
+                  type: SIMPLE_CHANGE
+                  parameters:
+                    - ''
+              master_item:
+                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}","-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
+            -
+              uuid: 9501596fbba44b218ebe472b2a933d6a
+              name: '{#INTERFACE_NAME} Error Reception Packets'
+              type: DEPENDENT
+              key: 'error_rx_packets[{#INTERFACE_NAME}]'
+              delay: '0'
+              units: pkts
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.if_table[ ?(@.name == ''{#INTERFACE_NAME}'' ) ].rx_errors.first()'
+                -
+                  type: SIMPLE_CHANGE
+                  parameters:
+                    - ''
+              master_item:
+                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}","-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
+            -
+              uuid: 844b49f61d244b24b5b7e4ed855d6e41
+              name: '{#INTERFACE_NAME} Error Transmission Packets'
+              type: DEPENDENT
+              key: 'error_tx_packets[{#INTERFACE_NAME}]'
+              delay: '0'
+              units: pkts
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.if_table[ ?(@.name == ''{#INTERFACE_NAME}'' ) ].rx_errors.first()'
+                -
+                  type: SIMPLE_CHANGE
+                  parameters:
+                    - ''
+              master_item:
+                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}","-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
+            -
+              uuid: 3b51035d18444307a4d3c401a028a6fd
+              name: '{#INTERFACE_NAME} Latency'
+              type: DEPENDENT
+              key: 'latency[{#INTERFACE_NAME}]'
+              delay: '0'
+              units: ms
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.if_table[ ?(@.name == ''{#INTERFACE_NAME}'' ) ].latency.first()'
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}","-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
+            -
+              uuid: 83c70fed5040461da15332098aee2749
+              name: '{#INTERFACE_NAME} Reception Bandwidth'
+              type: DEPENDENT
+              key: 'reception_bandwidth[{#INTERFACE_NAME}]'
+              delay: '0'
+              units: bps
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.if_table[ ?(@.name == ''{#INTERFACE_NAME}'' ) ].rx_bytes.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+              master_item:
+                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}","-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
+            -
+              uuid: 23faff035f8d4b348b20861b3d2b41f7
+              name: '{#INTERFACE_NAME} Transmission Bandwidth'
+              type: DEPENDENT
+              key: 'transmission_bandwidth[{#INTERFACE_NAME}]'
+              delay: '0'
+              units: bps
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.if_table[ ?(@.name == ''{#INTERFACE_NAME}'' ) ].tx_bytes.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+              master_item:
+                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}","-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
+          master_item:
+            key: 'mca-dump-short.sh[ "-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
+          lld_macro_paths:
+            -
+              lld_macro: '{#INTERFACE_NAME}'
+              path: $.name
           preprocessing:
             -
               type: CHECK_JSON_ERROR
               parameters:
                 - $.mcaDumpError
               error_handler: CUSTOM_ERROR
-              error_handler_params: mcaDumpError
+              error_handler_params: $.reason
             -
               type: JSONPATH
               parameters:
-                - '$.if_table.[?(@.latency > 0)].latency.first()'
-          master_item:
-            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}","-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
-          tags:
-            -
-              tag: Application
-              value: wan
-      discovery_rules:
+                - '$.if_table[?(@.up == "true" && @.name != "" )]'
         -
           uuid: feb50bd260ce4553a47bb89eeb5e46e8
           name: 'Network Discovery'
@@ -5798,22 +5725,6 @@ zabbix_export:
             host: 'Unifi Protect NVR4'
             key: incoming_bandwidth_moving_average_threshold
     -
-      uuid: a1b1190f8dfa4c9694f69132ea7027a2
-      name: Bandwidth
-      graph_items:
-        -
-          sortorder: '1'
-          color: 1A7C11
-          item:
-            host: 'Unifi UDMP'
-            key: download_bandwidth
-        -
-          sortorder: '2'
-          color: F63100
-          item:
-            host: 'Unifi UDMP'
-            key: upload_bandwidth
-    -
       uuid: fad2952510f34a4897c8194393d3e6e3
       name: Bandwidth
       graph_items:
@@ -5947,16 +5858,6 @@ zabbix_export:
           item:
             host: 'Unifi Protect Cloud Key'
             key: incoming_bandwidth_moving_average_threshold
-    -
-      uuid: 10507414af274cf19b4bc87a2b85d55d
-      name: Latency
-      graph_items:
-        -
-          sortorder: '1'
-          color: 1A7C11
-          item:
-            host: 'Unifi UDMP'
-            key: wan_latency
     -
       uuid: 47ef7a2c34d24f75bb0453105a57974e
       name: 'Load Averages'
