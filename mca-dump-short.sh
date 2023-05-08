@@ -10,8 +10,8 @@ VALIDATOR_BY_TYPE["UDMP"]=".network_table? != null"
 VALIDATOR_BY_TYPE["USG"]="( .network_table? != null ) and ( .network_table | map(select(.mac!=null)) | length>0 )"
 declare -A OPTIONAL_VALIDATOR_BY_TYPE
 declare -A OPTION_MESSAGE
-OPTIONAL_VALIDATOR_BY_TYPE["USG"]=" ( ( .[\"system-stats\"].temps | length ) == 4 ) "
-OPTION_MESSAGE["USG"]="missingTemperatures"
+#OPTIONAL_VALIDATOR_BY_TYPE["USG"]=" ( ( .[\"system-stats\"].temps | length ) == 4 ) "
+#OPTION_MESSAGE["USG"]="missingTemperatures"
 
 
 #---------------------------------------------------------------------------------------
@@ -46,6 +46,19 @@ function errorJsonWithReason() {
 	local t; t=$(date +"%T")
 	echo '{ "at":"'"${t}"'", "r":"'"${reason}"'", "device":"'"${TARGET_DEVICE}"'", "mcaDumpError":"Error" }'
 }
+
+function validationErrorJsonWithReason() {
+	local reason; reason=$(echo "$1" | tr -d "\"'\n\r" )
+	local t; t=$(date +"%T")
+	echo '{ "at":"'"${t}"'", "r":"'"${reason}"'", "device":"'"${TARGET_DEVICE}"'", "mcaDumpValidationError":"Error" }'
+}
+
+function timeoutJsonWithReason() {
+	local reason; reason=$(echo "$1" | tr -d "\"'\n\r" )
+	local t; t=$(date +"%T")
+	echo '{ "at":"'"${t}"'", "r":"'"${reason}"'", "device":"'"${TARGET_DEVICE}"'", "mcaDumpTimeout":"Error" }'
+}
+
 
 function insertWarningIntoJsonOutput() {
 	local warning=$1
@@ -362,7 +375,7 @@ function invokeMcaDump() {
 	jsonOutput="${output}"
 
 	if (( exitCode >= 127 && exitCode != 255 )); then
-		output=$(errorJsonWithReason "timeout ($exitCode)")
+		output=$(timeoutJsonWithReason "timeout ($exitCode)")
 	elif (( exitCode != 0 )) || [[ -z "${output}" ]]; then
 		output=$(errorJsonWithReason "$(echo "Remote pb: "; cat "${mcaErrorFile}"; echo "${output}" )")
 		exitCode=1
@@ -371,7 +384,7 @@ function invokeMcaDump() {
 			local validation; validation=$(echo "${output}" | jq "${JQ_VALIDATOR}")
 			exitCode=$?
 			if [[ -z "${validation}" ]] || [[ "${validation}" == "false" ]] || (( exitCode != 0 )); then
-				output=$(errorJsonWithReason "validationError: ${JQ_VALIDATOR}")
+				output=$(validationErrorJsonWithReason "validationError: ${JQ_VALIDATOR}")
 				exitCode=1
 			fi
 		fi

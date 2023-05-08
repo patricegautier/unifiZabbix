@@ -965,6 +965,11 @@ zabbix_export:
               parameters:
                 - $.mcaDumpValidationError
               error_handler: DISCARD_VALUE
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpTimeout
+              error_handler: DISCARD_VALUE
         -
           uuid: f07faffa28cc416483cf089bb94ec20a
           name: 'Memory Utilization'
@@ -2491,13 +2496,14 @@ zabbix_export:
           delay: '0'
           trends: '0'
           value_type: CHAR
+          description: 'MAC address of the interface tied to the host''s IP.  The IP address must be specified in the host connection in Zabbix (even if the DNS name is used to connect)'
           inventory_link: MACADDRESS_A
           preprocessing:
             -
               type: REGEX
               parameters:
-                - '.*HWaddr|ether ([a-fA-F0-9:]{17}|[a-fA-F0-9]{12})'
-                - \1
+                - '.*(HWaddr|ether) ([a-fA-F0-9:]{17}|[a-fA-F0-9]{12})'
+                - \2
               error_handler: DISCARD_VALUE
           master_item:
             key: 'ssh.run[ifconfig]'
@@ -2533,9 +2539,10 @@ zabbix_export:
           type: SSH
           key: 'ssh.run[ifconfig]'
           delay: 1h
+          history: 2h
           trends: '0'
           value_type: CHAR
-          params: '/sbin/ifconfig | grep -A5 {HOST.IP}'
+          params: '/sbin/ifconfig | grep -B1 -A5 {HOST.IP}'
           authtype: PUBLIC_KEY
           username: '{$UNIFI_USER}'
           publickey: '{$UNIFI_PUB_KEY}'
@@ -2545,7 +2552,6 @@ zabbix_export:
               type: NOT_MATCHES_REGEX
               parameters:
                 - '.*No route to host.*'
-              error_handler: DISCARD_VALUE
           tags:
             -
               tag: Application
@@ -2807,6 +2813,11 @@ zabbix_export:
               type: CHECK_JSON_ERROR
               parameters:
                 - $.mcaDumpValidationError
+              error_handler: DISCARD_VALUE
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpTimeout
               error_handler: DISCARD_VALUE
           tags:
             -
@@ -3826,6 +3837,11 @@ zabbix_export:
                 - $.mcaDumpError
               error_handler: CUSTOM_ERROR
               error_handler_params: mcaDumpError
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpTimeout
+              error_handler: DISCARD_VALUE
           tags:
             -
               tag: Application
@@ -4053,6 +4069,45 @@ zabbix_export:
               manual_close: 'YES'
       discovery_rules:
         -
+          uuid: 587bc229309143898a4bb0cc6209b269
+          name: 'External Interface Discovery'
+          type: DEPENDENT
+          key: external_interface_discovery
+          delay: '0'
+          description: 'Interface Discovery'
+          item_prototypes:
+            -
+              uuid: 32017ea908ad4006b87e751f79c83a9f
+              name: '{#INTERFACE_NAME} Latency'
+              type: DEPENDENT
+              key: 'latency[{#INTERFACE_NAME}]'
+              delay: '0'
+              units: ms
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.if_table[ ?(@.name == ''{#INTERFACE_NAME}'' ) ].latency.first()'
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
+          master_item:
+            key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
+          lld_macro_paths:
+            -
+              lld_macro: '{#INTERFACE_NAME}'
+              path: $.name
+          preprocessing:
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
+              error_handler: DISCARD_VALUE
+            -
+              type: JSONPATH
+              parameters:
+                - '$.if_table[?(@.up == "true" && @.name != "" && @.latency > 0 )]'
+        -
           uuid: 164715828328451f85ebcd3965b42cdd
           name: 'Fan discovery'
           type: DEPENDENT
@@ -4169,21 +4224,6 @@ zabbix_export:
                   type: SIMPLE_CHANGE
                   parameters:
                     - ''
-              master_item:
-                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
-            -
-              uuid: 9c4a2fc2e2de452d9fa6ccac4a2da967
-              name: '{#INTERFACE_NAME} Latency'
-              type: DEPENDENT
-              key: 'latency[{#INTERFACE_NAME}]'
-              delay: '0'
-              units: ms
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$.if_table[ ?(@.name == ''{#INTERFACE_NAME}'' ) ].latency.first()'
-                  error_handler: DISCARD_VALUE
               master_item:
                 key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
             -
@@ -4971,6 +5011,11 @@ zabbix_export:
               parameters:
                 - $.mcaDumpValidationError
               error_handler: DISCARD_VALUE
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpTimeout
+              error_handler: DISCARD_VALUE
           tags:
             -
               tag: Application
@@ -5184,6 +5229,45 @@ zabbix_export:
               manual_close: 'YES'
       discovery_rules:
         -
+          uuid: c0b0d0a60191441d8608aa3d5fcc2f0e
+          name: 'External Interface Discovery'
+          type: DEPENDENT
+          key: external_interface_discovery
+          delay: '0'
+          item_prototypes:
+            -
+              uuid: 4b67b2b83e414272876118307e0ee8c1
+              name: '{#INTERFACE_NAME} Latency'
+              type: DEPENDENT
+              key: 'latency[{#INTERFACE_NAME}]'
+              delay: '0'
+              units: ms
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.if_table[ ?(@.name == ''{#INTERFACE_NAME}'' ) ].latency.first()'
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}","-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
+          master_item:
+            key: 'mca-dump-short.sh[ "-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
+          lld_macro_paths:
+            -
+              lld_macro: '{#INTERFACE_NAME}'
+              path: $.name
+          preprocessing:
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpError
+              error_handler: CUSTOM_ERROR
+              error_handler_params: $.reason
+            -
+              type: JSONPATH
+              parameters:
+                - '$.if_table[?(@.up == "true" && @.name != "" && @.latency > 0 )]'
+        -
           uuid: 30628a74a4d047108b731201709dd0cf
           name: 'Interface Discovery'
           type: DEPENDENT
@@ -5260,21 +5344,6 @@ zabbix_export:
                   type: SIMPLE_CHANGE
                   parameters:
                     - ''
-              master_item:
-                key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}","-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
-            -
-              uuid: 3b51035d18444307a4d3c401a028a6fd
-              name: '{#INTERFACE_NAME} Latency'
-              type: DEPENDENT
-              key: 'latency[{#INTERFACE_NAME}]'
-              delay: '0'
-              units: ms
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$.if_table[ ?(@.name == ''{#INTERFACE_NAME}'' ) ].latency.first()'
-                  error_handler: DISCARD_VALUE
               master_item:
                 key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}","-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
             -
@@ -5490,6 +5559,11 @@ zabbix_export:
               type: CHECK_JSON_ERROR
               parameters:
                 - $.mcaDumpValidationError
+              error_handler: DISCARD_VALUE
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.mcaDumpTimeout
               error_handler: DISCARD_VALUE
           tags:
             -
