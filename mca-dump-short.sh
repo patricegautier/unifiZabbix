@@ -10,8 +10,8 @@ VALIDATOR_BY_TYPE["UDMP"]=".network_table? != null"
 VALIDATOR_BY_TYPE["USG"]="( .network_table? != null ) and ( .network_table | map(select(.mac!=null)) | length>0 )"
 declare -A OPTIONAL_VALIDATOR_BY_TYPE
 declare -A OPTION_MESSAGE
-OPTIONAL_VALIDATOR_BY_TYPE["USG"]=" ( ( .[\"system-stats\"].temps | length ) == 4 ) "
-OPTION_MESSAGE["USG"]="missingTemperatures"
+#OPTIONAL_VALIDATOR_BY_TYPE["USG"]=" ( ( .[\"system-stats\"].temps | length ) == 4 ) "
+#OPTION_MESSAGE["USG"]="missingTemperatures"
 
 
 #---------------------------------------------------------------------------------------
