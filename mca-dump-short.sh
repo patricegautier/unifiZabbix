@@ -53,6 +53,12 @@ function validationErrorJsonWithReason() {
 	echo '{ "at":"'"${t}"'", "r":"'"${reason}"'", "device":"'"${TARGET_DEVICE}"'", "mcaDumpValidationError":"Error" }'
 }
 
+function timeoutJsonWithReason() {
+	local reason; reason=$(echo "$1" | tr -d "\"'\n\r" )
+	local t; t=$(date +"%T")
+	echo '{ "at":"'"${t}"'", "r":"'"${reason}"'", "device":"'"${TARGET_DEVICE}"'", "mcaDumpTimeout":"Error" }'
+}
+
 
 function insertWarningIntoJsonOutput() {
 	local warning=$1
@@ -369,7 +375,7 @@ function invokeMcaDump() {
 	jsonOutput="${output}"
 
 	if (( exitCode >= 127 && exitCode != 255 )); then
-		output=$(errorJsonWithReason "timeout ($exitCode)")
+		output=$(timeoutJsonWithReason "timeout ($exitCode)")
 	elif (( exitCode != 0 )) || [[ -z "${output}" ]]; then
 		output=$(errorJsonWithReason "$(echo "Remote pb: "; cat "${mcaErrorFile}"; echo "${output}" )")
 		exitCode=1
