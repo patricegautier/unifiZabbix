@@ -226,7 +226,7 @@ function retrievePortNamesInto() {
       expect ".*\r\n"
 	  expect {
 
-	  	-re "(USW-Aggregation|USW-Flex-XG)\r\n" { 
+	  	-re "(USW-Aggregation|USW-Flex-XG|USW-Enterprise-8-PoE)\r\n" {
 		  expect -re ".*#"
 
 		  send -- "cli\r"
