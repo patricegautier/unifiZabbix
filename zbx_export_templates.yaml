@@ -986,6 +986,10 @@ zabbix_export:
                   parameters:
                     - '$.vap_table[?(@.radio == ''{#RADIO_NAME}'')].channel.first()'
                   error_handler: DISCARD_VALUE
+                - type: IN_RANGE
+                  parameters:
+                    - '1'
+                    - '255'
               master_item:
                 key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
               tags:
@@ -1134,7 +1138,7 @@ zabbix_export:
               error_handler: DISCARD_VALUE
             - type: JSONPATH
               parameters:
-                - '$.radio_table.[?(@.athstats.name != "" && @.athstats.noise_floor < 0)]'
+                - '$.radio_table.[?(@.athstats.name != "" &&  (@.athstats.noise_floor < 0  && @.athstats.noise_floor > -500 || @.cu_total > 0))]'
               error_handler: DISCARD_VALUE
         - uuid: 90e43b647faa4a6fa7af643960bcf0a5
           name: 'Wifi Network Discovery'
