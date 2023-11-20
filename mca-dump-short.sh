@@ -459,6 +459,14 @@ function usage() {
 	exit 1
 }
 
+function checkOptForMissingMacro() {
+	local v=$1
+	local t=$2
+	if [[ "$v" == "{\$$t}" ]]; then
+		echo "Please set the {\$$t} macro in zabbix > Administration"
+	fi
+}
+
 #------------------------------------------------------------------------------------------------
 
 declare SSHPASS_OPTIONS=
@@ -479,20 +487,22 @@ declare BATCH_MODE=
 while getopts 'i:u:t:hd:vp:wm:o:OV:U:P:eb' OPT
 do
   case $OPT in
-    i) PRIVKEY_OPTION="-i "${OPTARG} ;;
-    u) USER=${OPTARG} ;;
-    t) DEVICE_TYPE=${OPTARG} ;;
-    d) TARGET_DEVICE=${OPTARG} ;;
-    P) TARGET_DEVICE_PORT=${OPTARG} ;;
-    v) export VERBOSE=true ;;
-    p) PASSWORD_FILE_PATH=${OPTARG} ;;
-    w) VERBOSE_PORT_DISCOVERY=true ;;
-    m) logFile=${OPTARG} ;;
-    o) TIMEOUT=$(( OPTARG-1 )) ;;
-    O) ECHO_OUTPUT=true ;;
-    V) JQ_VALIDATOR=${OPTARG} ;;
-    b) BATCH_MODE="-o BatchMode=yes" ;;
-    e) echo -n "$(errorJsonWithReason "simulated error")"; exit 1 ;;
+    i) 	checkOptForMissingMacro "${OPTARG}" "UNIFI_SSH_PRIV_KEY_PATH}"
+    	PRIVKEY_OPTION="-i "${OPTARG} ;;
+    u) 	checkOptForMissingMacro "${OPTARG}" "USER}"
+    	USER=${OPTARG} ;;
+    t) 	DEVICE_TYPE=${OPTARG} ;;
+    d) 	TARGET_DEVICE=${OPTARG} ;;
+    P) 	TARGET_DEVICE_PORT=${OPTARG} ;;
+    v) 	export VERBOSE=true ;;
+    p) 	PASSWORD_FILE_PATH=${OPTARG} ;;
+    w) 	VERBOSE_PORT_DISCOVERY=true ;;
+    m) 	logFile=${OPTARG} ;;
+    o) 	TIMEOUT=$(( OPTARG-1 )) ;;
+    O) 	ECHO_OUTPUT=true ;;
+    V) 	JQ_VALIDATOR=${OPTARG} ;;
+    b) 	BATCH_MODE="-o BatchMode=yes" ;;
+    e) 	echo -n "$(errorJsonWithReason "simulated error")"; exit 1 ;;
     U)  if [[ -n "${OPTARG}" ]] &&  [[ "${OPTARG}" != "{\$UNIFI_VERBOSE_SSH}" ]]; then
     		export VERBOSE_SSH="${OPTARG}"
     	fi ;;
@@ -503,6 +513,7 @@ done
 declare EXIT_CODE=0
 declare OUTPUT=
 declare JSON_OUTPUT=
+
 
 
 if [[ -n "${ECHO_OUTPUT:-}" ]]; then
@@ -534,10 +545,12 @@ if [[ -n "${TARGET_DEVICE_PORT}" ]]; then
 	fi
 fi
 
+
 if [[ -z "${USER:-}" ]]; then
 	echo "Please specify a username with -u" >&2
 	usage
 fi
+
 
 if [[ -z "${JQ_VALIDATOR:-}" ]]; then
 	JQ_VALIDATOR=${VALIDATOR_BY_TYPE["${DEVICE_TYPE}"]:-}
