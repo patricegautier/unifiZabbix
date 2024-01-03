@@ -44,19 +44,19 @@ function runWithTimeout () {
 function errorJsonWithReason() {
 	local reason; reason=$(echo "$1" | tr -d "\"'\n\r" )
 	local t; t=$(date +"%T")
-	echo '{ "at":"'"${t}"'", "r":"'"${reason}"'", "device":"'"${TARGET_DEVICE}"'", "mcaDumpError":"Error" }'
+	echo '{ "at":"'"${t}"'", "r":"'"${reason}"'", "device":"'"${TARGET_DEVICE}"'", "mcaDumpError":"Error" }' 
 }
 
 function validationErrorJsonWithReason() {
 	local reason; reason=$(echo "$1" | tr -d "\"'\n\r" )
 	local t; t=$(date +"%T")
-	echo '{ "at":"'"${t}"'", "r":"'"${reason}"'", "device":"'"${TARGET_DEVICE}"'", "mcaDumpValidationError":"Error" }'
+	echo '{ "at":"'"${t}"'", "r":"'"${reason}"'", "device":"'"${TARGET_DEVICE}"'", "mcaDumpValidationError":"Error" }' 
 }
 
 function timeoutJsonWithReason() {
 	local reason; reason=$(echo "$1" | tr -d "\"'\n\r" )
 	local t; t=$(date +"%T")
-	echo '{ "at":"'"${t}"'", "r":"'"${reason}"'", "device":"'"${TARGET_DEVICE}"'", "mcaDumpTimeout":"Error" }'
+	echo '{ "at":"'"${t}"'", "r":"'"${reason}"'", "device":"'"${TARGET_DEVICE}"'", "mcaDumpTimeout":"Error" }' 
 }
 
 
@@ -74,6 +74,11 @@ function echoErr() {
 		echo "$(date) $TARGET_DEVICE"
 		echo "  ${error}"
 	} >> "${errFile}"
+	if [[ -f "/./.dockerenv" ]]; then   # also echo the error to docker logs if running inside a container
+	{
+		echo "  ${error}" 
+	} >> /proc/1/fd/1
+	fi
 }
 
 function issueSSHCommand() {
@@ -404,7 +409,7 @@ function invokeMcaDump() {
 			output=$(echo  "${jqInput}" | jq ${INDENT_OPTION} "${JQ_OPTIONS}" 2> "${errorFile}")
 			exitCode=$?
 			if (( exitCode != 0 )) || [[ -z "${output}" ]]; then
-				output=$(errorJsonWithReason "jq ${INDENT_OPTION} ${JQ_OPTIONS} returned status $exitCode; $(cat $errorFile);  JQ input was ${jqInput}")
+				output=$(errorJsonWithReason "jq ${INDENT_OPTION} ${JQ_OPTIONS} returned status $exitCode; $(cat $errorFile)")
 				exitCode=1
 			fi
 			rm -f "${errorFile}" 2>/dev/null
