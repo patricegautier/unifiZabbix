@@ -7,6 +7,7 @@ declare HE_RSA_SSH_KEY_OPTIONS='-o PubkeyAcceptedKeyTypes=+ssh-rsa -o HostKeyAlg
 declare -A VALIDATOR_BY_TYPE
 VALIDATOR_BY_TYPE["AP"]=".vap_table? != null and .radio_table != null"
 VALIDATOR_BY_TYPE["UDMP"]=".network_table? != null"
+VALIDATOR_BY_TYPE["USG-LITE"]=".network_table? != null"
 VALIDATOR_BY_TYPE["USG"]="( .network_table? != null ) and ( .network_table | map(select(.mac!=null)) | length>0 )"
 declare -A OPTIONAL_VALIDATOR_BY_TYPE
 declare -A OPTION_MESSAGE
@@ -351,6 +352,7 @@ function invokeMcaDump() {
 
 	INDENT_OPTION="--indent 0"
 
+	local delay=1 # the CPU is very wimpy on the USG-lite, ssh into it affects the usage.  Sleeping 2s gets a better CPU read
 	case "${deviceType:-}" in 
 
 		AP) 							JQ_OPTIONS='del (.port_table) | del(.radio_table[]?.scan_table) | ( .vap_table[]|= ( .clientCount = ( .sta_table|length ) ) ) | del (.vap_table[]?.sta_table)' ;;
@@ -368,21 +370,23 @@ function invokeMcaDump() {
 												fan_level_key_name: \"fan_level\"
 												} ]" ;;
 		UDMP| USG)						JQ_OPTIONS='del (.dpi_stats) | del(.fingerprints) | del( .network_table[]? |  select ( .address == null ))' ;;
+		USG-LITE)						JQ_OPTIONS='del (.dpi_stats) | del(.fingerprints) | del( .network_table[]? |  select ( .address == null ))'
+										delay=2 ;;  # the CPU is very wimpy on the USG-lite, ssh into it affects the usage.  Sleeping 2s gets a better CPU read
 		CK)								JQ_OPTIONS='del (.dpi_stats)' ;;
 		*)								echo "Unknown device Type: '${DEVICE_TYPE:-}'"; usage ;;
 	esac
-
-	local mcaErrorFile=/tmp/mca-$RANDOM.err
-
-	output=$(runWithTimeout "${TIMEOUT}" issueSSHCommand mca-dump  2> "${mcaErrorFile}")
+	
+	#shellcheck disable=SC2086
+	output=$(timeout --signal=HUP --kill-after=5 "${TIMEOUT}" \
+		${SSHPASS_OPTIONS} ssh ${SSH_PORT} ${VERBOSE_SSH} ${HE_RSA_SSH_KEY_OPTIONS} ${BATCH_MODE} -o ConnectTimeout=5 -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} "${USER}@${TARGET_DEVICE}" ${delay:+sleep ${delay}\;} mca-dump 2>&1	)
 	exitCode=$?
 	#shellcheck disable=SC2034
 	jsonOutput="${output}"
 
-	if (( exitCode >= 127 && exitCode != 255 )); then
+	if (( exitCode == 124  )); then
 		output=$(timeoutJsonWithReason "timeout ($exitCode)")
-	elif (( exitCode != 0 )) || [[ -z "${output}" ]]; then
-		output=$(errorJsonWithReason "$(echo "Remote pb: "; cat "${mcaErrorFile}"; echo "${output}" )")
+	elif (( exitCode )) || [[ -z "${output}" ]]; then
+		output=$(errorJsonWithReason "$(echo "Remote pb: "; echo "${output}" )")
 		exitCode=1
 	else
 		if [[ -n "${JQ_VALIDATOR:-}" ]]; then
@@ -431,7 +435,6 @@ function invokeMcaDump() {
 		fi
 		rm "${errorFile}" 2>/dev/null
 	fi
-	rm -f  "${mcaErrorFile}" 2>/dev/null
 }
 
 
@@ -447,7 +450,7 @@ function usage() {
 	fi
 	
 	cat <<- EOF
-	Usage ${0}  -i privateKeyPath -p <passwordFilePath> -u user -v -d targetDevice [-t AP|SWITCH|SWITCH_FEATURE_DISCOVERY|SWITCH_DISCOVERY|UDMP|UDMP_FAN_DISCOVERY|UDMP_TEMP_DISCOVERY|USG|CK|WIFI_SITE]
+	Usage ${0}  -i privateKeyPath -p <passwordFilePath> -u user -v -d targetDevice [-t AP|SWITCH|SWITCH_FEATURE_DISCOVERY|SWITCH_DISCOVERY|UDMP|UDMP_FAN_DISCOVERY|UDMP_TEMP_DISCOVERY|USG|USG-LITE|CK|WIFI_SITE]
 	  -i specify private public key pair path
 	  -p specify password file path to be passed to sshpass -f. Note if both -i and -p are provided, the password file will be used
 	  -u SSH user name for Unifi device
