@@ -371,7 +371,7 @@ function invokeMcaDump() {
 												} ]" ;;
 		UDMP| USG)						JQ_OPTIONS='del (.dpi_stats) | del(.fingerprints) | del( .network_table[]? |  select ( .address == null ))' ;;
 		USG-LITE)						JQ_OPTIONS='del (.dpi_stats) | del(.fingerprints) | del( .network_table[]? |  select ( .address == null ))'
-										delay=2 ;;  # the CPU is very wimpy on the USG-lite, ssh into it affects the usage.  Sleeping 2s gets a better CPU read
+										delay=4 ;;  # the CPU is very wimpy on the USG-lite, ssh into it affects the usage.  Sleeping 2s gets a better CPU read
 		CK)								JQ_OPTIONS='del (.dpi_stats)' ;;
 		*)								echo "Unknown device Type: '${DEVICE_TYPE:-}'"; usage ;;
 	esac
