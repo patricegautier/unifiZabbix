@@ -61,6 +61,12 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '0.001'
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '100'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Invalid Voltage'
           master_item:
             key: 'solarpointBattery.sh["-u", "{$SOLARPOINT_USERNAME}", "-p", "{$SOLARPOINT_PASSWORD}", {HOST.CONN}]'
           tags:
@@ -106,6 +112,13 @@ zabbix_export:
           value_type: FLOAT
           units: W
           params: 'avg(//net_power_consumption,30d)'
+          preprocessing:
+            - type: IN_RANGE
+              parameters:
+                - '-1000'
+                - '1000'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Invalid Power Consumption'
         - uuid: c0ea86e3665c4539b080a94d76d14396
           name: 'Raw Power Consumption Monthly Average'
           type: CALCULATED
@@ -143,6 +156,12 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '0.001'
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '1000'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Invalid Power Consumption'
           master_item:
             key: 'solarpointBattery.sh["-u", "{$SOLARPOINT_USERNAME}", "-p", "{$SOLARPOINT_PASSWORD}", {HOST.CONN}]'
           tags:
@@ -162,6 +181,12 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '0.001'
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '1000'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Invalid Power Input'
           master_item:
             key: 'solarpointBattery.sh["-u", "{$SOLARPOINT_USERNAME}", "-p", "{$SOLARPOINT_PASSWORD}", {HOST.CONN}]'
           tags:
@@ -180,6 +205,12 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '0.001'
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '100'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Invalid Voltage'
           master_item:
             key: 'solarpointBattery.sh["-u", "{$SOLARPOINT_USERNAME}", "-p", "{$SOLARPOINT_PASSWORD}", {HOST.CONN}]'
           tags:
@@ -194,6 +225,13 @@ zabbix_export:
           units: W
           params: 'last(//pvInputPower) - last(//powerOutput)'
           description: 'Instantaneous power consumption: PV Input - power output.  Does not take the SolarPoint itself into account'
+          preprocessing:
+            - type: IN_RANGE
+              parameters:
+                - '-10'
+                - '200'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Invalid Power'
           tags:
             - tag: Application
               value: Battery
@@ -222,6 +260,12 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '0.001'
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '100'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Invalid Voltage'
           master_item:
             key: 'solarpointBattery.sh["-u", "{$SOLARPOINT_USERNAME}", "-p", "{$SOLARPOINT_PASSWORD}", {HOST.CONN}]'
           tags:
@@ -364,6 +408,12 @@ zabbix_export:
               parameters:
                 - 'airTime=(.*)'
                 - \1
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '100'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Invalid AirTime Percentage'
           master_item:
             key: 'ssh.run[mca-status]'
           tags:
@@ -401,6 +451,12 @@ zabbix_export:
               parameters:
                 - 'cpuUsage=(.*)'
                 - \1
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '100'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Invalid Usage'
           master_item:
             key: 'ssh.run[mca-status]'
           tags:
@@ -418,6 +474,12 @@ zabbix_export:
               parameters:
                 - 'loadavg=(.*)'
                 - \1
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '100'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Invalid Load Average'
           master_item:
             key: 'ssh.run[mca-status]'
           tags:
@@ -435,6 +497,12 @@ zabbix_export:
               parameters:
                 - 'noise=(.*)'
                 - \1
+            - type: IN_RANGE
+              parameters:
+                - '-150'
+                - '0'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Invalid Noise'
           master_item:
             key: 'ssh.run[mca-status]'
           tags:
@@ -463,6 +531,12 @@ zabbix_export:
               parameters:
                 - 'signal=(.*)'
                 - \1
+            - type: IN_RANGE
+              parameters:
+                - '-150'
+                - '0'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Invalid Signal'
           master_item:
             key: 'ssh.run[mca-status]'
           tags:
@@ -506,6 +580,10 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1000'
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '10000000000'
           master_item:
             key: 'ssh.run[mca-status]'
           tags:
@@ -539,6 +617,12 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '8'
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '10000000000'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Invalid Bandwidth'
           master_item:
             key: 'ssh.run[mca-status]'
           tags:
@@ -590,6 +674,12 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '8'
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '10000000000'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Invalid Bandwidth'
           master_item:
             key: 'ssh.run[mca-status]'
           tags:
@@ -638,6 +728,12 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1000'
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '10000000000'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Invalid Bandwidth'
           master_item:
             key: 'ssh.run[mca-status]'
           tags:
@@ -683,6 +779,12 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - '$.vap_table.[*].clientCount.sum()'
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '2000'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Invalid Client Count'
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
           tags:
@@ -704,6 +806,12 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - '$.[''system-stats''].cpu'
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '100'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Invalid Percentage'
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
           tags:
@@ -758,6 +866,12 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - '$.[''sys_stats''].loadavg_1'
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '100'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Invalid Load Average'
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
           tags:
@@ -777,6 +891,12 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - '$.[''sys_stats''].loadavg_5'
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '100'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Invalid Load Average'
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
           tags:
@@ -796,6 +916,12 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - '$.[''sys_stats''].loadavg_15'
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '100'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Invalid Load Average'
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
           tags:
@@ -814,11 +940,12 @@ zabbix_export:
               parameters:
                 - $.mcaDumpError
               error_handler: CUSTOM_ERROR
-              error_handler_params: mcaDumpError
+              error_handler_params: $.mcaDumpError.reason
             - type: CHECK_JSON_ERROR
               parameters:
                 - $.mcaDumpValidationError
-              error_handler: DISCARD_VALUE
+              error_handler: CUSTOM_ERROR
+              error_handler_params: $.mcaDumpValidationError.reason
             - type: CHECK_JSON_ERROR
               parameters:
                 - $.mcaDumpTimeout
@@ -831,6 +958,13 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           params: '100* last(//mem_used) / last(//mem_total)'
+          preprocessing:
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '100'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Invalid Percentage'
           tags:
             - tag: Application
               value: Host
@@ -849,6 +983,12 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.sys_stats.mem_total
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '1000000000'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Invalid Memory'
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
           tags:
@@ -869,6 +1009,12 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.sys_stats.mem_used
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '1000000000'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Invalid Memory'
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
           tags:
@@ -893,6 +1039,12 @@ zabbix_export:
               parameters:
                 - '-1'
                 - '100'
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '100'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Invalid Percentage'
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
           tags:
@@ -955,6 +1107,12 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '8'
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '10000000000'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Invalid Bandwitch'
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
           tags:
@@ -980,6 +1138,12 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '8'
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '10000000000'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Invalid Bandwidth'
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
           tags:
@@ -1013,6 +1177,8 @@ zabbix_export:
                   parameters:
                     - '1'
                     - '255'
+                  error_handler: CUSTOM_ERROR
+                  error_handler_params: 'Invalid Channel Value'
               master_item:
                 key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
               tags:
@@ -1030,6 +1196,13 @@ zabbix_export:
               key: 'cint[{#RADIO_NAME}]'
               units: '%'
               params: '((last( //cu_total[{#RADIO_NAME}] )- last( //cu_tx[{#RADIO_NAME}])-last(//cu_rx[{#RADIO_NAME}]))>0)*(last( //cu_total[{#RADIO_NAME}] )- last( //cu_tx[{#RADIO_NAME}])-last(//cu_rx[{#RADIO_NAME}]))'
+              preprocessing:
+                - type: IN_RANGE
+                  parameters:
+                    - '0'
+                    - '100'
+                  error_handler: CUSTOM_ERROR
+                  error_handler_params: 'Invalid Value'
               tags:
                 - tag: Application
                   value: Radio
@@ -1064,6 +1237,12 @@ zabbix_export:
                 - type: JSONPATH
                   parameters:
                     - '$.radio_table[?(@.radio == ''{#RADIO_NAME}'')].athstats.cu_self_rx.first()'
+                - type: IN_RANGE
+                  parameters:
+                    - '0'
+                    - '100'
+                  error_handler: CUSTOM_ERROR
+                  error_handler_params: 'Invalid Percentage Value'
               master_item:
                 key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
               tags:
@@ -1084,6 +1263,12 @@ zabbix_export:
                 - type: JSONPATH
                   parameters:
                     - '$.radio_table[?(@.radio == ''{#RADIO_NAME}'')].athstats.cu_total.first()'
+                - type: IN_RANGE
+                  parameters:
+                    - '0'
+                    - '100'
+                  error_handler: CUSTOM_ERROR
+                  error_handler_params: 'Invalid Percentage Value'
               master_item:
                 key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
               tags:
@@ -1120,6 +1305,12 @@ zabbix_export:
                 - type: JSONPATH
                   parameters:
                     - '$.radio_table[?(@.radio == ''{#RADIO_NAME}'')].athstats.cu_self_tx.first()'
+                - type: IN_RANGE
+                  parameters:
+                    - '0'
+                    - '100'
+                  error_handler: CUSTOM_ERROR
+                  error_handler_params: 'Invalid Percentage Value'
               master_item:
                 key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
               tags:
@@ -1149,6 +1340,28 @@ zabbix_export:
               tags:
                 - tag: Application
                   value: Radio
+          graph_prototypes:
+            - uuid: 02ca3d6fb6cd4f9291070725a6b98cc3
+              name: 'Utilization and Interference {#RADIO_NAME}'
+              height: '400'
+              graph_items:
+                - color: 1A7C11
+                  calc_fnc: ALL
+                  item:
+                    host: 'Unifi AP'
+                    key: 'cint[{#RADIO_NAME}]'
+                - sortorder: '1'
+                  color: F63100
+                  calc_fnc: ALL
+                  item:
+                    host: 'Unifi AP'
+                    key: 'cu_total[{#RADIO_NAME}]'
+                - sortorder: '3'
+                  color: '274482'
+                  calc_fnc: ALL
+                  item:
+                    host: 'Unifi AP'
+                    key: 'cu_tx[{#RADIO_NAME}]'
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-P", "{$UNIFI_SSH_PORT}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "AP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
           lld_macro_paths:
@@ -1358,6 +1571,12 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '8'
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '10000000'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Invalid Reception Bandwidth'
           master_item:
             key: 'ssh.run[ifconfig]'
           tags:
@@ -1424,6 +1643,10 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '8'
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '100000000'
           master_item:
             key: 'ssh.run[ifconfig]'
           tags:
@@ -1606,6 +1829,13 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           params: '100 - last(//cpu_idle)'
+          preprocessing:
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '100'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Invalid Percentage'
           tags:
             - tag: Application
               value: Host
@@ -1750,6 +1980,12 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '0.001'
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '200'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Invalid Temperature'
           tags:
             - tag: Application
               value: Host
@@ -1769,6 +2005,12 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '0.001'
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '200'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Invalid Temperature'
           tags:
             - tag: Application
               value: Host
@@ -1788,6 +2030,12 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '0.001'
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '200'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Invalid Temperature'
           tags:
             - tag: Application
               value: Host
@@ -1838,6 +2086,12 @@ zabbix_export:
               parameters:
                 - '.*load average: ([0-9]+([.][0-9]+))'
                 - \1
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '100'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Invalid Load Average'
           master_item:
             key: 'ssh.run[uptime]'
           tags:
@@ -1865,6 +2119,12 @@ zabbix_export:
               parameters:
                 - '.*load average: [^ ]*, ([0-9]+([.][0-9]+))'
                 - \1
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '100'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Invalid Load Average'
           master_item:
             key: 'ssh.run[uptime]'
           tags:
@@ -1883,6 +2143,12 @@ zabbix_export:
               parameters:
                 - '.*load average: [^ ]*, [^ ]*, ([0-9]+([.][0-9]+))'
                 - \1
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '100'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Invalid Load Average'
           master_item:
             key: 'ssh.run[uptime]'
           tags:
@@ -1963,6 +2229,12 @@ zabbix_export:
                 - \0
               error_handler: CUSTOM_VALUE
               error_handler_params: '1'
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '32'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Invalid Number of Processors'
           tags:
             - tag: Application
               value: Hardware
@@ -2058,6 +2330,12 @@ zabbix_export:
               parameters:
                 - '.*load average: ([0-9]+([.][0-9]+))'
                 - \1
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '100'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Invalid Load Average'
           master_item:
             key: 'ssh.run[uptime]'
           tags:
@@ -2085,6 +2363,12 @@ zabbix_export:
               parameters:
                 - '.*load average: [^ ]*, ([0-9]+([.][0-9]+))'
                 - \1
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '100'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Invalid Load Average'
           master_item:
             key: 'ssh.run[uptime]'
           tags:
@@ -2103,6 +2387,12 @@ zabbix_export:
               parameters:
                 - '.*load average: [^ ]*, [^ ]*, ([0-9]+([.][0-9]+))'
                 - \1
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '100'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Invalid Load Average'
           master_item:
             key: 'ssh.run[uptime]'
           tags:
@@ -2193,6 +2483,12 @@ zabbix_export:
                 - \0
               error_handler: CUSTOM_VALUE
               error_handler_params: '1'
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '32'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Invalid Number of Processors'
           tags:
             - tag: Application
               value: Hardware
@@ -2277,6 +2573,12 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - 'return Math.round(value)'
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '100'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Incorrect Utilization'
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "SWITCH", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-U", "{$UNIFI_VERBOSE_SSH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
           tags:
@@ -2320,6 +2622,12 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.sys_stats.loadavg_1
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '100'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Incorrect Load Average'
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "SWITCH", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-U", "{$UNIFI_VERBOSE_SSH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
         - uuid: 9e29ac5c713c471ba6da69eb45c01732
@@ -2336,6 +2644,12 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.sys_stats.loadavg_5
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '100'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Incorrect Load Average'
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "SWITCH", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-U", "{$UNIFI_VERBOSE_SSH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
         - uuid: fd6213ada9c3468f9d64e540a8c95159
@@ -2352,6 +2666,12 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.sys_stats.loadavg_15
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '100'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Incorrect Load Average'
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "SWITCH", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-U", "{$UNIFI_VERBOSE_SSH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
         - uuid: 3aab4c5928fe428eaa68c3ded3c966d8
@@ -2389,11 +2709,12 @@ zabbix_export:
               parameters:
                 - $.mcaDumpError
               error_handler: CUSTOM_ERROR
-              error_handler_params: mcaDumpError
+              error_handler_params: $.mcaDumpError.reason
             - type: CHECK_JSON_ERROR
               parameters:
                 - $.mcaDumpValidationError
-              error_handler: DISCARD_VALUE
+              error_handler: CUSTOM_ERROR
+              error_handler_params: $.mcaDumpValidationError.reason
             - type: CHECK_JSON_ERROR
               parameters:
                 - $.mcaDumpTimeout
@@ -2414,11 +2735,12 @@ zabbix_export:
               parameters:
                 - $.mcaDumpError
               error_handler: CUSTOM_ERROR
-              error_handler_params: mcaDumpError
+              error_handler_params: $.mcaDumpError.reason
             - type: CHECK_JSON_ERROR
               parameters:
                 - $.mcaDumpValidationError
-              error_handler: DISCARD_VALUE
+              error_handler: CUSTOM_ERROR
+              error_handler_params: $.mcaDumpValidationError.reason
           tags:
             - tag: Application
               value: Power
@@ -2435,11 +2757,12 @@ zabbix_export:
               parameters:
                 - $.mcaDumpError
               error_handler: CUSTOM_ERROR
-              error_handler_params: mcaDumpError
+              error_handler_params: $.mcaDumpError.reason
             - type: CHECK_JSON_ERROR
               parameters:
                 - $.mcaDumpValidationError
-              error_handler: DISCARD_VALUE
+              error_handler: CUSTOM_ERROR
+              error_handler_params: $.mcaDumpValidationError.reason
           tags:
             - tag: Application
               value: Power
@@ -2454,6 +2777,12 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - 'return Math.round(value)'
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '100'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Incorrect Memory Utilization'
           tags:
             - tag: Application
               value: Host
@@ -2650,8 +2979,8 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - '$[?(@.has_fan=="true")]'
-              error_handler: CUSTOM_VALUE
-              error_handler_params: '[]'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Fanless Switch'
         - uuid: 3440ec98490a4b40bcc1dddca0955cb8
           name: 'POE Discovery'
           type: DEPENDENT
@@ -2673,6 +3002,12 @@ zabbix_export:
                 - type: JSONPATH
                   parameters:
                     - $.total_max_power
+                - type: IN_RANGE
+                  parameters:
+                    - '0'
+                    - '1000'
+                  error_handler: CUSTOM_ERROR
+                  error_handler_params: 'Invalid Power'
               master_item:
                 key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "SWITCH", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-U", "{$UNIFI_VERBOSE_SSH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
               tags:
@@ -2683,6 +3018,13 @@ zabbix_export:
               type: CALCULATED
               key: '_[{#PERCENT_POWER_CONSUMED_KEY_NAME}]'
               params: '100 * last(//_[{#TOTAL_POWER_CONSUMED_KEY_NAME}]) / last(//_[{#MAX_POWER_KEY_NAME}])'
+              preprocessing:
+                - type: IN_RANGE
+                  parameters:
+                    - '0'
+                    - '100'
+                  error_handler: CUSTOM_ERROR
+                  error_handler_params: 'Invalid Percentage'
               tags:
                 - tag: Application
                   value: Power
@@ -2702,6 +3044,12 @@ zabbix_export:
                 - type: JSONPATH
                   parameters:
                     - '$.port_table[*].poe_power.sum()'
+                - type: IN_RANGE
+                  parameters:
+                    - '0'
+                    - '1000'
+                  error_handler: CUSTOM_ERROR
+                  error_handler_params: 'Invalid Power'
               master_item:
                 key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "SWITCH", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-U", "{$UNIFI_VERBOSE_SSH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
               tags:
@@ -2725,8 +3073,8 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - '$[?(@.power=="true")]'
-              error_handler: CUSTOM_VALUE
-              error_handler_params: '[]'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'No POE on this switch'
         - uuid: ccacdb7fcb1c41d1a3e58f7a201e6603
           name: 'POE Discovery by Port'
           type: DEPENDENT
@@ -2777,8 +3125,8 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - '$.port_table[?(@.poe_power>=0)]'
-              error_handler: CUSTOM_VALUE
-              error_handler_params: '[]'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'No POE ports on this switch'
         - uuid: 2363ae0485a84853af24157aab6ed5f5
           name: 'Switch Port Discovery'
           type: DEPENDENT
@@ -3095,6 +3443,12 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - '$.[''system-stats''].cpu'
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '100'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Incorrect Utilization'
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
           tags:
@@ -3164,6 +3518,12 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.sys_stats.loadavg_1
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '100'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Incorrect Utilization'
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
         - uuid: bc785bbc152b420a931451829442b3a6
@@ -3180,6 +3540,12 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.sys_stats.loadavg_5
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '100'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Incorrect Utilization'
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
         - uuid: c10b01b0305646729a64414799837881
@@ -3196,6 +3562,12 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.sys_stats.loadavg_15
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '100'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Incorrect Utilization'
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
           triggers:
@@ -3217,12 +3589,13 @@ zabbix_export:
             - type: CHECK_JSON_ERROR
               parameters:
                 - $.mcaDumpValidationError
-              error_handler: DISCARD_VALUE
+              error_handler: CUSTOM_ERROR
+              error_handler_params: '$. mcaDumpValidationError.reason'
             - type: CHECK_JSON_ERROR
               parameters:
                 - $.mcaDumpError
               error_handler: CUSTOM_ERROR
-              error_handler_params: mcaDumpError
+              error_handler_params: $.mcaDumpError.reason
             - type: CHECK_JSON_ERROR
               parameters:
                 - $.mcaDumpTimeout
@@ -3243,11 +3616,12 @@ zabbix_export:
               parameters:
                 - $.mcaDumpError
               error_handler: CUSTOM_ERROR
-              error_handler_params: mcaDumpError
+              error_handler_params: $.mcaDumpError.reason
             - type: CHECK_JSON_ERROR
               parameters:
                 - $.mcaDumpValidationError
-              error_handler: DISCARD_VALUE
+              error_handler: CUSTOM_ERROR
+              error_handler_params: $.mcaDumpValidationError.reason
           tags:
             - tag: Application
               value: Host
@@ -3259,6 +3633,13 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           params: '100* last(//mem_used) / last(//mem_total)'
+          preprocessing:
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '100'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Incorrect Percentage'
           tags:
             - tag: Application
               value: Host
@@ -3422,6 +3803,12 @@ zabbix_export:
                   parameters:
                     - '$.if_table[ ?(@.name == ''{#INTERFACE_NAME}'' ) ].latency.first()'
                   error_handler: DISCARD_VALUE
+                - type: IN_RANGE
+                  parameters:
+                    - '0'
+                    - '10000'
+                  error_handler: CUSTOM_ERROR
+                  error_handler_params: 'Incorrect Latency'
               master_item:
                 key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
           master_item:
@@ -3454,6 +3841,12 @@ zabbix_export:
                   parameters:
                     - '{#FAN_NAME}:[ ]+([0-9]+) RPM'
                     - \1
+                - type: IN_RANGE
+                  parameters:
+                    - '0'
+                    - '10000'
+                  error_handler: CUSTOM_ERROR
+                  error_handler_params: 'Incorrect Fan Speed'
               master_item:
                 key: 'ssh.run[sensors]'
           graph_prototypes:
@@ -3959,6 +4352,12 @@ zabbix_export:
                 - type: JSONPATH
                   parameters:
                     - '$.temperatures[ ?(@.name == ''{#TEMP_NAME}'' ) ].value.first()'
+                - type: IN_RANGE
+                  parameters:
+                    - '0'
+                    - '200'
+                  error_handler: CUSTOM_ERROR
+                  error_handler_params: 'Incorrect Temperature'
               master_item:
                 key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "UDMP", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
               trigger_prototypes:
@@ -4027,6 +4426,12 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - '$.[''system-stats''].cpu'
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '100'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Invalid Percentage'
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}","-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
           tags:
@@ -4068,6 +4473,12 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.sys_stats.loadavg_1
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '100'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Incorrect Utilization'
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}","-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
         - uuid: 8675bf85b33d4e6fbc801a2d08e5c42e
@@ -4084,6 +4495,12 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.sys_stats.loadavg_5
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '100'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Incorrect load Average'
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}","-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
         - uuid: 1cf125481eaa4efc9a5fa47fcdb5e107
@@ -4100,6 +4517,12 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.sys_stats.loadavg_15
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '100'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Incorrect Load Average'
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}","-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
           triggers:
@@ -4131,11 +4554,12 @@ zabbix_export:
               parameters:
                 - $.mcaDumpError
               error_handler: CUSTOM_ERROR
-              error_handler_params: mcaDumpError
+              error_handler_params: $.mcaDumpError.reason
             - type: CHECK_JSON_ERROR
               parameters:
                 - $.mcaDumpValidationError
-              error_handler: DISCARD_VALUE
+              error_handler: CUSTOM_ERROR
+              error_handler_params: $.mcaDumpValidationError.reason
             - type: CHECK_JSON_ERROR
               parameters:
                 - $.mcaDumpTimeout
@@ -4156,11 +4580,12 @@ zabbix_export:
               parameters:
                 - $.mcaDumpError
               error_handler: CUSTOM_ERROR
-              error_handler_params: mcaDumpError
+              error_handler_params: $.mcaDumpError.reason
             - type: CHECK_JSON_ERROR
               parameters:
                 - $.mcaDumpValidationError
-              error_handler: DISCARD_VALUE
+              error_handler: CUSTOM_ERROR
+              error_handler_params: $.mcaDumpValidationError.reason
           tags:
             - tag: Application
               value: Host
@@ -4172,6 +4597,13 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           params: '100* last(//mem_used) / last(//mem_total)'
+          preprocessing:
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '100'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Incorrect Utilization'
           tags:
             - tag: Application
               value: Host
@@ -4190,6 +4622,12 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.sys_stats.mem_total
+            - type: IN_RANGE
+              parameters:
+                - '100000000'
+                - '1000000000'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Incorrect Memory Size'
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}","-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
           tags:
@@ -4259,6 +4697,12 @@ zabbix_export:
               parameters:
                 - ' C'
                 - ''
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '200'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Incorrect Temperature'
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}","-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
           tags:
@@ -4286,6 +4730,12 @@ zabbix_export:
               parameters:
                 - ' C'
                 - ''
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '200'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Incorrect Temperature'
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "{$UNIFI_USER}", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}","-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
           tags:
@@ -4579,6 +5029,12 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - '$.[''system-stats''].cpu'
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '100'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Incorrect Utilization'
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG-LITE", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
           tags:
@@ -4635,6 +5091,12 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.sys_stats.loadavg_1
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '100'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Incorrect Load Average'
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG-LITE", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
         - uuid: a2647e39043e40c682dd1e18443aae5a
@@ -4651,6 +5113,12 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.sys_stats.loadavg_5
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '100'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Incorrect Load Average'
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG-LITE", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
         - uuid: a1089326de3748debaae259ace999f19
@@ -4667,6 +5135,12 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.sys_stats.loadavg_15
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '100'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Incorrect Load Average'
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG-LITE", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
           triggers:
@@ -4710,6 +5184,13 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           params: '100* last(//mem_used) / last(//mem_total)'
+          preprocessing:
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '100'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Incorrect Percentage'
           tags:
             - tag: Application
               value: Host
@@ -4726,6 +5207,12 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.sys_stats.mem_total
+            - type: IN_RANGE
+              parameters:
+                - '100000000'
+                - '2000000000'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Incorrect Memory Size'
           master_item:
             key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG-LITE", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
           tags:
@@ -4857,6 +5344,12 @@ zabbix_export:
                   parameters:
                     - '$.if_table[ ?(@.name == ''{#INTERFACE_NAME}'' ) ].latency.first()'
                   error_handler: DISCARD_VALUE
+                - type: IN_RANGE
+                  parameters:
+                    - '0'
+                    - '1000'
+                  error_handler: CUSTOM_ERROR
+                  error_handler_params: 'Incorrect Latency'
               master_item:
                 key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG-LITE", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
           master_item:
@@ -5361,6 +5854,12 @@ zabbix_export:
                 - type: JSONPATH
                   parameters:
                     - '$.temperatures[ ?(@.name == ''{#TEMP_NAME}'' ) ].value.first()'
+                - type: IN_RANGE
+                  parameters:
+                    - '0'
+                    - '200'
+                  error_handler: CUSTOM_ERROR
+                  error_handler_params: 'Incorrect Temperature'
               master_item:
                 key: 'mca-dump-short.sh["-d","{HOST.CONN}", "-u", "root", "-i", "{$UNIFI_SSH_PRIV_KEY_PATH}", "-t", "USG-LITE", "-p", "{$UNIFI_SSHPASS_PASSWORD_PATH}", "-o", "{$UNIFI_CHECK_TIMEOUT}","-b"]'
               trigger_prototypes:
@@ -5434,11 +5933,12 @@ zabbix_export:
               parameters:
                 - $.mcaDumpError
               error_handler: CUSTOM_ERROR
-              error_handler_params: mcaDumpError
+              error_handler_params: $.mcaDumpError.reason
             - type: CHECK_JSON_ERROR
               parameters:
                 - $.mcaDumpValidationError
-              error_handler: DISCARD_VALUE
+              error_handler: CUSTOM_ERROR
+              error_handler_params: $.mcaDumpValidationError.reason
             - type: CHECK_JSON_ERROR
               parameters:
                 - $.mcaDumpTimeout
