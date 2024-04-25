@@ -9,7 +9,7 @@ I am currently running those on the current versions of the base software as of 
 
 ## Zabbix 6.2
 
-I am now testing and exporting from zabbix server 6.2.   I am not sure how far backwards compatible those templates are with older versions of Zabbix.  
+I am now testing and exporting from zabbix server 6.4.   I am not sure how far backwards compatible those templates are with older versions of Zabbix.  
 
 It may be problematic to import those templates in anything less than 6.2. A couple of people have asked to have a version based on 6.0.  For now, look at the workaround in https://github.com/patricegautier/unifiZabbix/issues/64
 
@@ -138,6 +138,13 @@ In your Zabbix conf file (/etc/zabbix/zabbix_server.conf typically) add:
 in my case I have:
 	
 	SSHKeyLocation=/home/pi/.ssh/zabbix
+
+## Zabbix Proxies
+
+If some of your unifi devices are monitored through a proxy you will need to:
+
+1/ Install jq/expect and mca-dump-short on the proxy host as well, as detailed in the first 2 steps above
+2/ make sure the proxy host can get to the devices it monitors via SSH as explained above
 
 ## Running the Zabbix server in a container
 
