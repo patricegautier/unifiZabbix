@@ -459,6 +459,7 @@ function usage() {
 	  -t Unifi device type
 	  -v verbose and non compressed output
 	  -w verbose output for port discovery
+	  -x extreme debugging
 	  -o <timeout> max timeout (3s minimum)
 	  -O echoes debug and timing info to /tmp/mcaDumpShort.log; errors are always echoed to /tmp/mcaDumpShort.err
 	  -V <jqExpression> Provide a JQ expression that must return a non empty output to validate the results. A json error is returned otherwise
@@ -492,7 +493,7 @@ declare VERBOSE=
 declare FULL_ARGS="$*"
 declare BATCH_MODE=
 
-while getopts 'i:u:t:hd:vp:wm:o:OV:U:P:eb' OPT
+while getopts 'i:u:t:hd:vp:wm:o:OV:U:P:ebx' OPT
 do
   case $OPT in
     i) 	checkOptForMissingMacro "${OPTARG}" "UNIFI_SSH_PRIV_KEY_PATH}"
@@ -509,6 +510,7 @@ do
     o) 	TIMEOUT=$(( OPTARG-1 )) ;;
     O) 	ECHO_OUTPUT=true ;;
     V) 	JQ_VALIDATOR=${OPTARG} ;;
+    x)	set -x ;;
     b) 	BATCH_MODE="-o BatchMode=yes" ;;
     e) 	echo -n "$(errorJsonWithReason "simulated error")"; exit 1 ;;
     U)  if [[ -n "${OPTARG}" ]] &&  [[ "${OPTARG}" != "{\$UNIFI_VERBOSE_SSH}" ]]; then
