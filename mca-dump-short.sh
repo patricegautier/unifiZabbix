@@ -14,6 +14,7 @@ declare -A OPTION_MESSAGE
 #OPTIONAL_VALIDATOR_BY_TYPE["USG"]=" ( ( .[\"system-stats\"].temps | length ) == 4 ) "
 #OPTION_MESSAGE["USG"]="missingTemperatures"
 
+declare RETRIABLE_ERROR=250
 
 #---------------------------------------------------------------------------------------
 # Utilities
@@ -343,6 +344,25 @@ function insertPortNamesIntoJson() {
 #---------------------------------------------------------------------------------------------------------------------
 # mca-dump invocation
 
+
+function invokeUpToNTimesWithDelay() {
+	local count=$1
+	local delay=$2
+	shift 2
+	local returnCode=0
+	local invocations
+	for (( invocations=0; invocations < count; invocations++ )); do
+		"$@"
+		returnCode=$?
+		if (( returnCode==0 || returnCode != RETRIABLE_ERROR )); then
+			invocations=$count
+		else
+			sleep "$delay"
+		fi
+	done
+	return $returnCode
+}
+
 function invokeMcaDump() {
 	local deviceType=$1
 	local jqProgram=$2
@@ -394,10 +414,10 @@ function invokeMcaDump() {
 			exitCode=$?
 			if [[ -z "${validation}" ]] || [[ "${validation}" == "false" ]] || (( exitCode != 0 )); then
 				output=$(validationErrorJsonWithReason "validationError: ${JQ_VALIDATOR}")
-				exitCode=1
+				exitCode=$RETRIABLE_ERROR
 			fi
 		fi
-		if [[ -n "${JQ_OPTION_VALIDATOR:-}" ]]; then
+		if (( ! exitCode )) && [[ -n "${JQ_OPTION_VALIDATOR:-}" ]]; then
 			local optionValidation; optionValidation=$(echo "${output}" | jq "${JQ_OPTION_VALIDATOR}")
 			exitCode=$?
 			if [[ -z "${optionValidation}" ]] || [[ "${optionValidation}" == "false" ]] || (( exitCode != 0 )); then				
@@ -405,7 +425,7 @@ function invokeMcaDump() {
 				output=$(insertWarningIntoJsonOutput "$message" "$output")
 			fi			
 		fi		
-		if (( exitCode == 0 )); then
+		if (( ! exitCode )); then
 			errorFile="/tmp/jq$RANDOM$RANDOM.err"
 			jqInput=${output}
 			output=
@@ -413,14 +433,14 @@ function invokeMcaDump() {
 			output=$(echo  "${jqInput}" | jq ${INDENT_OPTION} "${JQ_OPTIONS}" 2> "${errorFile}")
 			exitCode=$?
 			if (( exitCode != 0 )) || [[ -z "${output}" ]]; then
-				output=$(errorJsonWithReason "jq ${INDENT_OPTION} ${JQ_OPTIONS} returned status $exitCode; $(cat $errorFile)")
+				output=$(errorJsonWithReason "jq ${INDENT_OPTION} ${JQ_OPTIONS} returned status $exitCode; $(cat "$errorFile")")
 				exitCode=1
 			fi
 			rm -f "${errorFile}" 2>/dev/null
 		fi
 	fi
 
-	if (( exitCode == 0 )) && [[ "${DEVICE_TYPE:-}" == 'SWITCH_DISCOVERY' ]]; then
+	if (( ! exitCode )) && [[ "${DEVICE_TYPE:-}" == 'SWITCH_DISCOVERY' ]]; then
 		# do not wait anymore for retrievePortNamesInto
 		# this will ensure we don't time out, but sometimes we will use an older file
 		# wait 
@@ -430,7 +450,7 @@ function invokeMcaDump() {
 		insertPortNamesIntoJson output "${jqProgram}" "${jqInput}"  2> "${errorFile}"
 		local code=$?
 		if (( code != 0 )) || [[ -z "${output}" ]]; then
-			output=$(errorJsonWithReason "insertPortNamesIntoJson failed with error code $code; $(cat $errorFile)")
+			output=$(errorJsonWithReason "insertPortNamesIntoJson failed with error code $code; $(cat "$errorFile")")
 			exitCode=1
 		fi
 		rm "${errorFile}" 2>/dev/null
@@ -587,7 +607,7 @@ fi
 if (( EXIT_CODE == 0 )); then
 	case "${DEVICE_TYPE}" in
 		UDMP_FAN_DISCOVERY)	fanDiscovery EXIT_CODE OUTPUT JSON_OUTPUT ;;
-		*)					invokeMcaDump "$DEVICE_TYPE" "$JQ_PROGRAM" EXIT_CODE OUTPUT JSON_OUTPUT ;;
+		*)					invokeUpToNTimesWithDelay 2 0 invokeMcaDump "$DEVICE_TYPE" "$JQ_PROGRAM" EXIT_CODE OUTPUT JSON_OUTPUT ;;
 	esac
 fi
 
