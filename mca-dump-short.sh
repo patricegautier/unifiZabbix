@@ -357,6 +357,7 @@ function invokeUpToNTimesWithDelay() {
 		if (( returnCode==0 || returnCode != RETRIABLE_ERROR )); then
 			invocations=$count
 		else
+			echoErr "Retrying with count=$invocations"
 			sleep "$delay"
 		fi
 	done
@@ -371,6 +372,10 @@ function invokeMcaDump() {
 	local -n jsonOutput=$5
 
 	INDENT_OPTION="--indent 0"
+
+	exitCode=0
+	output=
+	jsonOutput=
 
 	local delay=1 # the CPU is very wimpy on the USG-lite, ssh into it affects the usage.  Sleeping 2s gets a better CPU read
 	case "${deviceType:-}" in 
