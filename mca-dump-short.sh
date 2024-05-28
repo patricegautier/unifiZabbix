@@ -355,6 +355,9 @@ function invokeUpToNTimesWithDelay() {
 		"$@"
 		returnCode=$?
 		if (( returnCode==0 || returnCode != RETRIABLE_ERROR )); then
+			if (( returnCode )); then 
+				echoErr "Not retrying with error $returnCode"
+			fi
 			invocations=$count
 		else
 			echoErr "Retrying with count=$invocations"
@@ -367,15 +370,12 @@ function invokeUpToNTimesWithDelay() {
 function invokeMcaDump() {
 	local deviceType=$1
 	local jqProgram=$2
-	local -n exitCode=$3
-	local -n output=$4
-	local -n jsonOutput=$5
+	local -n exitCode=$3; exitCode=0
+	local -n output=$4; output=
+	local -n jsonOutput=$5; jsonOutput=
 
-	INDENT_OPTION="--indent 0"
+	local indentOption="--indent 0"
 
-	exitCode=0
-	output=
-	jsonOutput=
 
 	local delay=1 # the CPU is very wimpy on the USG-lite, ssh into it affects the usage.  Sleeping 2s gets a better CPU read
 	case "${deviceType:-}" in 
@@ -435,10 +435,10 @@ function invokeMcaDump() {
 			jqInput=${output}
 			output=
 			#shellcheck disable=SC2086
-			output=$(echo  "${jqInput}" | jq ${INDENT_OPTION} "${JQ_OPTIONS}" 2> "${errorFile}")
+			output=$(echo  "${jqInput}" | jq ${indentOption} "${JQ_OPTIONS}" 2> "${errorFile}")
 			exitCode=$?
 			if (( exitCode != 0 )) || [[ -z "${output}" ]]; then
-				output=$(errorJsonWithReason "jq ${INDENT_OPTION} ${JQ_OPTIONS} returned status $exitCode; $(cat "$errorFile")")
+				output=$(errorJsonWithReason "jq ${indentOption} ${JQ_OPTIONS} returned status $exitCode; $(cat "$errorFile")")
 				exitCode=1
 			fi
 			rm -f "${errorFile}" 2>/dev/null
