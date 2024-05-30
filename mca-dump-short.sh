@@ -417,7 +417,7 @@ function invokeMcaDump() {
 		if [[ -n "${JQ_VALIDATOR:-}" ]]; then
 			local validation; validation=$(echo "${output}" | jq "${JQ_VALIDATOR}")
 			exitCode=$?
-			if [[ -z "${validation}" ]] || [[ "${validation}" == "false" ]] || (( exitCode != 0 )); then
+			if [[ -z "${validation}"  || "${validation}" == "false" ]] || (( exitCode )); then
 				output=$(validationErrorJsonWithReason "validationError: ${JQ_VALIDATOR}")
 				exitCode=$RETRIABLE_ERROR
 			fi
@@ -460,6 +460,7 @@ function invokeMcaDump() {
 		fi
 		rm "${errorFile}" 2>/dev/null
 	fi
+	return "$exitCode"
 }
 
 
@@ -627,8 +628,9 @@ if [[ -n "${ECHO_OUTPUT:-}" ]]; then
 	fi
 fi
 
-if (( EXIT_CODE != 0 )); then
-	echoErr " ${OUTPUT}\n  ${JSON_OUTPUT}" 
+if (( EXIT_CODE )); then
+	echoErr "${OUTPUT}" 
+	echoErr "${JSON_OUTPUT}" 
 fi
 
 echo "${OUTPUT}"
