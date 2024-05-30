@@ -228,7 +228,7 @@ zabbix_export:
           preprocessing:
             - type: IN_RANGE
               parameters:
-                - '-10'
+                - '-200'
                 - '200'
               error_handler: CUSTOM_ERROR
               error_handler_params: 'Invalid Power'
@@ -3456,7 +3456,7 @@ zabbix_export:
               value: Host
           triggers:
             - uuid: bfac9fee93424eebbe3a3a3925f56ebc
-              expression: 'last(/Unifi UDMP/cpu,#1)>{$UNIFI_CPU_UTILIZATION_HIGH}'
+              expression: 'avg(/Unifi UDMP/cpu,10m)>{$UNIFI_CPU_UTILIZATION_HIGH}'
               name: '{HOST.NAME} CPU Utilization is > {$UNIFI_CPU_UTILIZATION_HIGH}%'
               opdata: 'CPU utilization is {ITEM.VALUE1}'
               priority: AVERAGE
@@ -5040,6 +5040,13 @@ zabbix_export:
           tags:
             - tag: Application
               value: Host
+          triggers:
+            - uuid: 12b9ae4b6f4f4c1ca5eab89328ab4a35
+              expression: 'avg(/Unifi USG Lite/cpu,15m)>{$UNIFI_CPU_UTILIZATION_HIGH}'
+              name: '{HOST.NAME} CPU Utilization is > {$UNIFI_CPU_UTILIZATION_HIGH}%'
+              opdata: 'CPU utilization is {ITEM.VALUE1}'
+              priority: AVERAGE
+              manual_close: 'YES'
         - uuid: 1ec511653ef245cbbf61ea1879b826f5
           name: 'CPU Smooth'
           type: CALCULATED
@@ -5051,13 +5058,6 @@ zabbix_export:
           tags:
             - tag: Application
               value: Host
-          triggers:
-            - uuid: 12b9ae4b6f4f4c1ca5eab89328ab4a35
-              expression: 'last(/Unifi USG Lite/cpu_smooth,#1)>{$UNIFI_CPU_UTILIZATION_HIGH}'
-              name: '{HOST.NAME} CPU Utilization is > {$UNIFI_CPU_UTILIZATION_HIGH}%'
-              opdata: 'CPU utilization is {ITEM.VALUE1}'
-              priority: AVERAGE
-              manual_close: 'YES'
         - uuid: 4e7a41d4f7204cba9d06c753b91be7cc
           name: Hostname
           type: DEPENDENT
