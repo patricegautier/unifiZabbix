@@ -357,7 +357,7 @@ function invokeUpToNTimesWithDelay() {
 		if (( returnCode==0 || returnCode != RETRIABLE_ERROR )); then
 			invocations=$count
 		else
-			echoErr " Warning: Retrying request"
+			echoErr " Warning: Retrying $1 request"
 			sleep "$delay"
 		fi
 	done
