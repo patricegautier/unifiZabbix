@@ -300,7 +300,7 @@ function retrievePortNamesInto() {
 		}
 EOD
 	local exitCode=$?
-	if (( exitCode != 0 )); then
+	if (( exitCode )); then
 		{ 	echo "$(date) $TARGET_DEVICE"; 
 			echo "  retrievePortNamesInto failed with code $exitCode";
 			echo "Full command was mca-dump-short.sh $FULL_ARGS" 
@@ -308,6 +308,7 @@ EOD
 				cat "$logFile"
 			fi
 		} >> "${errFile}"
+		if (( exitCode == 255 )); then exitCode=10; fi  # 255 causes Zabbix to exit, so workaround
 		exit "${exitCode}"
 	fi
 
@@ -635,6 +636,7 @@ echo "${OUTPUT}"
 truncateFileOnceADay "$errFile"
 truncateFileOnceADay "$logFile"
 
+if (( EXIT_CODE == 255 )); then EXIT_CODE=10; fi  # 255 causes Zabbix to exit, so workaround
 exit $EXIT_CODE
 
 
