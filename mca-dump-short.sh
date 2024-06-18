@@ -225,7 +225,7 @@ function retrievePortNamesInto() {
 	/usr/bin/expect ${options} > "${outStream}" <<EOD
       set timeout 30
 
-      spawn ${SSHPASS_OPTIONS} ssh  ${SSH_PORT} ${HE_RSA_SSH_KEY_OPTIONS} -o LogLevel=Error -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} ${USER}@${TARGET_DEVICE}
+      spawn ${SSHPASS_OPTIONS} ssh  ${SSH_PORT} ${HE_RSA_SSH_KEY_OPTIONS}  -o ConnectTimeout=${SSH_CONNECT_TIMEOUT} -o LogLevel=Error -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} ${USER}@${TARGET_DEVICE}
       
 	  send -- "\r"
 
