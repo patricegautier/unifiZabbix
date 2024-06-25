@@ -11,6 +11,7 @@ Usage ${0}  -i privateKeyPath -p <passwordFilePath> -u user -v -d targetDevice <
 	-d IP or FQDN for Unifi device
 	-v verbose and non compressed output
 	-r explicitly allow RSA (for legacy devices, i.e Airmaxes)
+	-n empty option, to provide a default for zabbix key expansion
 EOF
 	exit 2
 }
@@ -20,7 +21,7 @@ declare PRIVKEY_OPTION=
 declare PASSWORD_FILE_PATH=
 declare SSH_OPTIONS="-o LogLevel=Error -o StrictHostKeyChecking=accept-new"
 
-while getopts 'i:u:hd:vp:r' OPT
+while getopts 'i:u:hd:vp:rn' OPT
 do
   case $OPT in
     i) PRIVKEY_OPTION="-i "${OPTARG} ;;
@@ -29,6 +30,7 @@ do
     v) VERBOSE="-v" ;;
     p) PASSWORD_FILE_PATH=${OPTARG} ;;
     r) SSH_OPTIONS+=" -o PubkeyAcceptedKeyTypes=+ssh-rsa -o HostKeyAlgorithms=+ssh-rsa" ;;
+    n) true ;;
     *) usage ;;
   esac
 done
