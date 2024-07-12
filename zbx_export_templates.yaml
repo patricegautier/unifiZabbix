@@ -1419,7 +1419,7 @@ zabbix_export:
               error_handler: DISCARD_VALUE
             - type: JSONPATH
               parameters:
-                - '$.radio_table.[?(@.athstats.name != "" &&  (@.athstats.noise_floor < 0  && @.athstats.noise_floor > -500 || @.cu_total > 0))]'
+                - '$.radio_table.[?(@.athstats.name != "" && (@.athstats.noise_floor < 0 || @.athstats.cu_total > 0))]'
               error_handler: DISCARD_VALUE
         - uuid: 90e43b647faa4a6fa7af643960bcf0a5
           name: 'Wifi Network Discovery'
