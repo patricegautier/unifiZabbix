@@ -57,6 +57,7 @@ You should now have the following templates available, and it should be pretty s
 	Unifi Protect NVR4
 	SunMax SolarPoint
 	Unifi SSH Host
+ 	Unsupported Item
 
 
 • You will need to assign the templates with the matching type to hosts you have to create in Zabbix for your unifi devices.  Use the 'Agent' interface in Zabbix with the proper IP or DNS entry.
