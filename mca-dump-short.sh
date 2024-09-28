@@ -380,7 +380,7 @@ function invokeMcaDump() {
 
 		AP) 							JQ_OPTIONS='del (.port_table) |\
 													del(.radio_table[]?.scan_table) | del(.scan_radio_table) |\
-												    del(.radio_table[]?.spectrum_table) |
+												    del(.radio_table[]?.spectrum_table) |\
 												    ( .vap_table[]|= ( .clientCount = ( .sta_table|length ) ) ) | del (.vap_table[]?.sta_table)' ;;
 		SWITCH | SWITCH_DISCOVERY)		JQ_OPTIONS='del (.port_table[]?.mac_table)' ;;
 		SWITCH_FEATURE_DISCOVERY)		JQ_OPTIONS="[ { power:  .port_table |  any (  .poe_power >= 0 ) ,\
