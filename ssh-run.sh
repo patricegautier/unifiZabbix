@@ -46,7 +46,7 @@ fi
 
 if [[ -n "${VERBOSE:-}" ]]; then
 	# shellcheck disable=SC2086
-   	echo "${SSHPASS_COMMAND}" ssh ${SSH_OPTIONS} ${PRIVKEY_OPTION} "${USER}@${TARGET_DEVICE}" "${REMOTE_COMMAND[@]}"
+   	echo ssh ${SSH_OPTIONS} ${PRIVKEY_OPTION} "${USER}@${TARGET_DEVICE}" "${REMOTE_COMMAND[@]}"
 fi
 
 if [[ -n "${SSHPASS_OPTIONS}" ]]; then
