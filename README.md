@@ -123,7 +123,7 @@ If you are set up correctly that should get you in *without asking for a passwor
 
 You can also check that the script used to retrieve data is working correctly for a given device with:
 
-	sudo -u zabbix /usr/lib/zabbix/externalscripts/mca-dump-short.sh -d <theDeviceIP> -u <yourUnifiUserName> -i <fullPathToYourPrivateKey> -t <UDMP|AP|SWITCH|CK>
+	sudo -u zabbix /usr/lib/zabbix/externalscripts/mca-dump-short.sh -d <theDeviceIP> -u <yourUnifiUserName> -i <fullPathToYourPrivateKey> -t <UDMP|AP|SWITCH>
 
 You should get a JSON document in return.
 
@@ -172,7 +172,7 @@ Also note that I have /usr/lib/zabbix/externalscripts also mapped to a persisten
 
 to create the public/private key pair.  Similarly to explicitly check the container can get to a particular device:
 
-	docker exec zabbix-server  /usr/lib/zabbix/externalscripts/mca-dump-short.sh -d <ip> -u <userName> -i /var/lib/zabbix/ssh_keys/zb_id_rsa -t <UDMP|AP|SWITCH|CK>
+	docker exec zabbix-server  /usr/lib/zabbix/externalscripts/mca-dump-short.sh -d <ip> -u <userName> -i /var/lib/zabbix/ssh_keys/zb_id_rsa -t <UDMP|AP|SWITCH>
 
 
 
