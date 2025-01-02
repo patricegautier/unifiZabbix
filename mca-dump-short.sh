@@ -476,7 +476,7 @@ function usage() {
 	fi
 	
 	cat <<- EOF
-	Usage ${0}  -i privateKeyPath -p <passwordFilePath> -u user -v -d targetDevice [-t AP|SWITCH|SWITCH_FEATURE_DISCOVERY|SWITCH_DISCOVERY|UDMP|UDMP_FAN_DISCOVERY|UDMP_TEMP_DISCOVERY|USG|USG-LITE|WIFI_SITE]
+	Usage ${0}  -i privateKeyPath -p <passwordFilePath> -u user -v -d targetDevice [-t AP|SWITCH|SWITCH_FEATURE_DISCOVERY|SWITCH_DISCOVERY|UDMP|UDMP_FAN_DISCOVERY|UDMP_TEMP_DISCOVERY|USG|USG-LITE]
 	  -i specify private public key pair path
 	  -p specify password file path to be passed to sshpass -f. Note if both -i and -p are provided, the password file will be used
 	  -u SSH user name for Unifi device
