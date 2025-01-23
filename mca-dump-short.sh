@@ -75,6 +75,8 @@ function echoErr() {
 	{
 		echo "----------------------------------"
 		echo "$(date) $TARGET_DEVICE"
+		echo "${FULL_ARGS}"
+		echo
 		echo "  ${error}"
 	} >> "${errFile}"
 	if [[ -f "/./.dockerenv" ]]; then   # also echo the error to docker logs if running inside a container
