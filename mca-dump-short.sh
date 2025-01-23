@@ -410,6 +410,11 @@ function invokeMcaDump() {
 	#shellcheck disable=SC2034
 	jsonOutput="${output}"
 
+ 	if [[ -n "${VERBOSE:-}" ]]; then
+ 		echo "mcaDump.sh output"
+ 		echo "${jsonOutput}"
+	fi
+	
 	if (( exitCode == 124  )); then
 		output=$(timeoutJsonWithReason "timeout ($exitCode)")
 	elif (( exitCode )) || [[ -z "${output}" ]]; then
