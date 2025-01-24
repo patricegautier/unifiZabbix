@@ -445,6 +445,7 @@ function invokeMcaDump() {
 			output=$(echo  "${jqInput}" | jq ${indentOption} "${JQ_OPTIONS}" 2> "${errorFile}")
 			exitCode=$?
 			if (( exitCode != 0 )) || [[ -z "${output}" ]]; then
+				if [[ -n "${VERBOSE}" ]]; then echoErr "JQ failed processing with input: ${jqInput}"; fi
 				output=$(errorJsonWithReason "jq ${indentOption} ${JQ_OPTIONS} returned status $exitCode; $(cat "$errorFile")")
 				exitCode=1
 			fi
