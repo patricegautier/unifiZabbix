@@ -438,16 +438,16 @@ function invokeMcaDump() {
 			fi			
 		fi		
 		if (( ! exitCode )); then
-			errorFile="/tmp/jq$RANDOM$RANDOM.err"
-			jqInput=${output}
+			local errorFile="/tmp/jq$RANDOM$RANDOM.err"
+			local jqInput=${output}
 			output=
 			#shellcheck disable=SC2086
 			output=$(echo  "${jqInput}" | jq ${indentOption} "${JQ_OPTIONS}" 2> "${errorFile}")
 			exitCode=$?
 			if (( exitCode )) || [[ -z "${output}" ]]; then
-				local errorMessage; errorMessage="jq ${indentOption} ${JQ_OPTIONS} returned status $exitCode
+				local errorMessage; errorMessage="jq ${indentOption} ${JQ_OPTIONS} returned status code $exitCode
 					 $(cat "$errorFile")"
-				if [[ -n "${VERBOSE}" ]]; then errorMessage="${errorMessage}
+				if [[ -n "${VERBOSE:-}" ]]; then errorMessage="${errorMessage}
 					 Input was: ${jqInput}"
 				fi
 				output=$(errorJsonWithReason "${errorMessage}")
@@ -462,7 +462,7 @@ function invokeMcaDump() {
 		# this will ensure we don't time out, but sometimes we will use an older file
 		# wait 
 		errorFile="/tmp/jq${RANDOM}${RANDOM}.err"
-		jqInput="${output}"
+		local jqInput="${output}"
 		output=
 		insertPortNamesIntoJson output "${jqProgram}" "${jqInput}"  2> "${errorFile}"
 		local code=$?
