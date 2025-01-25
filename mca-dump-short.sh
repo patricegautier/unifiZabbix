@@ -444,9 +444,13 @@ function invokeMcaDump() {
 			#shellcheck disable=SC2086
 			output=$(echo  "${jqInput}" | jq ${indentOption} "${JQ_OPTIONS}" 2> "${errorFile}")
 			exitCode=$?
-			if (( exitCode != 0 )) || [[ -z "${output}" ]]; then
-				if [[ -n "${VERBOSE}" ]]; then echoErr "JQ failed processing with input: ${jqInput}"; fi
-				output=$(errorJsonWithReason "jq ${indentOption} ${JQ_OPTIONS} returned status $exitCode; $(cat "$errorFile")")
+			if (( exitCode )) || [[ -z "${output}" ]]; then
+				local errorMessage; errorMessage="jq ${indentOption} ${JQ_OPTIONS} returned status $exitCode
+					 $(cat "$errorFile")"
+				if [[ -n "${VERBOSE}" ]]; then errorMessage="${errorMessage}
+					 Input was: ${jqInput}"
+				fi
+				output=$(errorJsonWithReason "${errorMessage}")
 				exitCode=1
 			fi
 			rm -f "${errorFile}" 2>/dev/null
