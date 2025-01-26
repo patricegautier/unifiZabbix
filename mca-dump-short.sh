@@ -411,8 +411,8 @@ function invokeMcaDump() {
 	jsonOutput="${output}"
 
  	if [[ -n "${VERBOSE:-}" ]]; then
- 		echo "mcaDump.sh output"
- 		echo "${jsonOutput}"
+ 		echoErr "mcaDump.sh output"
+ 		echoErr "${jsonOutput}"
 	fi
 	
 	if (( exitCode == 124  )); then
