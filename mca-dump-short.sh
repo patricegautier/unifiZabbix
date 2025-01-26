@@ -75,7 +75,7 @@ function echoErr() {
 	{
 		echo "----------------------------------"
 		echo "$(date) $TARGET_DEVICE"
-		echo "${FULL_ARGS}"
+		echo "Command: ${FULL_ARGS}"
 		echo
 		echo "  ${error}"
 	} >> "${errFile}"
@@ -306,7 +306,7 @@ EOD
 	if (( exitCode )); then
 		{ 	echo "$(date) $TARGET_DEVICE"; 
 			echo "  retrievePortNamesInto failed with code $exitCode";
-			echo "Full command was mca-dump-short.sh $FULL_ARGS" 
+			echo "Full command was $FULL_ARGS" 
 			if [[ -f "$logFile" ]]; then 
 				cat "$logFile"
 			fi
@@ -528,7 +528,7 @@ declare logFile="/tmp/mcaDumpShort.log"
 declare errFile="/tmp/mcaDumpShort.err"
 declare ECHO_OUTPUT=
 declare VERBOSE=
-declare FULL_ARGS="$*"
+declare FULL_ARGS="$0 $*"
 declare BATCH_MODE=
 
 while getopts 'i:u:t:hd:vp:wm:o:OV:U:P:ebx' OPT
