@@ -384,7 +384,7 @@ function invokeMcaDump() {
 													del(.radio_table[]?.scan_table) | del(.scan_radio_table) |
 												    del(.radio_table[]?.spectrum_table) |
 												    ( .vap_table[]|= ( .clientCount = ( .sta_table|length ) ) ) | del (.vap_table[]?.sta_table)' ;;
-		SWITCH | SWITCH_DISCOVERY)		JQ_OPTIONS='del (.port_table[]?.mac_table)' ;;
+		SWITCH | SWITCH_DISCOVERY)		JQ_OPTIONS='del (.port_table[]?.mac_table?)' ;;
 		SWITCH_FEATURE_DISCOVERY)		JQ_OPTIONS="[ { power:  .port_table |  any (  .poe_power >= 0 ) ,\
 												total_power_consumed_key_name: \"total_power_consumed\",\
 												max_power_key_name: \"max_power\",\
@@ -404,8 +404,8 @@ function invokeMcaDump() {
 	esac
 	
 	#shellcheck disable=SC2086
-	output=$(timeout --signal=HUP --kill-after=5 "${TIMEOUT}" \
-		${SSHPASS_OPTIONS} ssh ${SSH_PORT} ${VERBOSE_SSH} ${HE_RSA_SSH_KEY_OPTIONS} ${BATCH_MODE} -o LogLevel=Error -o ConnectTimeout=${SSH_CONNECT_TIMEOUT} -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} "${USER}@${TARGET_DEVICE}" ${delay:+sleep ${delay}\;} mca-dump 2>&1	)
+	local errorFile="/tmp/mca-dump-short-$RANDOM$RANDOM.err"
+	output=$(timeout --signal=HUP --kill-after=5 "${TIMEOUT}" issueSSHCommand ${delay:+sleep ${delay}\;} mca-dump 2>&1)
 	exitCode=$?
 	#shellcheck disable=SC2034
 	jsonOutput="${output}"
@@ -607,7 +607,7 @@ declare JQ_OPTION_VALIDATOR=${OPTIONAL_VALIDATOR_BY_TYPE["${DEVICE_TYPE}"]:-}
 
 
 # {$UNIFI_SSHPASS_PASSWORD_PATH} means the macro didn't resolve in Zabbix
-if [[ -n "${PASSWORD_FILE_PATH}" ]] && ! [[ "${PASSWORD_FILE_PATH}" == "{\$UNIFI_SSHPASS_PASSWORD_PATH}" ]]; then 
+if [[ -n "${PASSWORD_FILE_PATH}" ]] && [[ "${PASSWORD_FILE_PATH}" != "{\$UNIFI_SSHPASS_PASSWORD_PATH}" ]]; then 
 	if ! [[ -f "${PASSWORD_FILE_PATH}" ]]; then
 		echo "Password file not found '$PASSWORD_FILE_PATH'"
 		exit 1
