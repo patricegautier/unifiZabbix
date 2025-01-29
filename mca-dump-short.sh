@@ -403,9 +403,11 @@ function invokeMcaDump() {
 		*)								echo "Unknown device Type: '${DEVICE_TYPE:-}'"; usage ;;
 	esac
 	
-	#shellcheck disable=SC2086
 	local errorFile="/tmp/mca-dump-short-$RANDOM$RANDOM.err"
-	output=$(timeout --signal=HUP --kill-after=5 "${TIMEOUT}" issueSSHCommand ${delay:+sleep ${delay}\;} mca-dump 2>&1)
+	#shellcheck disable=SC2086
+	output=$(timeout --signal=HUP --kill-after=5 "${TIMEOUT}"\
+		 ${SSHPASS_OPTIONS} ssh ${SSH_PORT} ${VERBOSE_SSH} ${HE_RSA_SSH_KEY_OPTIONS} ${BATCH_MODE} -o LogLevel=Error -o ConnectTimeout=${SSH_CONNECT_TIMEOUT} -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} "${USER}@${TARGET_DEVICE}"\
+		 ${delay:+sleep ${delay}\;} mca-dump 2>&1)
 	exitCode=$?
 	#shellcheck disable=SC2034
 	jsonOutput="${output}"
