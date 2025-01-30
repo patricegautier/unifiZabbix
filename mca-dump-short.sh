@@ -342,7 +342,8 @@ function insertPortNamesIntoJson() {
 		out=$(echo "${json}" | jq -f "${jqProgramFile}" -r)
 		#rm "$jqProgramFile" 2>/dev/null # we now leave it for the next guy
 	else
-		exit 2
+		echoErr "Empty jqProgramFile"
+		echo "$json"
 	fi
 }
 
