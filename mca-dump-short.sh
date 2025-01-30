@@ -316,7 +316,9 @@ EOD
 
 	if [[ -f "$logFile" ]]; then 
 		#shellcheck disable=SC2002
-		cat "$logFile" | tr -d '\r' | awk "$PORT_NAMES_AWK" > "${jqFile}"
+		local tmpFile="$1-$RANDOM.tmp"
+		cat "$logFile" | tr -d '\r' | awk "$PORT_NAMES_AWK" > "${tmpFile}"
+		mv "${tmpFile}" "${jqFile}"
 		rm -f "$logFile" 2>/dev/null
 	else
 		if [[ -n "${VERBOSE:-}" ]]; then
