@@ -209,8 +209,8 @@ function startSwitchDiscovery() {
 
 
 function retrievePortNamesInto() {
-	local logFile="$1-$RANDOM.log"
 	local jqFile=$1
+	local logFile="$1-$RANDOM.log"
 	local outStream="/dev/null"
 	local options=
 	#sleep $(( TIMEOUT + 1 )) # This ensures we leave the switch alone while mca-dump proper is processed;  the next invocation will find the result
@@ -318,12 +318,14 @@ EOD
 		#shellcheck disable=SC2002
 		local tmpFile="$1-$RANDOM.tmp"
 		cat "$logFile" | tr -d '\r' | awk "$PORT_NAMES_AWK" > "${tmpFile}"
-		mv "${tmpFile}" "${jqFile}"
+		if [[ -s "$tmpFile" ]]; then 
+			mv "${tmpFile}" "${jqFile}"
+		else
+			echoErr "Empty port names file"	
+		fi
 		rm -f "$logFile" 2>/dev/null
 	else
-		if [[ -n "${VERBOSE:-}" ]]; then
-			echo "** No Show Run output"
-		fi	
+		echoErr "** No Show Run output"
 	fi
 
 }
