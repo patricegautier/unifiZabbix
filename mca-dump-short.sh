@@ -323,7 +323,7 @@ EOD
 		else
 			echoErr "Empty port names file"	
 		fi
-		rm -f "$logFile" 2>/dev/null
+		rm -f "$logFile" "$tmpFile" 2>/dev/null
 	else
 		echoErr "** No Show Run output"
 	fi
