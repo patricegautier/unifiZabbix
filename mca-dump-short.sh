@@ -332,7 +332,7 @@ function insertPortNamesIntoJson() {
 	local -n out=$1
 	local jqProgramFile=$2
 	local json=$3
-	if [[ -f "${jqProgramFile}" ]]; then	
+	if [[ -s "${jqProgramFile}" ]]; then	
 		if [[ -n "${VERBOSE:-}" ]]; then
 			echo "jqProgramFile: "
 			cat "${jqProgramFile}"
