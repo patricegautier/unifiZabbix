@@ -314,7 +314,7 @@ EOD
 		exit "${exitCode}"
 	fi
 
-	if [[ -f "$logFile" ]]; then 
+	if [[ -s "$logFile" ]]; then 
 		#shellcheck disable=SC2002
 		local tmpFile="$1-$RANDOM.tmp"
 		cat "$logFile" | tr -d '\r' | awk "$PORT_NAMES_AWK" > "${tmpFile}"
