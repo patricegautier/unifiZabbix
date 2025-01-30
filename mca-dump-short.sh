@@ -343,7 +343,8 @@ function insertPortNamesIntoJson() {
 		#rm "$jqProgramFile" 2>/dev/null # we now leave it for the next guy
 	else
 		echoErr "Empty jqProgramFile"
-		echo "$json"
+		#shellcheck disable=SC2034
+		out=$json
 	fi
 }
 
@@ -471,7 +472,7 @@ function invokeMcaDump() {
 		output=
 		insertPortNamesIntoJson output "${jqProgram}" "${jqInput}"  2> "${errorFile}"
 		local code=$?
-		if (( code != 0 )) || [[ -z "${output}" ]]; then
+		if (( code )) || [[ -z "${output}" ]]; then
 			output=$(errorJsonWithReason "insertPortNamesIntoJson failed with error code $code; $(cat "$errorFile")")
 			exitCode=1
 		fi
