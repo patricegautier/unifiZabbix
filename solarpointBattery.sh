@@ -55,6 +55,10 @@ SessionJSON=$(curl -s "https://$TARGET/ubus"\
 	-H "Accept: application/json"\
 	--data "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"call\",\"params\":[\"00000000000000000000000000000000\",\"session\",\"login\",{\"username\":\"$USERNAME\",\"password\":\"$PASSWORD\",\"timeout\":30}]}")
 	
+if (( $? )); then
+	echo "Failed to connect to https://$TARGET/ubus"
+	exit 1
+fi
 
 if [[ -n "${VERBOSE}" ]]; then echo "${SessionJSON}"; fi	
 	         	 
@@ -62,7 +66,9 @@ SESSION_ID=$(echo "${SessionJSON}" | jq ".result[1].ubus_rpc_session")
 
 if [[ -n "${VERBOSE}" ]]; then echo SessionID="${SESSION_ID}"; fi
 
-if [[ -z "${SESSION_ID}" ]]; then echo "Could not retrieve Session ID: ${SessionJSON}";
+if [[ -z "${SESSION_ID}" ]]; then 
+	echo "Could not retrieve Session ID: ${SessionJSON}"
+	exit 1
 else
 	BatteryData=$(curl -s "https://$TARGET/ubus"\
 		--insecure\
