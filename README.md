@@ -106,6 +106,10 @@ For most devices,  there is one setting in the Unifi controller UI in Settings >
  
 For managed devices (APs, Switches), the Unifi controller has handy UI to install your public key on all the devices.  This is by far the easiest way to do this.
 
+On network app v9, go to Preferences (gear icon bottom left) > System > Advanced > Device Authentication
+
+and that will let you add SSH keys that get uploaded to all the known devices.
+
 for UDMPs and AirMax devices, you will need to do it by hand.  *ssh-copy-id* helps there, esp. on the UDMP since those will embarrasingly wipe all your keys at every firmware update and reboot (seriously UBNT):  
 
 	sudo -u zabbix ssh-copy-id -i <path_to_your_privateKey> yourUserName@oneOfYourUnifiDevicesIP
