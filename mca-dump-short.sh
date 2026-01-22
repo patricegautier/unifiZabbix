@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
+#shellcheck disable=SC2329
+
 set -uo pipefail
+set -e
 
 declare HE_RSA_SSH_KEY_OPTIONS='-o PubkeyAcceptedKeyTypes=+ssh-rsa -o HostKeyAlgorithms=+ssh-rsa'
 
@@ -80,10 +83,9 @@ function echoErr() {
 		echo "  ${error}"
 	} >> "${errFile}"
 	if [[ -f "/./.dockerenv" ]]; then   # also echo the error to docker logs if running inside a container
-	{
-		echo "  ${error}" 
-	} >> /proc/1/fd/1
+		echo "  ${error}" >> /proc/1/fd/1
 	fi
+	echo "$error" >&2
 }
 
 function issueSSHCommand() {
@@ -161,7 +163,7 @@ match($0, "^interface [A-z0-9]+$") {
 	countedPortId=countedPortId+1
 	portId=countedPortId
 }
-/description / {
+/^description / {
 		desc=""
 		defaultDesc="Port " portId
 		for (i=2; i<=NF; i++) {
@@ -188,6 +190,7 @@ match($0, "^interface [A-z0-9]+$") {
 
 declare SWITCH_DISCOVERY_DIR="/tmp/unifiSwitchDiscovery"
 function startSwitchDiscovery() {
+	local err=0
 	local jqProgram=$1
 	local exp; exp=$(command -v expect)
 	if [[ -z "${exp}" ]]; then exp=$(ls /usr/bin/expect); fi
@@ -202,13 +205,18 @@ function startSwitchDiscovery() {
 		#	nohup runWithTimeout 60 retrievePortNamesInto "${jqProgram}" &
 		#(set -m; runWithTimeout 60 retrievePortNamesInto "${jqProgram}" &) &
 		#runWithTimeout 60 retrievePortNamesInto "${jqProgram}" &
-		runWithTimeout 60 retrievePortNamesInto "${jqProgram}" > /dev/null 2> /dev/null < /dev/null & disown
+		if [[ -n "${VERBOSE_PORT_DISCOVERY:-}" ]]; then
+			runWithTimeout 60 retrievePortNamesInto "${jqProgram}" || err=$?
+		else
+			runWithTimeout 60 retrievePortNamesInto "${jqProgram}" > /dev/null  < /dev/null & disown
+		fi
 	fi
-	return 0
+	return $err
 }
 
-
+#shellcheck disable=SC2329
 function retrievePortNamesInto() {
+	local err=0
 	local jqFile=$1
 	local logFile="$1-$RANDOM.log"
 	local outStream="/dev/null"
@@ -222,41 +230,37 @@ function retrievePortNamesInto() {
  		options="-d"
  		outStream="/dev/stdout"
  	fi
-
 	#shellcheck disable=SC2086
 	/usr/bin/expect ${options} > "${outStream}" <<EOD
-      set timeout 30
-
+      set timeout 15
       spawn ${SSHPASS_OPTIONS} ssh  ${SSH_PORT} ${HE_RSA_SSH_KEY_OPTIONS}  -o ConnectTimeout=${SSH_CONNECT_TIMEOUT} -o LogLevel=Error -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} ${USER}@${TARGET_DEVICE}
-      
-	  send -- "\r"
+      expect -re ".*\r\n.*# $"
+	  send -- "cat /etc/board.info | grep board.name | cut -d'=' -f2\r\n"
+	  expect "cat /etc/board.info | grep board.name | cut -d'=' -f2\r\n"
 
-      expect ".*#"
-	  send -- "cat /etc/board.info | grep board.name | cut -d'=' -f2\r"
-      expect ".*\r\n"
 	  expect {
 
-	  	-re "(USW-Aggregation|USW-Flex-XG|USW-Enterprise-8-PoE)\r\n" {
-		  expect -re ".*#"
+	  	# -re "(USW-Aggregation|USW-Flex-XG|USW-Enterprise-8-PoE)\r\n" {
+		#   expect -re ".*#"
 
-		  send -- "cli\r"
-		  expect -re ".*#"
+		#   send -- "cli \$port\r"
+		#   expect -re ".*#"
 		  
-		  send -- "terminal length 0\r"
-		  expect -re ".*#"
+		#   send -- "terminal length 0\r"
+		#   expect -re ".*#"
 
-		  send -- "terminal datadump\r"
- 		  expect -re ".*#"
+		#   send -- "terminal datadump\r"
+ 		#   expect -re ".*#"
 		  
-		  send -- "show run\r"
-		  log_file -noappend ${logFile};
-		  expect -re ".*#"
+		#   send -- "show run\r"
+		#   log_file -noappend ${logFile};
+		#   expect -re ".*#"
 		  
-		  send -- "exit\r"
+		#   send -- "exit\r"
 
-	  	}	  	
+	  	# }	  	
 	  	
-	  	"USW-Flex\r\n" {
+	  	"USW-Flex" {
 		  log_file -noappend ${logFile};
 		  send_log "interface 0/1\r\n"
 		  send_log "description 'Port 1'\r\n"
@@ -270,35 +274,46 @@ function retrievePortNamesInto() {
 	  	 }
 
 		-re ".*\r\n" { 
-			send -- "telnet 127.0.0.1\r"
+
+			#send -- "stty -echo\r\n"
+			#expect -re "stty -echo\r\n.*# $"
+
+			# send "netstat -atn | grep  LISTEN | grep 127.0.0.1 | grep -v :: | awk -F' ' '{print \\\$4}' | awk -F: '{print \\\$2}'\r"
+			# expect  {
+			# 	-re "^\r\n" 
+			# 		{ set port 23 }
+			# 	-re "(\[0-9]{1,5})\r\n" 
+			# 		{ set port \$expect_out(1,string) }
+			# }
+			# expect -re ".*# $"
+
+		# less chance of sth going wrong
+          set port 2222 
+
+	      expect -re ".*\r\n.*# $"
+			send -- "telnet 127.0.0.1:\$port\r\n"
+			expect -- "telnet 127.0.0.1:\$port\r\n"
+			send -- "\r\n"
 			expect { 
 				"(UBNT) >" { 
-					send -- "enable\r"
+					send -- "enable\r\n"
 					expect "(UBNT) #" 
 
-					send -- "terminal length 0\r"
+					send -- "terminal length 0\r\n"
 					expect "(UBNT) #"
 
-					send -- "show run\r" 
+					send -- "show run\r\n" 
 					log_file -noappend ${logFile};
 
+					expect "Current Configuration:"
 					expect "(UBNT) #" 
-					send -- "exit\r"
+					send -- "exit\r\n"
+					expect "(UBNT) >" 
+					send -- "exit\r\n"
+				    expect -re ".*# $"
+					send -- "exit\r\n"
 
 				} 
-				"telnet: not found\r\n" { 
-					send -- "cli\r"
-					expect -re ".*#" 
-
-					send -- "terminal length 0\r"
-					expect -re ".*#" 
-
-					send -- "show run\r" 
-					log_file -noappend ${logFile};
-					expect -re ".*#" 
-				
-					send "exit\r" 
-				}
 			}
 		}
 EOD
@@ -322,11 +337,14 @@ EOD
 			mv "${tmpFile}" "${jqFile}"
 		else
 			echoErr "Empty port names file"	
+			err=1
 		fi
-		rm -f "$logFile" "$tmpFile" 2>/dev/null
+		#rm -f "$logFile" "$tmpFile" 2>/dev/null
 	else
 		echoErr "** No Show Run output"
+		err=1
 	fi
+	return "$err"
 
 }
 
@@ -345,6 +363,7 @@ function insertPortNamesIntoJson() {
 		#rm "$jqProgramFile" 2>/dev/null # we now leave it for the next guy
 	else
 		echoErr "Empty jqProgramFile"
+		exit 1
 		#shellcheck disable=SC2034
 		out=$json
 	fi
@@ -413,7 +432,7 @@ function invokeMcaDump() {
 	#shellcheck disable=SC2086
 	output=$(timeout --signal=HUP --kill-after=5 "${TIMEOUT}"\
 		 ${SSHPASS_OPTIONS} ssh ${SSH_PORT} ${VERBOSE_SSH} ${HE_RSA_SSH_KEY_OPTIONS} ${BATCH_MODE} -o LogLevel=Error -o ConnectTimeout=${SSH_CONNECT_TIMEOUT} -o StrictHostKeyChecking=accept-new ${PRIVKEY_OPTION} "${USER}@${TARGET_DEVICE}"\
-		 ${delay:+sleep ${delay}\;} mca-dump 2>&1)
+		 ${delay:+sleep ${delay}\;} mca-dump)
 	exitCode=$?
 	#shellcheck disable=SC2034
 	jsonOutput="${output}"
@@ -472,7 +491,7 @@ function invokeMcaDump() {
 		errorFile="/tmp/jq${RANDOM}${RANDOM}.err"
 		local jqInput="${output}"
 		output=
-		insertPortNamesIntoJson output "${jqProgram}" "${jqInput}"  2> "${errorFile}"
+		insertPortNamesIntoJson output "${jqProgram}" "${jqInput}" |tee -a "${errorFile}" >&2
 		local code=$?
 		if (( code )) || [[ -z "${output}" ]]; then
 			output=$(errorJsonWithReason "insertPortNamesIntoJson failed with error code $code; $(cat "$errorFile")")
