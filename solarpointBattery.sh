@@ -48,16 +48,17 @@ if [ -z "${PASSWORD:-}" ]; then
 fi
 
 if [[ -n "${VERBOSE}" ]]; then set -x; fi
-	
+
+declare err=0
 SessionJSON=$(curl -s "https://$TARGET/ubus"\
  	--insecure \
  	-H "Content-Type: application/json" \
 	-H "Accept: application/json"\
-	--data "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"call\",\"params\":[\"00000000000000000000000000000000\",\"session\",\"login\",{\"username\":\"$USERNAME\",\"password\":\"$PASSWORD\",\"timeout\":30}]}")
+	--data "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"call\",\"params\":[\"00000000000000000000000000000000\",\"session\",\"login\",{\"username\":\"$USERNAME\",\"password\":\"$PASSWORD\",\"timeout\":30}]}") || err=$?
 	
-if (( $? )); then
-	echo "Failed to connect to https://$TARGET/ubus"
-	exit 1
+if (( err )); then
+	echo "Failed to connect to https://$TARGET/ubus" >&2
+	exit "$err"
 fi
 
 if [[ -n "${VERBOSE}" ]]; then echo "${SessionJSON}"; fi	
@@ -70,11 +71,16 @@ if [[ -z "${SESSION_ID}" ]]; then
 	echo "Could not retrieve Session ID: ${SessionJSON}"
 	exit 1
 else
+	err=0
 	BatteryData=$(curl -s "https://$TARGET/ubus"\
 		--insecure\
 		-H "Content-Type: application/json"\
 		-H "Accept: application/json"\
-		--data "{\"jsonrpc\":\"2.0\",\"id\":344,\"method\":\"call\",\"params\":[$SESSION_ID,\"battery\",\"stats\",{\"timeout\":30}]}")
+		--data "{\"jsonrpc\":\"2.0\",\"id\":344,\"method\":\"call\",\"params\":[$SESSION_ID,\"battery\",\"stats\",{\"timeout\":30}]}") || err=$?
+	if (( err )); then
+		echo "Failed to retrieve battery data from https://$TARGET/ubus" >&2
+		exit "$err"
+	fi
 	echo "${BatteryData}"
 fi
 
