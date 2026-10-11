@@ -92,7 +92,7 @@ if [[ -z "${NOPING}" ]]; then
 fi
 
 #shellcheck disable=SC2086
-${SUDO_USER} ssh ${BIND_INTERFACE_OPTION} ${IPV4} -i "${PRIVKEY_PATH}" -q -o "BatchMode yes" "${TARGET}" true
+${SUDO_USER} ssh ${BIND_INTERFACE_OPTION} ${IPV4} -i "${PRIVKEY_PATH}" -q -o "BatchMode=yes" "${TARGET}" true
 PUBKEY_OK=$?
 SSHPASS=$(command -v sshpass)
 
